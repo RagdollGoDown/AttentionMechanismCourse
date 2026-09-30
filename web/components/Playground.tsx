@@ -8,53 +8,58 @@ export interface PlaygroundProps {
   focusKey: string;
   showWeights: boolean;
   showScores?: boolean;
+  /** Override the weights (e.g. the √d_k slider); defaults to the real attention weights. */
+  weights?: number[];
   onTileClick?: (tile: Tile) => void;
   selectedKey?: string | null;
   correctKey?: string | null;
   notes?: Record<string, string>;
-  onRemove?: (tile: Tile) => void;
 }
 
+/** The board: one column per word, bar on top, word tile below with its match score in the corner. */
 export function Playground({
-  tiles, focusKey, showWeights, showScores = true, onTileClick, selectedKey = null, correctKey = null, notes = {}, onRemove,
+  tiles, focusKey, showWeights, showScores = true, weights: override, onTileClick, selectedKey = null, correctKey = null, notes = {},
 }: PlaygroundProps) {
-  const { scores, weights } = weightsFor(tiles, focusKey);
+  const row = weightsFor(tiles, focusKey);
+  const weights = override ?? row.weights;
   const percents = percentages(weights);
   return (
-    <div className="flex flex-wrap items-start justify-center gap-3">
-      {tiles.map((tile, i) => {
-        const isFocus = tile.key === focusKey;
-        const canClick = Boolean(onTileClick) && !isFocus;
-        const tileClass = isFocus
-          ? 'border-indigo-600 bg-indigo-600 font-semibold text-white'
-          : selectedKey === tile.key
-            ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-300'
-            : canClick
-              ? 'cursor-pointer border-slate-300 bg-white hover:border-indigo-400 hover:bg-indigo-50'
-              : 'border-slate-200 bg-white';
-        return (
-          <div key={tile.key} className="flex w-24 flex-col items-center gap-2">
-            <WeightBar weight={weights[i]} percent={percents[i]} score={scores[i]} visible={showWeights} muted={isFocus} showScore={showScores} />
-            <button
-              type="button"
-              disabled={!canClick}
-              onClick={() => onTileClick?.(tile)}
-              className={`w-full break-words rounded-lg border px-2 py-1.5 text-center text-sm leading-tight transition ${tileClass}`}
-            >
-              {displayWord(tile.word, i)}
-            </button>
-            {isFocus && <span className="text-[11px] text-slate-500">focus · itself</span>}
-            {selectedKey === tile.key && <span className="text-[11px] font-medium text-amber-700">your pick</span>}
-            {correctKey === tile.key && <span className="text-[11px] font-medium text-emerald-700">✓ most weight</span>}
-            {notes[tile.key] && <span className="text-center text-[11px] font-medium text-amber-700">{notes[tile.key]}</span>}
-            {onRemove && !isFocus && (
-              <button type="button" onClick={() => onRemove(tile)} aria-label={`Remove ${tile.word}`} className="text-xs text-slate-400 hover:text-red-600">
-                ✕
+    <div className="w-full">
+      <div className="mx-auto grid max-w-3xl gap-1.5 sm:gap-3" style={{ gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))` }}>
+        {tiles.map((tile, i) => {
+          const isFocus = tile.key === focusKey;
+          const canClick = Boolean(onTileClick) && !isFocus;
+          const ring = selectedKey === tile.key ? 'ring-3 ring-cobalt' : correctKey === tile.key ? 'ring-3 ring-ok' : '';
+          return (
+            <div key={tile.key} className="flex min-w-0 flex-col items-center gap-2">
+              <WeightBar weight={weights[i]} percent={percents[i]} visible={showWeights} muted={isFocus} />
+              <button
+                type="button"
+                disabled={!canClick}
+                onClick={() => onTileClick?.(tile)}
+                aria-pressed={onTileClick ? selectedKey === tile.key : undefined}
+                className={`tile flex min-h-12 w-full items-center justify-center break-words px-1 pb-2 pt-2.5 text-center text-[clamp(0.68rem,2.4vw,0.95rem)] leading-tight transition ${
+                  isFocus ? 'tile-focus' : ''
+                } ${canClick ? 'cursor-pointer hover:-translate-y-0.5' : ''} ${ring}`}
+              >
+                {displayWord(tile.word, i)}
+                {showScores && (
+                  <span className="absolute bottom-0.5 right-1 text-[0.6rem] font-bold tabular-nums opacity-70" title="match score">
+                    {row.scores[i].toFixed(1)}
+                  </span>
+                )}
               </button>
-            )}
-          </div>
-        );
-      })}
+              <span className="min-h-4 text-center text-[11px] font-medium leading-tight">
+                {isFocus ? <span className="text-muted">focus</span>
+                  : correctKey === tile.key ? <span className="text-ok">✓ top</span>
+                  : selectedKey === tile.key ? <span className="text-cobalt">your pick</span>
+                  : notes[tile.key] ? <span className="text-miss">{notes[tile.key]}</span> : null}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {showScores && <p className="mt-2 text-center text-xs text-muted">Small number on a tile: its match score with &quot;model&quot;.</p>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { generateText, Output } from 'ai';
-import { TUTOR_MISSIONS, type TutorMission } from '@/content/missions';
+import { EXPLAIN_TASKS, type ExplainTask } from '@/content/missions';
 import { mockFeedback } from '@/lib/tutor/mock';
-import { SYSTEM_PROMPT, buildUserPrompt } from '@/lib/tutor/prompt';
+import { buildUserPrompt, systemPrompt } from '@/lib/tutor/prompt';
 import { FeedbackSchema, type Feedback, type FeedbackRequest, type FeedbackResponse } from '@/lib/tutor/schema';
 
 export type LlmFn = (system: string, prompt: string, signal: AbortSignal) => Promise<unknown>;
@@ -27,7 +27,7 @@ export function llmFromEnv(env: Record<string, string | undefined> = process.env
 }
 
 /** Drop ids the model invented, so logs only contain ids from the mission content. */
-export function sanitize(fb: Feedback, m: TutorMission): Feedback {
+export function sanitize(fb: Feedback, m: ExplainTask): Feedback {
   return {
     ...fb,
     rubricHits: fb.rubricHits.filter((id) => m.rubric.some((r) => r.id === id)),
@@ -35,8 +35,8 @@ export function sanitize(fb: Feedback, m: TutorMission): Feedback {
   };
 }
 
-/** Formula vocabulary the lesson withholds in M3 (spec: the tutor never gives the formula). */
-const FORMULA = /softmax|exponent|\bexp\b|dot product|\bquer(y|ies)\b|\bkeys?\b|\bvalue vectors?\b|√|sqrt|\bd_?k\b/i;
+/** Formula vocabulary withheld until the formula step (the tutor never gives the formula away). */
+const FORMULA = /softmax|exponent|\bexp\b|dot product|\bquer(y|ies)\b|\bkeys?\b|\bvalue vectors?\b|√|sqrt|\bd_?k\b|dₖ/i;
 
 function withTimeout<T>(p: Promise<T>, ms: number, ctrl: AbortController): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -50,14 +50,16 @@ function withTimeout<T>(p: Promise<T>, ms: number, ctrl: AbortController): Promi
 }
 
 export async function getFeedback(req: FeedbackRequest, llm: LlmFn | null, timeoutMs = 10_000): Promise<FeedbackResponse> {
-  const mission = TUTOR_MISSIONS[req.missionId];
+  const mission = EXPLAIN_TASKS[req.missionId];
   const start = Date.now();
   if (llm) {
     try {
       const ctrl = new AbortController();
-      const raw = await withTimeout(llm(SYSTEM_PROMPT, buildUserPrompt(mission, req), ctrl.signal), timeoutMs, ctrl);
+      const raw = await withTimeout(llm(systemPrompt(mission), buildUserPrompt(mission, req), ctrl.signal), timeoutMs, ctrl);
       const fb = sanitize(FeedbackSchema.parse(raw), mission);
-      if ([fb.correct, fb.missing, fb.question].some((s) => FORMULA.test(s))) throw new Error('LLM reply mentions the formula');
+      if (!mission.formulaTaught && [fb.correct, fb.missing, fb.question].some((s) => FORMULA.test(s))) {
+        throw new Error('LLM reply mentions the formula');
+      }
       return { ...fb, source: 'llm', latencyMs: Date.now() - start };
     } catch (err) {
       console.error('[tutor] LLM failed, using mock tutor:', err);

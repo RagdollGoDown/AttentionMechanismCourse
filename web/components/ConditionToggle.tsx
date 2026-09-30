@@ -10,8 +10,8 @@ const OPTIONS: { id: Condition; label: string }[] = [
 export function ConditionToggle({ value, onChange }: { value: Condition; onChange: (c: Condition) => void }) {
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="text-slate-500">Demo condition</span>
-      <div className="flex rounded-lg border border-slate-300 p-0.5" role="radiogroup" aria-label="Condition">
+      <span className="text-muted">Condition</span>
+      <div className="flex rounded-lg border border-line p-0.5" role="radiogroup" aria-label="Condition">
         {OPTIONS.map((o) => (
           <button
             key={o.id}
@@ -19,7 +19,7 @@ export function ConditionToggle({ value, onChange }: { value: Condition; onChang
             role="radio"
             aria-checked={value === o.id}
             onClick={() => onChange(o.id)}
-            className={`rounded-md px-2 py-1 ${value === o.id ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:bg-slate-100'}`}
+            className={`rounded-md px-2 py-1 ${value === o.id ? 'bg-cobalt text-white' : 'text-ink hover:bg-page'}`}
           >
             {o.label}
           </button>

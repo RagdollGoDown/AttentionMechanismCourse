@@ -1,5 +1,5 @@
 import type { Condition } from '@/lib/condition';
-import type { MissionId } from '@/content/missions';
+import type { MissionId } from '@/content/steps';
 
 export type EventType =
   | 'session_start'
@@ -18,7 +18,16 @@ export type EventType =
   | 'reflection_submit'
   | 'explanation_submit'
   | 'feedback_received'
-  | 'condition_change';
+  | 'condition_change'
+  | 'hook_answer'
+  | 'tab_open'
+  | 'qk_select'
+  | 'rule_try'
+  | 'check_answer'
+  | 'formula_part'
+  | 'dk_change'
+  | 'xp_gain'
+  | 'badge';
 
 export interface LogEvent {
   sessionId: string;

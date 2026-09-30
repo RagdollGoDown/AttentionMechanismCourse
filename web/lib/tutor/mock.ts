@@ -1,4 +1,4 @@
-import type { TutorMission } from '@/content/missions';
+import type { ExplainTask } from '@/content/missions';
 import type { Feedback } from '@/lib/tutor/schema';
 
 // ponytail: keyword heuristic; a sentence that negates or concedes ("not", "but", "even though")
@@ -8,7 +8,7 @@ const NEGATED = /\b(not|no|never|instead|but|even though|although|despite)\b|n't
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 /** Rule-based stand-in for the LLM tutor: keyword checks against the mission rubric. */
-export function mockFeedback(m: TutorMission, explanation: string): Feedback {
+export function mockFeedback(m: ExplainTask, explanation: string): Feedback {
   const hits = m.rubric.filter((r) => r.keywords.test(explanation));
   const sentences = explanation.split(/[.;!?\n]+/);
   const misconception = m.misconceptions.find((c) => sentences.some((s) => c.keywords.test(s) && !NEGATED.test(s))) ?? null;

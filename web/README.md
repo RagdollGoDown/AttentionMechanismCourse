@@ -12,6 +12,8 @@ Set `TUTOR_MODEL` (e.g. `anthropic/claude-haiku-4.5`) and `AI_GATEWAY_API_KEY` i
 (or in Vercel project settings). Without them, a rule-based offline tutor answers.
 
 ## Where things live
-- `content/`: all teaching content (vectors, sentences, missions, rubrics, expert answers)
-- `lib/`: attention math, tiles, logger, tutor
-- `components/missions/`: one view per mission; `registry.tsx` decides which are playable
+- `content/steps.ts`: lesson flow, chapters, all learner-facing text, XP and badges
+- `content/missions.ts`: the three explain tasks (swap, remove, formula): rubrics, misconceptions, expert answers
+- `lib/`: attention math, rule bricks (step 9), tiles, logger, tutor
+- `components/steps/`: one view per linear step; `Lab.tsx` is the hub with six unlockable experiments in `components/lab/`
+- `components/GameProvider.tsx`: XP (pays for effort, not correctness, identical in both conditions) and badges

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { MISSION_ORDER, QUICK_CHECK, TUTOR_MISSIONS, quickCheckAnswer } from '@/content/missions';
+import { EXPLAIN_TASKS, FORMULA_TASK, TUTOR_MISSIONS } from '@/content/missions';
+import { LAB_ORDER, QUICK_CHECK, STEP_ORDER, quickCheckAnswer } from '@/content/steps';
 import { applyChange, toTiles, topKey, weightsFor } from '@/lib/tiles';
 
 const setup = (id: 'swap' | 'remove') => {
@@ -11,7 +12,22 @@ const setup = (id: 'swap' | 'remove') => {
 };
 
 describe('mission content', () => {
-  it('mission order', () => expect(MISSION_ORDER).toEqual(['embeddings', 'contrast', 'swap', 'remove', 'free']));
+  it('flow order', () => {
+    expect(STEP_ORDER).toEqual(['welcome', 'hook', 'why', 'pretest', 'vectors', 'lab', 'formula', 'explain', 'posttest']);
+    expect(LAB_ORDER).toEqual(['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax']);
+  });
+
+  it.each(Object.values(EXPLAIN_TASKS))('$id: ids unique; no g-flag regexes', (t) => {
+    const all = [...t.rubric, ...t.misconceptions];
+    expect(new Set(all.map((r) => r.id)).size).toBe(all.length);
+    all.forEach((r) => expect(r.keywords.flags).not.toContain('g'));
+  });
+
+  it('only the formula task may name the formula', () => {
+    expect(FORMULA_TASK.formulaTaught).toBe(true);
+    expect(TUTOR_MISSIONS.swap.formulaTaught).toBeFalsy();
+    expect(TUTOR_MISSIONS.remove.formulaTaught).toBeFalsy();
+  });
 
   it.each(['swap', 'remove'] as const)('%s: focusIndex points at model; ids unique; no g-flag regexes', (id) => {
     const { m } = setup(id);

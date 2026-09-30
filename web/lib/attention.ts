@@ -20,15 +20,16 @@ export function softmax(xs: number[]): number[] {
 }
 
 export interface AttentionRow {
+  /** Raw match scores q·k, before the √d_k scaling (what learners see under the bars). */
   scores: number[];
   weights: number[];
 }
 
-/** Attention of token `focus` over all tokens (itself included): softmax(q·k / √d_k). */
+/** Attention of token `focus` over all tokens (itself included): weights = softmax(q·k / √d_k). */
 export function attentionRow(xs: Vec[], focus: number, WQ: Mat, WK: Mat): AttentionRow {
   if (focus < 0 || focus >= xs.length) throw new RangeError(`focus ${focus} out of range 0..${xs.length - 1}`);
   const q = project(xs[focus], WQ);
   const scale = Math.sqrt(q.length);
-  const scores = xs.map((x) => dot(q, project(x, WK)) / scale);
-  return { scores, weights: softmax(scores) };
+  const scores = xs.map((x) => dot(q, project(x, WK)));
+  return { scores, weights: softmax(scores.map((s) => s / scale)) };
 }

@@ -1,20 +1,8 @@
-import { dot } from '@/lib/attention';
 import type { Change } from '@/lib/tiles';
-import { EMBEDDINGS } from '@/content/vectors';
 import { SENTENCE_A } from '@/content/sentences';
 
-export type MissionId = 'embeddings' | 'contrast' | 'swap' | 'remove' | 'free';
-export type TutorMissionId = 'swap' | 'remove';
-
-export const MISSION_ORDER: MissionId[] = ['embeddings', 'contrast', 'swap', 'remove', 'free'];
-
-export const MISSION_TITLES: Record<MissionId, string> = {
-  embeddings: 'Words as vectors',
-  contrast: 'Same word, two meanings',
-  swap: 'Predict a swap',
-  remove: 'Predict a removal',
-  free: 'Free play',
-};
+/** Tasks where the learner writes an explanation and gets feedback (AI tutor or expert answer). */
+export type TutorMissionId = 'swap' | 'remove' | 'formula';
 
 export interface RubricItem {
   id: string;
@@ -36,12 +24,22 @@ export interface Misconception {
   probe: string;
 }
 
+export interface ExplainTask {
+  id: TutorMissionId;
+  explainPrompt: string;
+  rubric: RubricItem[];
+  misconceptions: Misconception[];
+  expertAnswer: string;
+  /** True once the formula has been taught; the tutor may then name its parts. */
+  formulaTaught?: boolean;
+}
+
 export type Prediction =
   | { kind: 'tile'; prompt: string; correctIndex: number }
   | { kind: 'choice'; prompt: string; options: string[]; correct: string };
 
-export interface TutorMission {
-  id: TutorMissionId;
+export interface TutorMission extends ExplainTask {
+  id: 'swap' | 'remove';
   intro: string;
   actionLabel: string;
   before: string[];
@@ -51,16 +49,12 @@ export interface TutorMission {
   changeNote: string;
   prediction: Prediction;
   revealNote: string;
-  explainPrompt: string;
-  rubric: RubricItem[];
-  misconceptions: Misconception[];
-  expertAnswer: string;
 }
 
-export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
+export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
   swap: {
     id: 'swap',
-    intro: 'Right now “model” leans on “fashion show”. We are about to swap “fashion show” for “training run”.',
+    intro: 'Right now "model" listens most to "fashion show". Next, we swap "fashion show" for "training run".',
     actionLabel: 'Swap it',
     before: SENTENCE_A,
     focusIndex: 4,
@@ -68,34 +62,34 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
     changeNote: '→ training run',
     prediction: {
       kind: 'tile',
-      prompt: 'Before we swap: which word will “model” lean on most afterwards? Click it in the sentence.',
+      prompt: 'Before we swap: which word will "model" listen to most afterwards? Click it in the sentence.',
       correctIndex: 2,
     },
-    revealNote: '“model” now leans on “training run”, even though “smiled” sits right next to it.',
-    explainPrompt: 'Why does “model” lean on “training run” and not on “smiled”, the word right next to it?',
+    revealNote: '"model" now listens most to "training run". Yet "smiled" sits right next to it.',
+    explainPrompt: 'Why does "model" listen to "training run" and not to "smiled", the word right next to it?',
     rubric: [
       {
         id: 'match',
-        text: 'A word gets a high score when it matches what “model” is about (its meaning).',
+        text: 'A word gets a high score when it matches what "model" is about (its meaning).',
         keywords: /match|similar|align|meaning|relat|relevan|fit|direction|vector|score/i,
-        hint: 'You describe what happened, but not what makes a word score high for “model”.',
-        probe: 'Look at the faint match scores under the bars: which words score highest, and what do they share with “model”?',
+        hint: 'You describe what happened, but not what makes a word score high for "model".',
+        probe: 'Look at the score on each tile. Which words score highest, and what do they share with "model"?',
       },
       {
         id: 'ml',
-        text: '“training run” fits the machine-learning meaning of “model”, as strongly as “fashion show” fitted the fashion meaning.',
+        text: '"training run" fits the machine-learning meaning of "model", as strongly as "fashion show" fitted the fashion meaning.',
         keywords: /machine|\bml\b|learning|\bai\b|neural|comput|data/i,
-        hint: 'Which of the two meanings of “model” does “training run” connect to?',
-        probe: 'Toggle before/after: which meaning of “model” did “fashion show” support, and which one does “training run” support?',
+        hint: 'Which of the two meanings of "model" does "training run" connect to?',
+        probe: 'Toggle before and after. Which meaning did "fashion show" support? Which one does "training run" support?',
       },
       {
         id: 'position',
-        text: 'Position does not matter: “smiled” is closer but matches “model” less.',
+        text: 'Position does not matter: "smiled" is closer but matches "model" less.',
         // Must state that position does NOT count; a bare "close"/"next to" would credit the misconception.
         keywords:
           /\b(position|order|distance|closeness|proximity|nearest|closest|neighbou?rs?|adjacent)\b[^.]{0,25}\b(doesn'?t|does not|don'?t|do not|isn'?t|is not|not|never)\b[^.]{0,10}\b(matter|count|help|play|relevant|important|get|receive)|\b(even though|although|despite|while)\b[^.]{0,40}\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)|\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)\w*\b[^.]{0,40}\bbut\b[^.]{0,40}\b(less|lower|smaller|weaker|doesn'?t|does not)\b/i,
-        hint: 'You haven’t said why being right next to “model” doesn’t help “smiled”.',
-        probe: '“smiled” is the closest word to “model”. Does its bar suggest that closeness counts?',
+        hint: 'You have not said why being right next to "model" does not help "smiled".',
+        probe: '"smiled" is the closest word to "model". Does its bar suggest that closeness counts?',
       },
     ],
     misconceptions: [
@@ -105,29 +99,29 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
         // Checked per sentence; sentences with a negation or "but/even though" are skipped (see mock.ts).
         keywords:
           /\b(close|closer|closest|nearest|next to|adjacent|near|neighbou?r\w*|order|position)\b[^.]{0,40}\b(gets?|getting|receives?|has|have|so|should)\b[^.]{0,20}\b(more|most|higher|highest|bigger|larger)\b|\b(is|are|it'?s|being)\s+(closer|closest|nearest|next to|adjacent)\b/i,
-        hint: 'Careful: you seem to link weight to how close a word is to “model”.',
-        probe: 'Think back to Mission 1: was “model” leaning on its neighbour there?',
+        hint: 'Careful: you seem to link the weight to how close a word is to "model".',
+        probe: 'Think back to "Two contexts". Did "model" listen to its neighbour there?',
       },
     ],
     expertAnswer:
-      '“model” is ambiguous: its vector sits between the fashion meaning and the machine-learning meaning. Every other word gets a match score for how well it fits what “model” is about. “training run” fits the machine-learning meaning very well, so it gets the highest score and the largest weight, just as “fashion show” did for the fashion meaning. Position plays no role: “smiled” is right next to “model” but fits it less, so it gets less weight.',
+      '"model" is ambiguous. Its vector sits between the fashion meaning and the machine-learning meaning. Every other word gets a match score for how well it fits "model". "training run" fits the machine-learning meaning very well. So it gets the highest score and the largest weight, just like "fashion show" did for fashion. Position plays no role: "smiled" is right next to "model" but fits it less, so it gets less weight.',
   },
   remove: {
     id: 'remove',
-    intro: 'Back to the original sentence. We are about to remove “smiled”.',
-    actionLabel: 'Remove “smiled”',
+    intro: 'Back to the original sentence. Next, we remove "smiled".',
+    actionLabel: 'Remove "smiled"',
     before: SENTENCE_A,
     focusIndex: 4,
     change: { type: 'remove', index: 5 },
     changeNote: '✕ will be removed',
     prediction: {
       kind: 'choice',
-      prompt: 'Before we remove it: what will happen to the weight on “fashion show”?',
+      prompt: 'Before we remove it: what happens to the weight on "fashion show"?',
       options: ['It goes up', 'It goes down', 'It stays the same'],
       correct: 'It goes up',
     },
-    revealNote: 'Look at the faint number under “fashion show”: its match score did not change, but its weight did.',
-    explainPrompt: 'The match score of “fashion show” did not change, yet its weight went up. Why?',
+    revealNote: 'Look at the score on "fashion show". It did not change. Its weight did.',
+    explainPrompt: 'The score of "fashion show" did not change, yet its weight went up. Why?',
     rubric: [
       {
         id: 'sum',
@@ -138,17 +132,17 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
       },
       {
         id: 'relative',
-        text: 'A weight depends on how a word’s score compares with the other words’ scores, not on the pair alone.',
+        text: 'A weight depends on how a word\'s score compares with the other words\' scores, not on the pair alone.',
         keywords: /compar|relative|other words|\bthe rest\b|proportion|competi/i,
-        hint: 'You haven’t said what a weight depends on besides the pair “model”–“fashion show”.',
-        probe: 'Toggle before/after and watch “after” and “the”: did their weights change too, even though nothing happened to them?',
+        hint: 'You have not said what a weight depends on, besides the pair "model" and "fashion show".',
+        probe: 'Toggle before and after. Watch "after" and "the": did their weights change too, even though nothing happened to them?',
       },
       {
         id: 'freed',
         text: 'Removing a competitor frees its share, which is split among the remaining words.',
         keywords: /free|redistribut|its share|spread|went to|goes to|split|left over|room/i,
-        hint: 'Where did the weight that “smiled” had go?',
-        probe: '“smiled” had about 16 %. Toggle before/after: which bars got that share?',
+        hint: 'Where did the weight of "smiled" go?',
+        probe: '"smiled" had about 16 %. Toggle before and after: which bars got that share?',
       },
     ],
     misconceptions: [
@@ -157,48 +151,59 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
         text: 'Each word pair has a fixed weight.',
         keywords: /\bweights?\b[^.]{0,30}\b(fixed|constant|always the same)\b|\b(fixed|constant)\s+weights?\b/i,
         hint: 'Careful: the score of a pair is fixed, but its weight is not.',
-        probe: 'Toggle before/after on “fashion show”: same score, different weight. What else changed in the sentence?',
+        probe: 'Toggle before and after on "fashion show": same score, different weight. What else changed in the sentence?',
       },
     ],
     expertAnswer:
-      'The match score of “model”–“fashion show” depends only on those two words, so it stays the same. Weights are not scores: they are shares of a total that always adds up to 100 %. A word’s weight depends on how its score compares with the scores of all the other words. When “smiled” is removed, its share (about 16 %) is freed and split among the remaining words, so “fashion show” goes up even though nothing about it changed.',
+      'The score of "model" and "fashion show" depends only on those two words, so it stays the same. Weights are not scores. They are shares of a total that always adds up to 100 %. A word\'s weight depends on how its score compares with the scores of all the other words. When "smiled" leaves, its share (about 16 %) is freed and split among the remaining words. So "fashion show" goes up, even though nothing about it changed.',
   },
 };
 
-export const EMBEDDINGS_TEXT = {
-  intro: [
-    'Language models turn every word into a list of numbers: a vector.',
-    'Here each word gets just two numbers: how “fashion-ish” and how “machine-learning-ish” it is. Words with related meanings point in similar directions.',
+export const FORMULA_TASK: ExplainTask = {
+  id: 'formula',
+  formulaTaught: true,
+  explainPrompt: 'In your own words: what do Q, K, V, softmax and √dₖ each do when "model" reads the sentence?',
+  rubric: [
+    {
+      id: 'qk',
+      text: 'The query of "model" is compared with the key of every word; a good match gives a high score.',
+      keywords: /\b(q|quer(y|ies))\b[^.]{0,80}\b(k|keys?)\b|\b(k|keys?)\b[^.]{0,80}\b(q|quer(y|ies))\b/i,
+      hint: 'You have not said where the scores come from.',
+      probe: 'Click Q and Kᵀ in the formula. What is the query of "model" compared with?',
+    },
+    {
+      id: 'softmax',
+      text: 'softmax turns the scores into positive weights that add up to 100 %.',
+      keywords: /softmax[^.]{0,80}(weight|sum|add|100|\b1\b|positive|probab|normali|share)|(weight|probab|share)[^.]{0,60}softmax/i,
+      hint: 'What does softmax do to the scores?',
+      probe: 'Click softmax. What is true of the weights that was not true of the scores?',
+    },
+    {
+      id: 'scale',
+      text: '√dₖ shrinks the scores, so softmax does not put almost all the weight on one word when vectors are long.',
+      keywords: /(√|sqrt|root|d_?k|dₖ|scal|divid)[^.]{0,100}(big|large|grow|huge|small|shrink|peak|spik|one word|extreme|sharp|flat|stable|range|saturat|dominat)/i,
+      hint: 'Why divide by √dₖ at all?',
+      probe: 'Turn the division off and move the dₖ slider. What happens to the bars?',
+    },
+    {
+      id: 'values',
+      text: 'The output of "model" is a mix of the values V, weighted by the attention weights.',
+      keywords: /\b(v|values?)\b[^.]{0,80}(mix|weighted|sum|combin|average|blend)|(mix|weighted|sum|combin|average|blend)[^.]{0,80}\b(v|values?)\b/i,
+      hint: 'What does "model" get at the very end?',
+      probe: 'Click V. Where does the arrow of "model" move, and why there?',
+    },
   ],
-  pickPrompt: 'Click two words on the map to compare them.',
-  caption: 'Arrows pointing the same way (and long) → large similarity.',
-  punchline:
-    'Notice where “model” sits: between the two groups. One fixed arrow has to cover both meanings. How could “model” figure out which meaning it has in a given sentence?',
-};
-
-export const QUICK_CHECK = {
-  prompt: 'Quick check: which pair is most similar?',
-  pairs: [['runway', 'dress'], ['model', 'smiled'], ['training', 'dress'], ['data', 'word']] as [string, string][],
-  reason: '“runway” and “dress” are long arrows pointing almost the same way, so their similarity is the largest.',
-};
-
-/** Index of the truly most similar pair in QUICK_CHECK (computed, never hard-coded). */
-export function quickCheckAnswer(): number {
-  const sims = QUICK_CHECK.pairs.map(([a, b]) => dot(EMBEDDINGS[a], EMBEDDINGS[b]));
-  return sims.indexOf(Math.max(...sims));
-}
-
-export const CONTRAST_TEXT = {
-  prompt: 'Same word, two sentences. In each one, click the word you think “model” leans on most.',
-  revealLabel: 'Reveal the weights',
-  reflectPrompt: 'What made the difference between the two sentences? (optional)',
-};
-
-export const FREE_PLAY_TEXT = {
-  intro: 'Build your own sentence. Click any word to make it the focus, and use ✕ to remove a word.',
-  challenges: [
-    'Find a sentence where “model” splits its attention about 50/50 between two words.',
-    'Make “model” lean most on the word after it.',
-    'Remove words until “model” leans only on itself.',
+  misconceptions: [
+    {
+      id: 'maxOnly',
+      text: 'softmax keeps only the word with the highest score.',
+      keywords: /softmax[^.]{0,60}\b(only|just)\b[^.]{0,30}\b(one|highest|biggest|max|top|best)\b|\b(only|just) (the )?(highest|biggest|top|best)\b[^.]{0,30}\b(word|score)\b[^.]{0,20}\b(counts?|matters?|kept|survives?)\b/i,
+      hint: 'Careful: softmax keeps every word in the mix, some with small weights.',
+      probe: 'Look at the bars. Does any word get exactly 0 %?',
+    },
   ],
+  expertAnswer:
+    'Q is the query of "model": what it looks for. K holds the keys of all words: what each one offers. Q times Kᵀ compares the query with every key and gives one match score per word. Dividing by √dₖ keeps these scores small. Otherwise, with long vectors, softmax would put almost all the weight on one word. softmax turns the scores into positive weights that add up to 100 %. Finally, "model" takes a mix of the values V, weighted by these weights. That mix is its new meaning in this sentence.',
 };
+
+export const EXPLAIN_TASKS: Record<TutorMissionId, ExplainTask> = { ...TUTOR_MISSIONS, formula: FORMULA_TASK };

@@ -27,9 +27,9 @@ describe('softmax', () => {
 
 describe('attentionRow', () => {
   it('matches a hand-computed 3-token example (d_k = 2)', () => {
-    // q = [1,0]; scores = [1, 0, 1]/√2; weights = e^.7071 / (2e^.7071 + 1) etc.
+    // q = [1,0]; raw scores = [1, 0, 1]; weights = softmax(scores/√2) = e^.7071 / (2e^.7071 + 1) etc.
     const { scores, weights } = attentionRow([[1, 0], [0, 1], [1, 1]], 0, I, I);
-    expect(scores[0]).toBeCloseTo(0.70711, 4);
+    expect(scores[0]).toBe(1);
     expect(scores[1]).toBeCloseTo(0, 10);
     expect(weights[0]).toBeCloseTo(0.40111, 4);
     expect(weights[1]).toBeCloseTo(0.19778, 4);

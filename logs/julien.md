@@ -164,3 +164,57 @@ with tests that check each mission's claims).
    to production: https://attention-playground-opal.vercel.app. No LLM key yet, so the offline
    tutor answers. Smoke test: page 200, API mock JSON, 400 on blank input, full headless
    playthrough in both conditions with complete logs. URLs added to `README.md`.
+
+
+## Session 2026-09-30 — Julien — M3 v2: new flow, sentence lab, formula part, gamified skin
+**Tool:** Claude Code (Claude Opus 5.5)
+
+### Interactions
+1. **User:** After testing the prototype: humanize and shorten all text (humanizer skill,
+   short sentences); make the layout adapt to screen size; implement the new 13-step flow
+   agreed with the team (welcome, hook, motivation, pre-test, vectors + dot product, exploration,
+   Q/K intro, predict-then-test, invent the weight formula, softmax, formula consolidation,
+   explain, post-test); make the experiments feel like tabs around the same sentence that unlock
+   one by one; restyle with the frontend-design skill and gamify it (XP bar, success).
+   **AI:** Read the whole prototype, then wrote a plan in `tasks/todo.md` and asked 3 questions.
+   The user chose: lab hub = steps 6–10; step 9 = "give them the bricks of the formula and they
+   put it together" (the AI had proposed free-text rules or picking ready-made rules, and the user
+   rejected both for a middle way); XP rewards effort, not correctness.
+   **AI:** Implemented it:
+   - new `content/steps.ts` with all copy rewritten short, straight quotes, no filler;
+   - lab hub (`components/steps/Lab.tsx`) with six experiments that unlock in order and stay
+     mounted, so going back never resets a prediction or duplicates log events;
+   - new experiments: Query & key on the map, brick rule builder (`lib/rules.ts`, weight =
+     top ÷ bottom, tested on our sentence plus two score sets with negative numbers), softmax
+     comparison + 3-word calculation check;
+   - formula step with clickable parts, √dₖ slider (with/without division) and V as the output
+     arrow of "model" on the map; explain step with a new `formula` tutor task (rubric,
+     misconception "softmax keeps only the top word", expert answer). The formula-leak guard
+     now applies only before the formula is taught;
+   - game layer: XP per effort, levels, 3 badges = LG1–LG3, a chapter map in the header;
+   - visual identity: "word tiles on a game board" (ink board, maple tiles with the match score
+     in the corner like tile points, cobalt bars, amber XP), Bricolage Grotesque + Atkinson
+     Hyperlegible; fluid layout from phone to wide screen.
+   Design decision by the AI: the bars now show raw q·k scores, while the weights still divide by
+   √dₖ. Step 10 therefore shows a gap ("close, but flatter") that step 11 resolves.
+   Pedagogical catch: in step 12 the formula board stays clickable, but the part explanations are
+   hidden. Showing them would let learners copy instead of self-explain.
+   **Verification:** 134 tests, lint, typecheck, build; headless playthroughs of the full lesson at
+   phone and desktop sizes in both conditions. Testing found a real accessibility bug (the map's
+   `role="img"` hid its clickable words) and hard-to-hit arrows; both fixed. The AI's own quote
+   sweep broke string literals twice and was fixed. Not committed or deployed.
+
+### Summary
+- Done: new 13-step flow with the sentence-lab hub, formula part (steps 9–12), gamification,
+  new skin, responsive layout, humanized copy. Pre-/post-tests are placeholders.
+- Decisions: bricks for the invented rule; XP for effort only; raw scores on tiles; explanations
+  hidden during the explain step; free-play mission removed (not in the new flow).
+- Open questions: XP for revisions may inflate revision rates in both groups (RQ2 measures
+  revision), so keep or drop it? Pre-/post-test items; LLM key for the AI condition; team review
+  of the new copy.
+- Reflection (AI draft, rewrite in your own words): the AI's first proposal for step 9 was either
+  fully open (type a formula) or fully closed (pick a rule). The team's "bricks" idea sits between
+  the two and fits productive failure better: learners still invent, but inside a space where
+  failure is informative. The headless playthrough caught problems no unit test would, such as an
+  accessibility bug and hydration races, but it did not judge whether the lesson *teaches*. That
+  still needs a pilot with a real student.

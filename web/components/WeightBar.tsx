@@ -1,25 +1,18 @@
-export function WeightBar({ weight, percent, score, visible, muted = false, showScore = true }: {
+export function WeightBar({ weight, percent, visible, muted = false }: {
   weight: number;
   percent: number;
-  score: number;
   visible: boolean;
   muted?: boolean;
-  showScore?: boolean;
 }) {
   return (
     <div className="flex w-full flex-col items-center gap-1">
-      <div className="relative h-36 w-10 overflow-hidden rounded-md bg-slate-100">
+      <span className="font-display text-sm font-bold tabular-nums">{visible ? `${percent}%` : '?'}</span>
+      <div className="relative h-[clamp(5rem,18vh,9rem)] w-full max-w-10 overflow-hidden rounded-md bg-cobalt-soft">
         <div
-          className={`absolute inset-x-0 bottom-0 transition-[height] duration-700 ease-out ${muted ? 'bg-slate-300' : 'bg-indigo-500'}`}
+          className={`absolute inset-x-0 bottom-0 rounded-t-sm transition-[height] duration-700 ease-out ${muted ? 'bg-muted/40' : 'bg-cobalt'}`}
           style={{ height: visible ? `${weight * 100}%` : '0%' }}
         />
       </div>
-      <span className="text-sm font-semibold tabular-nums">{visible ? `${percent}%` : '?'}</span>
-      {showScore && (
-        <span className={`text-[11px] tabular-nums text-slate-400 ${visible ? '' : 'invisible'}`} title="match score">
-          score {score.toFixed(2)}
-        </span>
-      )}
     </div>
   );
 }
