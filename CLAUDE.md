@@ -32,6 +32,8 @@ RQ1 = learning outcomes; RQ2 = process (revision behavior), taken from logs.
 - `lectures/`: course slides. **Read `lectures/RESUME.md` first** and justify design
   choices with those learning mechanisms. Update it when a new lecture PDF is added.
 - `logs/<member>.md`: per-person AI interaction logs (see below).
+- `web/`: the Next.js prototype (see `web/README.md`). `cd web && npm test` before committing.
+  Teaching content lives in `web/content/`. Its claims are enforced by `web/tests/content-*.test.ts`.
 
 ## Priorities
 

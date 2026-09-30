@@ -1,36 +1,17 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Attention Playground (M3 prototype)
 
-## Getting Started
+Interactive lesson on scaled dot-product attention. Spec: `../docs/superpowers/specs/2026-09-29-attention-playground-design.md`.
 
-First, run the development server:
+## Run
+    npm install
+    npm run dev        # http://localhost:3000  (?condition=ai | ?condition=control)
+    npm test           # math, content invariants, tutor, API route
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## AI tutor
+Set `TUTOR_MODEL` (e.g. `anthropic/claude-haiku-4.5`) and `AI_GATEWAY_API_KEY` in `.env.local`
+(or in Vercel project settings). Without them, a rule-based offline tutor answers.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Where things live
+- `content/`: all teaching content (vectors, sentences, missions, rubrics, expert answers)
+- `lib/`: attention math, tiles, logger, tutor
+- `components/missions/`: one view per mission; `registry.tsx` decides which are playable

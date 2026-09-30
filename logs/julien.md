@@ -92,3 +92,50 @@ appended at the bottom. Past entries are never edited.
   choices. The AI proposed options, and I shaped scope and added the embedding part myself.
   The AI tied each design choice back to lecture mechanisms, which will help justify the
   design in the M3 report.
+
+## Session 2026-09-30 — Julien Erbland — Building the M3 prototype (Tasks 3–11)
+**Tool:** Claude Code (Claude Opus 5.5, 1M context)
+
+*Context from git history (end of the 2026-09-29 session, not logged there):* the AI wrote a
+12-task implementation plan (`docs/superpowers/plans/2026-09-29-attention-playground.md`),
+refocused Mission 2 on the "attention goes to the nearest word" misconception, and built
+Task 1 (Next.js scaffold and attention math) and Task 2 (toy vectors, tiles, sentences,
+with tests that check each mission's claims).
+
+### Interactions
+1. **User:** "continue your task"
+   **AI:** Resumed the plan from its progress ledger at Task 3 and ran it inline: tests
+   first, watched them fail, then implemented. Built:
+   - Task 3: mission content (texts, rubrics, misconceptions, expert answers).
+   - Task 4: `?condition=` parsing and the event logger (a failing log sink cannot break the lesson).
+   - Task 5: tutor schema, rule-based mock tutor, LLM prompt, and fallback to the mock on
+     timeout, error or malformed output.
+   - Task 6: `/api/feedback` (400 on blank, padded or too-long explanations).
+   - Tasks 7–10: lesson shell, session log with JSON download, and Missions 0–4 with the
+     AI/control conditions.
+   The playwright tool was down, so the AI drove a headless Chromium with scripts to check
+   every manual item in the plan: bar percentages (55 %/20 %, 39/39, 55→65 %), locked
+   predictions, the 2-round cap, the offline-tutor badge, the identical expert card in the
+   control condition, and the log contents. A full 0→4 playthrough ran in each condition.
+   Both downloaded logs contain start/end for all five missions and feedback events.
+   **Deviation:** on the Mission 0 meaning map, three labels were nudged. Two arrows crossed
+   the "smiled" and "the" labels, and the "predicted" label covered the *data* dot, so
+   clicking *data* selected *predicted*. The headless click test found that. The vectors
+   themselves were not changed.
+   **Finding:** the offline tutor praised "it is closer to the model" as "position does not
+   matter", which is the opposite of what the learner wrote. Queued for the fix pass after
+   the final review.
+
+### Summary
+- Done: Missions 0–4 playable in both conditions with the offline tutor; logging with JSON
+  export; README and CLAUDE.md pointer. 108 unit tests plus headless browser checks.
+- Decisions: inline execution of the plan (no per-task subagents); label nudges on the
+  meaning map instead of changing vectors.
+- Open questions: which LLM and key to use for the real tutor (Task 12, Vercel deploy,
+  needs the user); the team should review the mock tutor's keyword rules, since they
+  can misfire on wording as shown above.
+- Reflection (AI draft — rewrite in your own words): The pre-written plan made this session
+  mostly execution. The useful surprises came from actually clicking through the app: a
+  label that stole clicks, and an offline tutor that rewarded the misconception it was
+  designed to catch. Neither shows up in unit tests. Keyword-based feedback is fragile,
+  and that is an argument for the LLM tutor in the AI condition.
