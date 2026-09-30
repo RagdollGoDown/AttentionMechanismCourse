@@ -52,3 +52,19 @@ describe('mission content', () => {
     expect(QUICK_CHECK.pairs[0]).toEqual(['runway', 'dress']);
   });
 });
+
+describe('displayed percentages', () => {
+  it.each(['swap', 'remove'] as const)('%s: bars add up to 100 before and after', async (id) => {
+    const { percentages } = await import('@/lib/tiles');
+    const { before, after, focusKey } = setup(id);
+    for (const t of [before, after]) expect(percentages(weightsFor(t, focusKey).weights).reduce((a, b) => a + b, 0)).toBe(100);
+  });
+});
+
+it('remove: the “smiled” share quoted in the texts matches its bar', async () => {
+  const { percentages } = await import('@/lib/tiles');
+  const { m, before, focusKey } = setup('remove');
+  const shown = `about ${percentages(weightsFor(before, focusKey).weights)[5]} %`;
+  expect(m.expertAnswer).toContain(shown);
+  expect(m.rubric.find((r) => r.id === 'freed')!.probe).toContain(shown);
+});

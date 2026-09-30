@@ -139,3 +139,23 @@ with tests that check each mission's claims).
   label that stole clicks, and an offline tutor that rewarded the misconception it was
   designed to catch. Neither shows up in unit tests. Keyword-based feedback is fragile,
   and that is an argument for the LLM tutor in the AI condition.
+
+**Addendum (same session), final review and fix pass**
+2. **AI:** Sent the whole branch to a fresh reviewer (a separate Claude Opus agent, read-only).
+   Verdict: "fix before the M3 demo". The reviewer showed that the offline tutor got the key
+   idea of both tutor missions backwards. It praised "smiled is close so it gets more weight"
+   as "position does not matter", and it flagged correct answers such as "the weights are not
+   fixed" as the misconception. It also found that the bar percentages added up to 99 % and
+   101 %, while the Mission 3 hint tells learners to add them up.
+   **AI:** Fixed each issue test-first (130 tests):
+   - stricter rules in the offline tutor, and it now ignores sentences that negate;
+   - bars rounded so they always total 100 %, with the "about 16 %" in the text now matching the bar;
+   - length caps on the feedback API;
+   - learner text fenced in the LLM prompt;
+   - a fallback to the offline tutor if the LLM mentions formula words.
+
+   Deferred as minor: duplicate submit events on retry, the free-play focus quirk, and some
+   loose keywords. Rate limiting is to be decided at deploy.
+3. **User:** Logged in to Vercel (`npx vercel login`) and asked how to check the current
+   state of the app. **AI:** Pointed to the local production server, the git log, the ledger
+   and this log. The deploy is waiting for explicit confirmation.

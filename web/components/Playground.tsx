@@ -1,7 +1,7 @@
 'use client';
 
 import { WeightBar } from '@/components/WeightBar';
-import { displayWord, weightsFor, type Tile } from '@/lib/tiles';
+import { displayWord, percentages, weightsFor, type Tile } from '@/lib/tiles';
 
 export interface PlaygroundProps {
   tiles: Tile[];
@@ -19,6 +19,7 @@ export function Playground({
   tiles, focusKey, showWeights, showScores = true, onTileClick, selectedKey = null, correctKey = null, notes = {}, onRemove,
 }: PlaygroundProps) {
   const { scores, weights } = weightsFor(tiles, focusKey);
+  const percents = percentages(weights);
   return (
     <div className="flex flex-wrap items-start justify-center gap-3">
       {tiles.map((tile, i) => {
@@ -33,7 +34,7 @@ export function Playground({
               : 'border-slate-200 bg-white';
         return (
           <div key={tile.key} className="flex w-24 flex-col items-center gap-2">
-            <WeightBar weight={weights[i]} score={scores[i]} visible={showWeights} muted={isFocus} showScore={showScores} />
+            <WeightBar weight={weights[i]} percent={percents[i]} score={scores[i]} visible={showWeights} muted={isFocus} showScore={showScores} />
             <button
               type="button"
               disabled={!canClick}

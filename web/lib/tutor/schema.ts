@@ -3,12 +3,16 @@ import { z } from 'zod';
 export const EXPLANATION_MIN = 10;
 export const EXPLANATION_MAX = 600;
 
+// Capped because `previous.feedback` comes back from the client and goes into the LLM prompt.
+const text = z.string().max(EXPLANATION_MAX);
+const id = z.string().max(40);
+
 export const FeedbackSchema = z.object({
-  correct: z.string(),
-  missing: z.string(),
-  question: z.string(),
-  misconceptionId: z.string().nullable(),
-  rubricHits: z.array(z.string()),
+  correct: text,
+  missing: text,
+  question: text,
+  misconceptionId: id.nullable(),
+  rubricHits: z.array(id).max(10),
 });
 export type Feedback = z.infer<typeof FeedbackSchema>;
 

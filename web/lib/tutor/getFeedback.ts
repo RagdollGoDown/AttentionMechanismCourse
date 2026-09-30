@@ -35,6 +35,9 @@ export function sanitize(fb: Feedback, m: TutorMission): Feedback {
   };
 }
 
+/** Formula vocabulary the lesson withholds in M3 (spec: the tutor never gives the formula). */
+const FORMULA = /softmax|exponent|\bexp\b|dot product|\bquer(y|ies)\b|\bkeys?\b|\bvalue vectors?\b|√|sqrt|\bd_?k\b/i;
+
 function withTimeout<T>(p: Promise<T>, ms: number, ctrl: AbortController): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
@@ -54,6 +57,7 @@ export async function getFeedback(req: FeedbackRequest, llm: LlmFn | null, timeo
       const ctrl = new AbortController();
       const raw = await withTimeout(llm(SYSTEM_PROMPT, buildUserPrompt(mission, req), ctrl.signal), timeoutMs, ctrl);
       const fb = sanitize(FeedbackSchema.parse(raw), mission);
+      if ([fb.correct, fb.missing, fb.question].some((s) => FORMULA.test(s))) throw new Error('LLM reply mentions the formula');
       return { ...fb, source: 'llm', latencyMs: Date.now() - start };
     } catch (err) {
       console.error('[tutor] LLM failed, using mock tutor:', err);

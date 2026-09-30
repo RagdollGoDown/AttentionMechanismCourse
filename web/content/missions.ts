@@ -91,7 +91,9 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
       {
         id: 'position',
         text: 'Position does not matter: “smiled” is closer but matches “model” less.',
-        keywords: /position|close|next to|nearest|distance|order|far\b|adjacent|neighbo/i,
+        // Must state that position does NOT count; a bare "close"/"next to" would credit the misconception.
+        keywords:
+          /\b(position|order|distance|closeness|proximity|nearest|closest|neighbou?rs?|adjacent)\b[^.]{0,25}\b(doesn'?t|does not|don'?t|do not|isn'?t|is not|not|never)\b[^.]{0,10}\b(matter|count|help|play|relevant|important|get|receive)|\b(even though|although|despite|while)\b[^.]{0,40}\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)|\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)\w*\b[^.]{0,40}\bbut\b[^.]{0,40}\b(less|lower|smaller|weaker|doesn'?t|does not)\b/i,
         hint: 'You haven’t said why being right next to “model” doesn’t help “smiled”.',
         probe: '“smiled” is the closest word to “model”. Does its bar suggest that closeness counts?',
       },
@@ -100,7 +102,9 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
       {
         id: 'nearest',
         text: 'Attention goes to the nearest word.',
-        keywords: /\b(nearest|closest)\b[^.]{0,30}\b(gets?|receives?|has|have)\b[^.]{0,20}\b(most|more|highest)\b/i,
+        // Checked per sentence; sentences with a negation or "but/even though" are skipped (see mock.ts).
+        keywords:
+          /\b(close|closer|closest|nearest|next to|adjacent|near|neighbou?r\w*|order|position)\b[^.]{0,40}\b(gets?|getting|receives?|has|have|so|should)\b[^.]{0,20}\b(more|most|higher|highest|bigger|larger)\b|\b(is|are|it'?s|being)\s+(closer|closest|nearest|next to|adjacent)\b/i,
         hint: 'Careful: you seem to link weight to how close a word is to “model”.',
         probe: 'Think back to Mission 1: was “model” leaning on its neighbour there?',
       },
@@ -144,20 +148,20 @@ export const TUTOR_MISSIONS: Record<TutorMissionId, TutorMission> = {
         text: 'Removing a competitor frees its share, which is split among the remaining words.',
         keywords: /free|redistribut|its share|spread|went to|goes to|split|left over|room/i,
         hint: 'Where did the weight that “smiled” had go?',
-        probe: '“smiled” had about 15 %. Toggle before/after: which bars got that share?',
+        probe: '“smiled” had about 16 %. Toggle before/after: which bars got that share?',
       },
     ],
     misconceptions: [
       {
         id: 'fixedPair',
         text: 'Each word pair has a fixed weight.',
-        keywords: /\bweights?\b[^.]{0,30}\b(fixed|constant|always the same)\b/i,
+        keywords: /\bweights?\b[^.]{0,30}\b(fixed|constant|always the same)\b|\b(fixed|constant)\s+weights?\b/i,
         hint: 'Careful: the score of a pair is fixed, but its weight is not.',
         probe: 'Toggle before/after on “fashion show”: same score, different weight. What else changed in the sentence?',
       },
     ],
     expertAnswer:
-      'The match score of “model”–“fashion show” depends only on those two words, so it stays the same. Weights are not scores: they are shares of a total that always adds up to 100 %. A word’s weight depends on how its score compares with the scores of all the other words. When “smiled” is removed, its share (about 15 %) is freed and split among the remaining words, so “fashion show” goes up even though nothing about it changed.',
+      'The match score of “model”–“fashion show” depends only on those two words, so it stays the same. Weights are not scores: they are shares of a total that always adds up to 100 %. A word’s weight depends on how its score compares with the scores of all the other words. When “smiled” is removed, its share (about 16 %) is freed and split among the remaining words, so “fashion show” goes up even though nothing about it changed.',
   },
 };
 

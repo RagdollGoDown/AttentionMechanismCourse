@@ -39,3 +39,13 @@ export function resolveFocus(tiles: Tile[], focusKey: string, fallback: string):
 export function displayWord(word: string, position: number): string {
   return position === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word;
 }
+
+/** Whole percentages that always add up to 100 (largest-remainder rounding), so learners can check the sum. */
+export function percentages(weights: number[]): number[] {
+  const raw = weights.map((w) => w * 100);
+  const out = raw.map(Math.floor);
+  const order = raw.map((r, i) => i).sort((a, b) => raw[b] - out[b] - (raw[a] - out[a]));
+  const missing = 100 - out.reduce((a, b) => a + b, 0);
+  for (let k = 0; k < missing; k++) out[order[k]]++;
+  return out;
+}

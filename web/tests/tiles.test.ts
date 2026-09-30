@@ -35,3 +35,14 @@ describe('tiles', () => {
     expect(displayWord('the', 1)).toBe('the');
   });
 });
+
+describe('percentages', () => {
+  it('rounds so the shown values always add up to 100', async () => {
+    const { percentages } = await import('@/lib/tiles');
+    for (const w of [[0.03, 0.03, 0.553, 0.03, 0.2, 0.157], [0.045, 0.045, 0.645, 0.045, 0.22], [1], [1 / 3, 1 / 3, 1 / 3]]) {
+      const p = percentages(w);
+      expect(p.reduce((a, b) => a + b, 0)).toBe(100);
+      p.forEach((x, i) => expect(Math.abs(x - w[i] * 100)).toBeLessThan(1));
+    }
+  });
+});

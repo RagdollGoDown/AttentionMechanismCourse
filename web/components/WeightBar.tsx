@@ -1,5 +1,6 @@
-export function WeightBar({ weight, score, visible, muted = false, showScore = true }: {
+export function WeightBar({ weight, percent, score, visible, muted = false, showScore = true }: {
   weight: number;
+  percent: number;
   score: number;
   visible: boolean;
   muted?: boolean;
@@ -13,7 +14,7 @@ export function WeightBar({ weight, score, visible, muted = false, showScore = t
           style={{ height: visible ? `${weight * 100}%` : '0%' }}
         />
       </div>
-      <span className="text-sm font-semibold tabular-nums">{visible ? `${Math.round(weight * 100)}%` : '?'}</span>
+      <span className="text-sm font-semibold tabular-nums">{visible ? `${percent}%` : '?'}</span>
       {showScore && (
         <span className={`text-[11px] tabular-nums text-slate-400 ${visible ? '' : 'invisible'}`} title="match score">
           score {score.toFixed(2)}
