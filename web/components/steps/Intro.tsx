@@ -1,10 +1,11 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useGame } from '@/components/GameProvider';
+import { Trophy } from '@/components/Trophy';
+import { useTrophy } from '@/components/TrophyProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { buttonClass, secondaryButtonClass } from '@/components/ui';
-import { BADGES, END_TEXT, TEST_PLACEHOLDER, WELCOME, WHY, type BadgeId } from '@/content/steps';
+import { END_TEXT, GOALS, TEST_PLACEHOLDER, TROPHY_PIECES, WELCOME, WHY } from '@/content/steps';
 import { downloadLog } from '@/lib/download';
 import type { StepProps } from '@/components/steps/types';
 
@@ -49,15 +50,15 @@ export function Why({ onDone }: StepProps) {
       <div className="max-w-lg space-y-2 text-lg text-pretty">
         {WHY.body.map((p) => <p key={p}>{p}</p>)}
       </div>
-      <ul className="grid w-full gap-3 sm:grid-cols-3">
-        {(Object.keys(BADGES) as BadgeId[]).map((id) => (
-          <li key={id} className="flex flex-col items-center gap-2 rounded-2xl border border-line bg-card p-4">
-            <span className="tile grid size-12 place-items-center text-2xl">{BADGES[id].icon}</span>
-            <p className="font-display font-bold">{BADGES[id].title}</p>
-            <p className="text-sm text-muted">{BADGES[id].goal}</p>
-          </li>
-        ))}
-      </ul>
+      <div className="flex w-full flex-col items-center gap-5 rounded-2xl border border-line bg-card p-5 sm:flex-row sm:text-left">
+        <Trophy won={0} total={TROPHY_PIECES.length} tone="light" className="size-24 shrink-0" />
+        <div>
+          <p className="mb-2 font-display text-lg font-bold">By the end, you can:</p>
+          <ul className="space-y-1.5">
+            {GOALS.map((g) => <li key={g} className="flex gap-2"><span aria-hidden className="text-ok">✓</span>{g}</li>)}
+          </ul>
+        </div>
+      </div>
       <button type="button" className={buttonClass} onClick={onDone}>{WHY.cta}</button>
     </Centered>
   );
@@ -76,22 +77,18 @@ export function TestPlaceholder({ which, onDone }: StepProps & { which: 'pretest
 
 export function End() {
   const logger = useLogger();
-  const { xp, level, badges } = useGame();
+  const { pieces, total } = useTrophy();
   return (
     <Centered>
-      <h2 className="font-display text-4xl font-bold tracking-tight">{END_TEXT.title}</h2>
-      <p className="text-lg text-muted">{END_TEXT.body}</p>
-      <p className="font-display text-2xl font-bold">
-        <span className="tabular-nums">{xp} XP</span>, level {level}
-      </p>
-      <ul className="flex gap-3">
-        {badges.map((id) => (
-          <li key={id} className="flex flex-col items-center gap-1">
-            <span className="tile grid size-14 place-items-center text-2xl">{BADGES[id].icon}</span>
-            <span className="text-sm font-semibold">{BADGES[id].title}</span>
-          </li>
-        ))}
-      </ul>
+      <Trophy won={pieces.length} total={total} tone="light" className="size-40 drop-shadow-[0_8px_24px_rgb(255_176_32/0.45)]" />
+      <h2 className="font-display text-[clamp(2rem,5vw,3rem)] font-extrabold leading-tight tracking-tight text-balance">{END_TEXT.title}</h2>
+      <p className="max-w-lg text-lg text-pretty text-muted">{END_TEXT.body}</p>
+      <div className="w-full max-w-md rounded-2xl border border-line bg-card p-4 text-left">
+        <p className="mb-2 font-display font-bold">{END_TEXT.goalsTitle}</p>
+        <ul className="space-y-1.5">
+          {GOALS.map((g) => <li key={g} className="flex gap-2"><span aria-hidden className="text-ok">✓</span>{g}</li>)}
+        </ul>
+      </div>
       <div className="flex flex-wrap justify-center gap-3">
         <button type="button" className={buttonClass} onClick={() => downloadLog(logger)}>{END_TEXT.download}</button>
         <button type="button" className={secondaryButtonClass} onClick={() => window.location.reload()}>{END_TEXT.restart}</button>

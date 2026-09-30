@@ -29,23 +29,25 @@ export const LAB_TITLES: Record<LabId, string> = {
   softmax: 'Meet softmax',
 };
 
-/** XP pays for effort, never for being right. Identical in both conditions. */
-export const XP = {
-  step: 20,
-  labDone: 30,
-  prediction: 10,
-  explore: 5,
-  explanation: 20,
-  revision: 15,
-} as const;
-export const XP_PER_LEVEL = 100;
+/** One trophy piece per finished module. Completion only, so it is identical in both conditions. */
+export const TROPHY_PIECES: { id: MissionId; title: string }[] = [
+  { id: 'vectors', title: 'Words as arrows' },
+  { id: 'contrast', title: 'Two contexts' },
+  { id: 'qk', title: 'Query and key' },
+  { id: 'swap', title: 'Swap a word' },
+  { id: 'remove', title: 'Remove a word' },
+  { id: 'rule', title: 'Invent the rule' },
+  { id: 'softmax', title: 'Meet softmax' },
+  { id: 'formula', title: 'The formula' },
+  { id: 'explain', title: 'Your explanation' },
+];
 
-export type BadgeId = 'explainer' | 'calculator' | 'predictor';
-export const BADGES: Record<BadgeId, { title: string; goal: string; icon: string }> = {
-  predictor: { title: 'Predictor', goal: 'Predict how the weights move when a word changes.', icon: '◆' },
-  calculator: { title: 'Calculator', goal: 'Work out the weights for three words.', icon: '▲' },
-  explainer: { title: 'Explainer', goal: 'Say what Q, K, V, softmax and √dₖ do.', icon: '●' },
-};
+/** What learners can do at the end (LG1–LG3), shown on the "Why" screen. */
+export const GOALS = [
+  'Predict how the weights move when a word changes.',
+  'Work out the weights for three words.',
+  'Say what Q, K, V, softmax and √dₖ do.',
+];
 
 export const WELCOME = {
   title: 'How does a word know what it means?',
@@ -73,7 +75,8 @@ export const WHY = {
   body: [
     'Attention runs inside GPT, Claude, Gemini and most translation tools.',
     'For every word, it decides which other words to listen to.',
-    'You will build it yourself, piece by piece. Three badges are waiting.',
+    'You will build it yourself, piece by piece.',
+    'Each module you finish wins a piece of the trophy.',
   ],
   cta: "Let's go",
 };
@@ -127,14 +130,19 @@ export const CONTRAST_TEXT = {
 
 export const QK_TEXT = {
   intro: [
-    'Each word plays two roles.',
-    'Its query says what it is looking for.',
-    'Its key says what it has to offer.',
-    'The match score tells how well a query fits a key. Here it is the dot product you just learned.',
+    '"model" has to decide who to listen to. So it asks a question: its query.',
+    'Every word answers with its key: what it is about.',
+    'The match score compares the two. A big match means "listen to me!"',
   ],
-  task: 'Click the words on the map. Whose key fits the query of "model" best?',
-  found: 'Yes. "fashion show" fits best, so it gets the tallest bar.',
-  toy: "In our toy, query and key are both the word's own arrow. In a real model, the query and the key are two different learned versions of it.",
+  query: 'Who matches me?',
+  task: 'Click each word to hear its answer.',
+  leaderboard: 'Matches so far',
+  winTitle: (w: string) => `"${w}" is the best match!`,
+  win: 'The best match gets the tallest bar. That is how "model" picks who to listen to.',
+  toy: "In our toy, a word's query and key are both its own two numbers. In a real model, they are two different learned versions of it.",
+  /** A word's key, said in plain words (from its two numbers). */
+  keySays: (fashion: number, ml: number) =>
+    Math.hypot(fashion, ml) < 0.6 ? 'Not much here' : fashion > 2 * ml ? "I'm about fashion" : ml > 2 * fashion ? "I'm about ML" : 'A bit of both',
 };
 
 export const RULE_TEXT = {
@@ -147,7 +155,7 @@ export const RULE_TEXT = {
   bottomSlot: 'bottom',
   checks: { positive: 'Every weight is positive', sums: 'The weights add up to 100 %', order: 'A higher score gets a higher weight' },
   pass: 'It works on every test. Nice rule!',
-  fail: 'Not yet. Look for the test that breaks.',
+  fail: 'Not yet.',
   giveUp: 'I tried enough, show me',
   cta: 'See what researchers use',
   minTries: 3,
@@ -165,18 +173,20 @@ export const RULE_BRICKS: { tops: TopId[]; bottoms: BottomId[] } = {
 };
 
 export const SOFTMAX_TEXT = {
-  intro: 'Researchers use eˢ ÷ sum of all tops. This rule is called softmax. e is a number, about 2.72.',
-  why: [
-    'eˢ is positive, even when s is below zero.',
-    'A bigger score always gives a bigger eˢ.',
-    'Dividing by the sum makes the weights add up to 100 %.',
+  intro: 'Researchers use one rule to turn scores into weights. It is called softmax. Watch it work on Test B, step by step.',
+  stages: [
+    { formula: 's', title: 'Start with the match scores', text: "Two are negative. A weight can't be negative, so we can't use them as they are." },
+    { formula: 'eˢ', title: 'Raise e to each score', text: 'e is a number, about 2.72. eˢ is always positive, even for s = −3. Each +1 in score multiplies eˢ by 2.7, so the best match pulls ahead.' },
+    { formula: 'eˢ ÷ sum', title: 'Divide by the sum', text: 'Now each weight is a share of the total. Together they make 100 %.' },
   ],
-  compare: 'Softmax on the scores of our sentence, next to the real bars:',
-  gap: 'Close, but the real bars are a bit flatter. One piece is still missing. You will find it in the formula.',
-  checkPrompt: 'Your turn. Three words have scores 2, 1 and 0. What weight does the first word get?',
-  hint: 'e² ≈ 7.4 · e¹ ≈ 2.7 · e⁰ = 1',
+  next: 'Next step',
+  done: 'That is softmax. If your rule was eˢ ÷ sum, you found it yourself!',
+  checkPrompt: 'Your turn. Three words have match scores 2, 1 and 0. What weight does the first word get?',
   options: [33, 50, 67, 90],
   solution: '7.4 ÷ (7.4 + 2.7 + 1) = 7.4 ÷ 11.1 ≈ 67 %',
+  mysteryTitle: 'One more thing',
+  mystery: (mine: number, real: number) =>
+    `On our sentence, softmax gives "fashion show" ${mine} %. The real bar shows ${real} %. The real bars are flatter. The missing piece is in the formula.`,
 };
 export const SOFTMAX_CHECK_SCORES = [2, 1, 0];
 /** The right option, computed so the text can't drift from the math. */
@@ -187,17 +197,21 @@ export const FORMULA_TEXT = {
   title: 'The formula',
   intro: 'Everything you found in the lab fits in one line. Click each part.',
   parts: {
-    q: { label: 'Q', text: 'Q is the query of "model": what it is looking for.' },
-    k: { label: 'Kᵀ', text: 'K holds the keys of all words: what each one offers. Q times Kᵀ gives one match score per word. Those are the numbers on the tiles.' },
-    dk: { label: '√dₖ', text: 'dₖ is the length of a key vector. Long vectors give big scores, and then softmax puts almost everything on one word. Dividing by √dₖ keeps the scores in range. It is the missing piece from the lab.' },
-    softmax: { label: 'softmax', text: 'softmax turns scores into weights: eˢ, then divide by the sum. It is the rule you built in the lab.' },
-    v: { label: 'V', text: 'V holds the values: what each word passes on. "model" takes a mix of the values, weighted by the bars. That mix is its new meaning.' },
+    q: { label: 'Q', text: 'Q is the query of "model": its question to the sentence. "Who should I listen to?"' },
+    k: { label: 'Kᵀ', text: "K holds the keys: each word's answer, what it is about. Q times Kᵀ compares the question with every answer. That gives one match score per word." },
+    dk: { label: '√dₖ', text: 'dₖ is how many numbers a key has. Real models use 64 or more. More numbers make bigger match scores. Without the division, softmax then gives one word almost 100 % and the rest almost 0 %. "model" stops listening to the sentence, and training gets stuck. Dividing by √dₖ keeps the scores in range.' },
+    softmax: { label: 'softmax', text: 'softmax turns the match scores into weights: eˢ, then divide by the sum. Every weight is positive, and together they make 100 %.' },
+    v: { label: 'V', text: 'V holds the values: what each word passes on. "model" collects a bit of every value, as much as its bar says. The mix is its new meaning: here, mostly fashion.' },
   } satisfies Record<FormulaPart, { label: string; text: string }>,
-  dkLabel: 'Vector length dₖ',
+  query: 'Who should I listen to?',
+  newMeaning: 'New me: mostly fashion',
+  dkLabel: 'Numbers per key, dₖ',
   dkValues: [2, 8, 64, 512],
-  divideLabel: 'Divide by √dₖ',
-  dkNote: 'Real models use dₖ = 64 or more. Try it with the division off.',
+  without: 'Without ÷√dₖ',
+  with: 'With ÷√dₖ',
+  dkNote: 'Move the slider. Watch what happens without the division.',
   mapNote: 'The dashed arrow is "model" after attention. It moved toward fashion.',
+  pick: 'Pick a part of the formula.',
   remaining: (n: number) => `${n} part${n === 1 ? '' : 's'} left to explore`,
   cta: 'Explain it yourself',
 };
@@ -208,8 +222,9 @@ export const EXPLAIN_TEXT = {
 };
 
 export const END_TEXT = {
-  title: 'You finished the lesson',
-  body: 'You built attention from scratch: scores, softmax, scaling and values.',
+  title: 'Congratulations! You finished the lecture.',
+  body: 'You built attention from scratch: queries and keys, softmax, scaling and values. The trophy is yours.',
+  goalsTitle: 'You can now:',
   download: 'Download session log',
   restart: 'Start again',
 };

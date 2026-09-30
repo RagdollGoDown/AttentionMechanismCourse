@@ -5,13 +5,16 @@ import type { Feedback } from '@/lib/tutor/schema';
 // is not read as holding a misconception. The LLM tutor is the real judge.
 const NEGATED = /\b(not|no|never|instead|but|even though|although|despite)\b|n't/i;
 
-const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+// Keeps symbols such as Q, K or V capitalised.
+const lowerFirst = (s: string) => (/^[A-Z]\b/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
 
 /** Rule-based stand-in for the LLM tutor: keyword checks against the mission rubric. */
-export function mockFeedback(m: ExplainTask, explanation: string): Feedback {
-  const hits = m.rubric.filter((r) => r.keywords.test(explanation));
-  const sentences = explanation.split(/[.;!?\n]+/);
-  const misconception = m.misconceptions.find((c) => sentences.some((s) => c.keywords.test(s) && !NEGATED.test(s))) ?? null;
+export function mockFeedback(m: ExplainTask, explanation: string, parts?: Record<string, string>): Feedback {
+  // With one box per part, an idea only counts in its own box.
+  const textFor = (part?: string) => (part && parts ? parts[part] ?? '' : explanation);
+  const hits = m.rubric.filter((r) => r.keywords.test(textFor(r.part)));
+  const misconception = m.misconceptions.find((c) =>
+    textFor(c.part).split(/[.;!?\n]+/).some((s) => c.keywords.test(s) && !NEGATED.test(s))) ?? null;
   const firstMissing = m.rubric.find((r) => !hits.includes(r));
 
   const correct = hits.length > 0

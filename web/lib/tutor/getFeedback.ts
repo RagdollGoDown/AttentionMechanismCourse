@@ -65,5 +65,5 @@ export async function getFeedback(req: FeedbackRequest, llm: LlmFn | null, timeo
       console.error('[tutor] LLM failed, using mock tutor:', err);
     }
   }
-  return { ...mockFeedback(mission, req.explanation), source: 'mock', latencyMs: Date.now() - start };
+  return { ...mockFeedback(mission, req.explanation, req.parts), source: 'mock', latencyMs: Date.now() - start };
 }

@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useGame } from '@/components/GameProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { MissionShell } from '@/components/MissionShell';
 import { Playground } from '@/components/Playground';
+import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { FOCUS, SENTENCE_A, SENTENCE_B } from '@/content/sentences';
-import { CONTRAST_TEXT, LAB_TITLES, XP } from '@/content/steps';
+import { CONTRAST_TEXT, LAB_TITLES } from '@/content/steps';
 import { toTiles, topKey, type Tile } from '@/lib/tiles';
 
 const SENTENCES = {
@@ -24,7 +24,6 @@ const wordOf = (which: Which, key: string | null) => SENTENCES[which].tiles.find
 
 export function Contrast({ onDone }: StepProps) {
   const logger = useLogger();
-  const { award } = useGame();
   const [picks, setPicks] = useState<Record<Which, string | null>>({ A: null, B: null });
   const [revealed, setRevealed] = useState(false);
   const [reflection, setReflection] = useState('');
@@ -39,12 +38,10 @@ export function Contrast({ onDone }: StepProps) {
       A: { pick: wordOf('A', picks.A), correct: picks.A === TOP.A },
       B: { pick: wordOf('B', picks.B), correct: picks.B === TOP.B },
     });
-    award(XP.prediction, 'contrast:predict');
   }
   function finish() {
     if (reflection.trim()) {
       logger.log('reflection_submit', { text: reflection.trim() });
-      award(XP.explore, 'contrast:reflect');
     }
     onDone();
   }
@@ -62,6 +59,14 @@ export function Contrast({ onDone }: StepProps) {
           </li>
         ))}
       </ul>
+      {revealed && (() => {
+        const right = (['A', 'B'] as const).filter((w) => picks[w] === TOP[w]).length;
+        return (
+          <ResultBanner ok={right === 2} title={right === 2 ? 'Right on both!' : `${right} of 2 right.`}>
+            <p>In A, &quot;model&quot; listens most to &quot;{wordOf('A', TOP.A)}&quot;. In B, to &quot;{wordOf('B', TOP.B)}&quot;. Same word, different context, different bars.</p>
+          </ResultBanner>
+        );
+      })()}
       {!revealed ? (
         <button type="button" className={buttonClass} disabled={!picks.A || !picks.B} onClick={reveal}>
           {CONTRAST_TEXT.revealLabel}

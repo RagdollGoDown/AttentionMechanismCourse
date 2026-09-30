@@ -7,7 +7,7 @@ export function FeedbackCard({ shown, round }: { shown: ShownFeedback; round: nu
     return (
       <div className="rounded-xl border-2 border-ok/40 bg-ok/5 p-3">
         <p className="mb-1 font-display font-bold text-ok">Expert answer</p>
-        <p>{shown.text}</p>
+        <p className="whitespace-pre-line">{shown.text}</p>
         <p className="mt-2 text-xs text-muted">Compare it with yours. Then revise if you want.</p>
       </div>
     );

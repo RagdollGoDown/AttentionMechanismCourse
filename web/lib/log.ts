@@ -24,10 +24,10 @@ export type EventType =
   | 'qk_select'
   | 'rule_try'
   | 'check_answer'
+  | 'softmax_stage'
   | 'formula_part'
   | 'dk_change'
-  | 'xp_gain'
-  | 'badge';
+  | 'trophy_piece';
 
 export interface LogEvent {
   sessionId: string;

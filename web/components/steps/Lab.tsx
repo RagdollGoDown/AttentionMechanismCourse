@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, type ComponentType } from 'react';
-import { useGame } from '@/components/GameProvider';
 import { useLogger } from '@/components/LoggerProvider';
+import { useTrophy } from '@/components/TrophyProvider';
 import { buttonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { Contrast } from '@/components/lab/Contrast';
@@ -12,7 +12,7 @@ import { RuleBuilder } from '@/components/lab/RuleBuilder';
 import { Softmax } from '@/components/lab/Softmax';
 import { TUTOR_MISSIONS } from '@/content/missions';
 import { FOCUS, SENTENCE_A } from '@/content/sentences';
-import { LAB_ORDER, LAB_TEXT, LAB_TITLES, XP, type LabId } from '@/content/steps';
+import { LAB_ORDER, LAB_TEXT, LAB_TITLES, type LabId } from '@/content/steps';
 import { displayWord } from '@/lib/tiles';
 
 function Swap(p: StepProps) {
@@ -45,7 +45,7 @@ function Lock() {
  */
 export function Lab({ condition, onDone }: StepProps) {
   const logger = useLogger();
-  const { award, earnBadge } = useGame();
+  const { win } = useTrophy();
   const [done, setDone] = useState<LabId[]>([]);
   const [active, setActive] = useState<LabId>('contrast');
   const [opened, setOpened] = useState<LabId[]>(['contrast']);
@@ -69,8 +69,7 @@ export function Lab({ condition, onDone }: StepProps) {
   function finish(id: LabId) {
     if (!done.includes(id)) {
       setDone([...done, id]);
-      award(XP.labDone, `lab:${id}`);
-      if (id === 'remove') earnBadge('predictor');
+      win(id);
     }
     const next = LAB_ORDER[LAB_ORDER.indexOf(id) + 1];
     if (next) {

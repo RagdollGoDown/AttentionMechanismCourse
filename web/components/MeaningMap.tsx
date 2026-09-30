@@ -95,7 +95,7 @@ export function MeaningMap({ words, selected, onSelect, labels = {}, extra, focu
           <g>
             <line x1={ox} y1={oy} x2={x} y2={y} stroke={INK} strokeWidth={3} strokeDasharray="6 4" />
             <circle cx={x} cy={y} r={5} fill={INK} />
-            <text x={x + 8} y={y + 4} fill={INK} fontSize={12} fontWeight={700}>{extra.label}</text>
+            <text x={x} y={y - 12} textAnchor="middle" fill={INK} fontSize={12} fontWeight={700}>{extra.label}</text>
           </g>
         );
       })()}

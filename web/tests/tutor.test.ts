@@ -186,9 +186,9 @@ describe('tutor hardening', () => {
 
 describe('formula task', () => {
   it.each(['swap', 'remove', 'formula'] as const)('%s: the expert answer earns every rubric idea and no misconception', async (id) => {
-    const { EXPLAIN_TASKS } = await import('@/content/missions');
+    const { EXPLAIN_TASKS, FORMULA_EXPERT } = await import('@/content/missions');
     const t = EXPLAIN_TASKS[id];
-    const f = mockFeedback(t, t.expertAnswer);
+    const f = mockFeedback(t, t.expertAnswer, id === 'formula' ? FORMULA_EXPERT : undefined);
     expect(f.rubricHits).toEqual(t.rubric.map((r) => r.id));
     expect(f.misconceptionId).toBeNull();
   });
@@ -202,6 +202,34 @@ describe('formula task', () => {
   });
   it('flags "softmax only keeps the highest score"', async () => {
     const { FORMULA_TASK } = await import('@/content/missions');
-    expect(mockFeedback(FORMULA_TASK, 'softmax only keeps the highest score word').misconceptionId).toBe('maxOnly');
+    expect(mockFeedback(FORMULA_TASK, '', { softmax: 'it only keeps the highest score word' }).misconceptionId).toBe('maxOnly');
   });
+  it('checks each idea in its own box only', async () => {
+    const { FORMULA_TASK } = await import('@/content/missions');
+    // "compare" belongs to Kᵀ; written in the Q box it must not count for Kᵀ.
+    const f = mockFeedback(FORMULA_TASK, '', { q: 'it compares scores', k: 'no idea', dk: '', softmax: '', v: '' });
+    expect(f.rubricHits).not.toContain('qk');
+  });
+  it('points at the first empty or wrong box', async () => {
+    const { FORMULA_TASK, FORMULA_EXPERT } = await import('@/content/missions');
+    const f = mockFeedback(FORMULA_TASK, '', { ...FORMULA_EXPERT, dk: 'no idea' });
+    expect(f.missing).toBe(FORMULA_TASK.rubric.find((r) => r.id === 'scale')!.hint);
+  });
+  it('the request accepts at most 5 short parts', () => {
+    const base = { missionId: 'formula', explanation: 'Q: something long enough', round: 1 };
+    expect(FeedbackRequestSchema.safeParse({ ...base, parts: { q: 'a', k: 'b' } }).success).toBe(true);
+    expect(FeedbackRequestSchema.safeParse({ ...base, parts: { q: 'x'.repeat(111) } }).success).toBe(false);
+    expect(FeedbackRequestSchema.safeParse({ ...base, parts: Object.fromEntries('abcdef'.split('').map((k) => [k, 'x'])) }).success).toBe(false);
+  });
+  it('the joined five boxes always fit in one explanation', async () => {
+    const { FORMULA_TASK } = await import('@/content/missions');
+    const { EXPLANATION_MAX, PART_MAX } = await import('@/lib/tutor/schema');
+    const joined = FORMULA_TASK.parts!.map((p) => `${p.label}: ${'x'.repeat(PART_MAX)}`).join('\n');
+    expect(joined.length).toBeLessThanOrEqual(EXPLANATION_MAX);
+  });
+});
+
+it('the offline tutor keeps symbols like Q capitalised when quoting an idea', async () => {
+  const { FORMULA_TASK, FORMULA_EXPERT } = await import('@/content/missions');
+  expect(mockFeedback(FORMULA_TASK, '', { ...FORMULA_EXPERT }).correct).toContain('Q is');
 });

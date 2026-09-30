@@ -57,3 +57,18 @@ Chapters on a quest map. Intro and consolidation are linear. The lab is a hub.
 - Not done: pre-/post-test content (placeholders), no LLM key on prod, not deployed, not committed.
 - Watch out: XP for revisions may raise revision rates in *both* conditions (RQ2). It is equal
   across groups, but mention it in the report.
+
+# M3 v3: feedback round after playtest (2026-09-30)
+- [x] Success/fail feedback: one prominent result banner (big green / amber), used everywhere
+- [x] Query & key: rework (query card meets key card, match leaderboard, no map arrows)
+- [x] Swap/remove: animate the change (old tile leaves, new tile drops in; smiled shrinks out) + preview before
+- [x] Match scores: labelled "match 4.3" under the tile instead of an unlabelled corner number
+- [x] Softmax: staged pipeline (scores → eˢ → ÷ sum) with intuition per stage; cleaner check
+- [x] Formula: each part animates the sentence (Q: model asks; K: words answer; √dₖ: with vs without; softmax: bars grow; V: values flow into model)
+- [x] Explain: one text box per formula part; rubric checked per part
+- [x] Remove XP and badges → trophy built from pieces (one per module), congratulations at the end
+- [x] Tests, build, playthrough at phone + desktop, log
+
+## Review (v3)
+- All 8 feedback items done. 140 tests pass, lint and build are clean, and full playthroughs pass on phone (AI) and desktop (control).
+- Not committed or deployed yet. AI log entry written in logs/julien.md.

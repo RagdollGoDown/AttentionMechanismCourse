@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useGame } from '@/components/GameProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { MeaningMap } from '@/components/MeaningMap';
 import { MissionShell } from '@/components/MissionShell';
+import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass, noteClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
-import { QUICK_CHECK, VECTORS_TEXT, XP, quickCheckAnswer } from '@/content/steps';
+import { QUICK_CHECK, VECTORS_TEXT, quickCheckAnswer } from '@/content/steps';
 import { EMBEDDINGS, MAP_WORDS } from '@/content/vectors';
 import { dot } from '@/lib/attention';
 
@@ -28,7 +28,6 @@ export function DotBreakdown({ a, b }: { a: string; b: string }) {
 
 export function Vectors({ onDone }: StepProps) {
   const logger = useLogger();
-  const { award } = useGame();
   const [selected, setSelected] = useState<string[]>([]);
   const [answer, setAnswer] = useState<number | null>(null);
   const correct = quickCheckAnswer();
@@ -39,14 +38,12 @@ export function Vectors({ onDone }: StepProps) {
     setSelected(next);
     if (adding && next.length === 2) {
       logger.log('map_pair_select', { a: next[0], b: next[1], dot: dot(EMBEDDINGS[next[0]], EMBEDDINGS[next[1]]) });
-      award(XP.explore, 'vectors:pair');
     }
   }
   function answerCheck(i: number) {
     if (answer !== null) return;
     setAnswer(i);
     logger.log('quick_check_answer', { choice: QUICK_CHECK.pairs[i].join('–'), correct: i === correct });
-    award(XP.prediction, 'vectors:check');
   }
   function skip() {
     logger.log('skip', { step: 'vectors' });
@@ -75,10 +72,9 @@ export function Vectors({ onDone }: StepProps) {
           })}
         </div>
         {answer !== null && (
-          <p className={answer === correct ? 'text-ok' : 'text-miss'}>
-            {answer === correct ? 'Right. ' : 'Not this one. '}
-            {QUICK_CHECK.reason}
-          </p>
+          <ResultBanner ok={answer === correct}>
+            <p>{QUICK_CHECK.reason}</p>
+          </ResultBanner>
         )}
       </div>
       {answer !== null ? (

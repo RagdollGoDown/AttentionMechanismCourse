@@ -226,3 +226,38 @@ with tests that check each mission's claims).
    The preview is behind Vercel login. An authenticated smoke test passed: the page loads the new
    lesson, and `/api/feedback` answers the new `formula` task (offline tutor). Production still
    serves the M3 v1 build until someone promotes this one.
+
+## Session 2026-09-30 — Julien — M3 v3: playtest feedback round
+**Tool:** Claude Code (Claude Opus 5.5)
+
+### Interactions
+1. **User:** playtest feedback on v2: success/fail feedback too quiet; query & key unclear;
+   swap/remove changes not visible; unlabelled score numbers; softmax step confusing; formula
+   needs animations and an explanation of the division; replace XP/badges with a trophy.
+   **AI:** implemented all 8 items:
+   - one prominent `ResultBanner` (green / amber) used in every experiment;
+   - Query & key rewritten: a query card for "model" meets each word's key card, with a match
+     leaderboard (the map arrows are gone);
+   - swap/remove animate on the board (old tile leaves, new tile drops in), with a preview before;
+   - tiles show a labelled "match 4.3" under the word;
+   - Softmax is now a staged pipeline (scores → eˢ → ÷ sum), with one intuition line per stage;
+   - Formula: each clickable part animates the sentence (Q asks, K answers, √dₖ with/without,
+     softmax bars grow, V flows into "model");
+   - Explain step: one text box per formula part, rubric checked per part (schema + mock tutor);
+   - XP/levels/badges replaced by `TrophyProvider` + `Trophy`: one piece per module, n/9 in the
+     header, a congratulation screen at the end.
+2. **User:** "finish the task you were doing"
+   **AI:** re-ran the checks (140 tests, lint, typecheck, `next build`, all clean), ticked the
+   todo item and wrote this entry. Not committed or deployed.
+
+### Summary
+- Done: all 8 playtest items; trophy replaces XP/badges; per-part explanations and rubric.
+- Decisions: the trophy counts completed modules, not correctness, and is identical across
+  conditions. Removing XP also resolves the v2 worry that XP for revisions would inflate revision
+  rates (RQ2).
+- Open questions: do the per-part explain boxes make the task too scaffolded versus one free
+  explanation (LG1)? Pre-/post-test items still placeholders; LLM key for the AI condition.
+- Reflection (AI draft, rewrite in your own words): the playtest found problems that tests and
+  headless runs could not: learners did not *notice* results or changes. Most fixes were about
+  making cause and effect visible (banners, animations, labels), which lowers extraneous load
+  rather than adding content.

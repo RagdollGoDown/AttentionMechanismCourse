@@ -6,6 +6,8 @@ export type TutorMissionId = 'swap' | 'remove' | 'formula';
 
 export interface RubricItem {
   id: string;
+  /** For tasks with parts: the box this idea belongs in. */
+  part?: string;
   /** The target idea, phrased for the tutor prompt. */
   text: string;
   /** Mock-tutor detector. No `g` flag. */
@@ -18,6 +20,7 @@ export interface RubricItem {
 
 export interface Misconception {
   id: string;
+  part?: string;
   text: string;
   keywords: RegExp;
   hint: string;
@@ -32,6 +35,8 @@ export interface ExplainTask {
   expertAnswer: string;
   /** True once the formula has been taught; the tutor may then name its parts. */
   formulaTaught?: boolean;
+  /** One answer box per part; rubric items with a `part` are checked in that box only. */
+  parts?: { id: string; label: string; prompt: string }[];
 }
 
 export type Prediction =
@@ -45,8 +50,6 @@ export interface TutorMission extends ExplainTask {
   before: string[];
   focusIndex: number;
   change: Change;
-  /** Shown under the tile that will change, during the prediction phase. */
-  changeNote: string;
   prediction: Prediction;
   revealNote: string;
 }
@@ -59,7 +62,6 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
     before: SENTENCE_A,
     focusIndex: 4,
     change: { type: 'swap', index: 2, to: 'training run' },
-    changeNote: '→ training run',
     prediction: {
       kind: 'tile',
       prompt: 'Before we swap: which word will "model" listen to most afterwards? Click it in the sentence.',
@@ -73,7 +75,7 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
         text: 'A word gets a high score when it matches what "model" is about (its meaning).',
         keywords: /match|similar|align|meaning|relat|relevan|fit|direction|vector|score/i,
         hint: 'You describe what happened, but not what makes a word score high for "model".',
-        probe: 'Look at the score on each tile. Which words score highest, and what do they share with "model"?',
+        probe: 'Look at the match score under each word. Which words score highest, and what do they share with "model"?',
       },
       {
         id: 'ml',
@@ -113,14 +115,13 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
     before: SENTENCE_A,
     focusIndex: 4,
     change: { type: 'remove', index: 5 },
-    changeNote: '✕ will be removed',
     prediction: {
       kind: 'choice',
       prompt: 'Before we remove it: what happens to the weight on "fashion show"?',
       options: ['It goes up', 'It goes down', 'It stays the same'],
       correct: 'It goes up',
     },
-    revealNote: 'Look at the score on "fashion show". It did not change. Its weight did.',
+    revealNote: 'Look at the match score under "fashion show". It did not change. Its weight did.',
     explainPrompt: 'The score of "fashion show" did not change, yet its weight went up. Why?',
     rubric: [
       {
@@ -159,51 +160,81 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
   },
 };
 
+
+const FORMULA_EXPERT: Record<string, string> = {
+  q: 'Q is what "model" is looking for: its question to the sentence.',
+  k: 'K is what each word offers. Q times Kᵀ compares them and gives one match score per word.',
+  dk: 'Long vectors make big scores. Dividing by √dₖ keeps them in range, so one word does not take all the weight.',
+  softmax: 'softmax turns the scores into positive weights that add up to 100 %.',
+  v: 'V is what each word passes on. "model" takes a weighted mix of the values: its new meaning.',
+};
+
 export const FORMULA_TASK: ExplainTask = {
   id: 'formula',
   formulaTaught: true,
-  explainPrompt: 'In your own words: what do Q, K, V, softmax and √dₖ each do when "model" reads the sentence?',
+  explainPrompt: 'Explain each part in your own words. One short sentence each.',
+  parts: [
+    { id: 'q', label: 'Q', prompt: 'What does Q do?' },
+    { id: 'k', label: 'Kᵀ', prompt: 'What does Kᵀ do, together with Q?' },
+    { id: 'dk', label: '√dₖ', prompt: 'Why divide by √dₖ?' },
+    { id: 'softmax', label: 'softmax', prompt: 'What does softmax do?' },
+    { id: 'v', label: 'V', prompt: 'What does V do?' },
+  ],
   rubric: [
     {
+      id: 'q',
+      part: 'q',
+      text: 'Q is what "model" is looking for: its question to the other words.',
+      keywords: /look|search|seek|want|ask|question|need|find|interest|attention/i,
+      hint: 'Your Q box does not say what the query is for.',
+      probe: 'Click Q. What does "model" ask the sentence?',
+    },
+    {
       id: 'qk',
-      text: 'The query of "model" is compared with the key of every word; a good match gives a high score.',
-      keywords: /\b(q|quer(y|ies))\b[^.]{0,80}\b(k|keys?)\b|\b(k|keys?)\b[^.]{0,80}\b(q|quer(y|ies))\b/i,
-      hint: 'You have not said where the scores come from.',
-      probe: 'Click Q and Kᵀ in the formula. What is the query of "model" compared with?',
+      part: 'k',
+      text: 'K is what each word offers; Q times Kᵀ compares the query with every key and gives a match score per word.',
+      keywords: /offer|about|describ|label|contain|advertis|match|compar|score|answer|similar/i,
+      hint: 'Your Kᵀ box does not say what the keys are compared with, or what comes out.',
+      probe: 'Click Kᵀ. What does each word answer, and what number appears under it?',
+    },
+    {
+      id: 'scale',
+      part: 'dk',
+      text: '√dₖ shrinks the scores, so softmax does not put almost all the weight on one word when vectors are long.',
+      keywords: /big|large|grow|huge|small|shrink|peak|spik|one word|extreme|sharp|flat|stable|range|saturat|dominat|100|all the weight/i,
+      hint: 'Your √dₖ box does not say what goes wrong without the division.',
+      probe: 'Click √dₖ and move the slider to 512. Compare the two boards.',
     },
     {
       id: 'softmax',
+      part: 'softmax',
       text: 'softmax turns the scores into positive weights that add up to 100 %.',
-      keywords: /softmax[^.]{0,80}(weight|sum|add|100|\b1\b|positive|probab|normali|share)|(weight|probab|share)[^.]{0,60}softmax/i,
+      keywords: /positive|sum|add|100|\b1\b|share|probab|normali|weight/i,
       hint: 'What does softmax do to the scores?',
       probe: 'Click softmax. What is true of the weights that was not true of the scores?',
     },
     {
-      id: 'scale',
-      text: '√dₖ shrinks the scores, so softmax does not put almost all the weight on one word when vectors are long.',
-      keywords: /(√|sqrt|root|d_?k|dₖ|scal|divid)[^.]{0,100}(big|large|grow|huge|small|shrink|peak|spik|one word|extreme|sharp|flat|stable|range|saturat|dominat)/i,
-      hint: 'Why divide by √dₖ at all?',
-      probe: 'Turn the division off and move the dₖ slider. What happens to the bars?',
-    },
-    {
       id: 'values',
+      part: 'v',
       text: 'The output of "model" is a mix of the values V, weighted by the attention weights.',
-      keywords: /\b(v|values?)\b[^.]{0,80}(mix|weighted|sum|combin|average|blend)|(mix|weighted|sum|combin|average|blend)[^.]{0,80}\b(v|values?)\b/i,
-      hint: 'What does "model" get at the very end?',
-      probe: 'Click V. Where does the arrow of "model" move, and why there?',
+      keywords: /mix|weighted|sum|combin|average|blend|pass|collect|new meaning|informat|content/i,
+      hint: 'Your V box does not say what "model" gets at the very end.',
+      probe: 'Click V. What flows into "model", and how much from each word?',
     },
   ],
   misconceptions: [
     {
       id: 'maxOnly',
+      part: 'softmax',
       text: 'softmax keeps only the word with the highest score.',
-      keywords: /softmax[^.]{0,60}\b(only|just)\b[^.]{0,30}\b(one|highest|biggest|max|top|best)\b|\b(only|just) (the )?(highest|biggest|top|best)\b[^.]{0,30}\b(word|score)\b[^.]{0,20}\b(counts?|matters?|kept|survives?)\b/i,
+      keywords: /\b(only|just)\b[^.]{0,30}\b(one|highest|biggest|max|top|best)\b[^.]{0,20}\b(word|score)?/i,
       hint: 'Careful: softmax keeps every word in the mix, some with small weights.',
-      probe: 'Look at the bars. Does any word get exactly 0 %?',
+      probe: 'Click softmax and look at the bars. Does any word get exactly 0 %?',
     },
   ],
-  expertAnswer:
-    'Q is the query of "model": what it looks for. K holds the keys of all words: what each one offers. Q times Kᵀ compares the query with every key and gives one match score per word. Dividing by √dₖ keeps these scores small. Otherwise, with long vectors, softmax would put almost all the weight on one word. softmax turns the scores into positive weights that add up to 100 %. Finally, "model" takes a mix of the values V, weighted by these weights. That mix is its new meaning in this sentence.',
+  expertAnswer: Object.entries(FORMULA_EXPERT).map(([id, t]) => `${({ q: 'Q', k: 'Kᵀ', dk: '√dₖ', softmax: 'softmax', v: 'V' } as Record<string, string>)[id]}: ${t}`).join('\n'),
 };
+
+export { FORMULA_EXPERT };
 
 export const EXPLAIN_TASKS: Record<TutorMissionId, ExplainTask> = { ...TUTOR_MISSIONS, formula: FORMULA_TASK };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ComponentType } from 'react';
-import { GameProvider, useGame } from '@/components/GameProvider';
+import { TrophyProvider, useTrophy } from '@/components/TrophyProvider';
 import { Header } from '@/components/Header';
 import { LoggerProvider, useLogger } from '@/components/LoggerProvider';
 import { SessionLog } from '@/components/SessionLog';
@@ -11,7 +11,7 @@ import { End, TestPlaceholder, Welcome, Why } from '@/components/steps/Intro';
 import { Lab } from '@/components/steps/Lab';
 import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
-import { STEP_ORDER, XP, type StepId } from '@/content/steps';
+import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
 
 function Pretest(p: StepProps) {
@@ -36,16 +36,16 @@ const VIEWS: Record<StepId, ComponentType<StepProps>> = {
 export function Lesson({ initialCondition }: { initialCondition: Condition }) {
   return (
     <LoggerProvider condition={initialCondition}>
-      <GameProvider>
+      <TrophyProvider>
         <LessonInner initialCondition={initialCondition} />
-      </GameProvider>
+      </TrophyProvider>
     </LoggerProvider>
   );
 }
 
 function LessonInner({ initialCondition }: { initialCondition: Condition }) {
   const logger = useLogger();
-  const { award } = useGame();
+  const { win } = useTrophy();
   const [condition, setCondition] = useState(initialCondition);
   const [index, setIndex] = useState(0);
   const [logOpen, setLogOpen] = useState(false);
@@ -62,7 +62,7 @@ function LessonInner({ initialCondition }: { initialCondition: Condition }) {
   }, [id, logger]);
 
   function next() {
-    if (id) award(XP.step, `step:${id}`);
+    if (id) win(id);
     setIndex((i) => i + 1);
     window.scrollTo({ top: 0 });
   }

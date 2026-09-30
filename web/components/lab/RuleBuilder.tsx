@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useGame } from '@/components/GameProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { MissionShell } from '@/components/MissionShell';
+import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass, secondaryButtonClass, selectedClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { FOCUS, SENTENCE_A } from '@/content/sentences';
-import { LAB_TITLES, RULE_BRICKS, RULE_SETS, RULE_TEXT, XP } from '@/content/steps';
+import { LAB_TITLES, RULE_BRICKS, RULE_SETS, RULE_TEXT } from '@/content/steps';
 import { BOTTOMS, TOPS, applyRule, checkRule, passes, type BottomId, type RuleCheck, type TopId } from '@/lib/rules';
 import { toTiles, weightsFor } from '@/lib/tiles';
 
@@ -68,7 +68,6 @@ function TestCard({ set, weights, check }: { set: (typeof SETS)[number]; weights
 /** Productive failure: learners snap bricks into "weight = top ÷ bottom" and test the rule on three score sets. */
 export function RuleBuilder({ onDone }: StepProps) {
   const logger = useLogger();
-  const { award } = useGame();
   const [top, setTop] = useState<TopId | null>(null);
   const [bottom, setBottom] = useState<BottomId | null>(null);
   const [tried, setTried] = useState<string[]>([]);
@@ -90,7 +89,6 @@ export function RuleBuilder({ onDone }: StepProps) {
     setTried([...tried, rule]);
     const checks = SETS.map((s) => checkRule(applyRule(nextTop, nextBottom, s.scores), s.scores));
     logger.log('rule_try', { rule, passes: checks.every(passes), checks });
-    award(XP.explore, `rule:${rule}`);
   }
 
   const panel = (
@@ -125,7 +123,11 @@ export function RuleBuilder({ onDone }: StepProps) {
         </div>
       </fieldset>
 
-      {results && <p className={`font-semibold ${allPass ? 'text-ok' : 'text-miss'}`}>{allPass ? RULE_TEXT.pass : RULE_TEXT.fail}</p>}
+      {results && (allPass
+        ? <ResultBanner ok title={RULE_TEXT.pass} />
+        : <ResultBanner ok={false} title={RULE_TEXT.fail}>
+          <p>{SETS.filter((_, i) => !passes(results[i].check)).map((s) => s.name).join(' and ')} {results.filter((r) => !passes(r.check)).length === 1 ? 'breaks' : 'break'} your rule.</p>
+        </ResultBanner>)}
       <p className="text-sm text-muted">Rules tried: {tried.length}</p>
 
       {(allPass || tried.length >= RULE_TEXT.minTries) && (

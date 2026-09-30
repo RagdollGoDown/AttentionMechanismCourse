@@ -1,9 +1,10 @@
 'use client';
 
 import { ConditionToggle } from '@/components/ConditionToggle';
-import { useGame } from '@/components/GameProvider';
+import { Trophy } from '@/components/Trophy';
+import { useTrophy } from '@/components/TrophyProvider';
 import { secondaryButtonClass } from '@/components/ui';
-import { BADGES, CHAPTERS, XP_PER_LEVEL, type BadgeId, type StepId } from '@/content/steps';
+import { CHAPTERS, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
 
 export function Header({ condition, onConditionChange, step, onOpenLog }: {
@@ -12,7 +13,7 @@ export function Header({ condition, onConditionChange, step, onOpenLog }: {
   step: StepId;
   onOpenLog: () => void;
 }) {
-  const { xp, level, levelXp, badges, toast } = useGame();
+  const { pieces, total, latest } = useTrophy();
   const current = CHAPTERS.findIndex((c) => c.steps.includes(step));
   return (
     <header className="z-10 bg-ink text-white shadow-md sm:sticky sm:top-0">
@@ -37,39 +38,19 @@ export function Header({ condition, onConditionChange, step, onOpenLog }: {
         </ol>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden gap-1 sm:flex" aria-label="Badges">
-            {(Object.keys(BADGES) as BadgeId[]).map((id) => {
-              const earned = badges.includes(id);
-              return (
-                <span
-                  key={id}
-                  title={`${BADGES[id].title}: ${BADGES[id].goal}${earned ? '' : ' (not earned yet)'}`}
-                  className={`grid size-7 place-items-center rounded-md text-sm ${earned ? 'tile' : 'border border-white/25 text-white/30'}`}
-                >
-                  {BADGES[id].icon}
-                </span>
-              );
-            })}
-          </div>
-
-          <div className="relative w-32 sm:w-40">
-            <div className="flex items-baseline justify-between text-xs">
-              <span className="font-display font-bold">Level {level}</span>
-              <span className="tabular-nums text-white/70">{xp} XP</span>
-            </div>
-            <div
-              className="mt-1 h-2 overflow-hidden rounded-full bg-white/15"
-              role="progressbar"
-              aria-label="XP to next level"
-              aria-valuemin={0}
-              aria-valuemax={XP_PER_LEVEL}
-              aria-valuenow={levelXp}
-            >
-              <div className="h-full rounded-full bg-xp transition-[width] duration-700 ease-out" style={{ width: `${(levelXp / XP_PER_LEVEL) * 100}%` }} />
-            </div>
-            {toast && (
-              <span key={toast.id} className="xp-toast pointer-events-none absolute -bottom-6 right-0 font-display text-sm font-bold text-xp" aria-live="polite">
-                +{toast.amount} XP
+          <div className="relative flex items-center gap-2">
+            <Trophy won={pieces.length} total={total} className="size-9" />
+            <span className="font-display text-sm font-bold tabular-nums">
+              {pieces.length}/{total}
+              <span className="sr-only"> trophy pieces</span>
+            </span>
+            {latest && (
+              <span
+                key={latest.id}
+                className="piece-toast pointer-events-none fixed inset-x-0 bottom-5 z-40 mx-auto w-fit max-w-[90vw] rounded-xl bg-xp px-4 py-2.5 text-center font-display text-base font-bold text-ink shadow-xl"
+                aria-live="polite"
+              >
+                Trophy piece won: {latest.title}
               </span>
             )}
           </div>
