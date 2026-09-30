@@ -218,3 +218,11 @@ with tests that check each mission's claims).
   failure is informative. The headless playthrough caught problems no unit test would, such as an
   accessibility bug and hydration races, but it did not judge whether the lesson *teaches*. That
   still needs a pilot with a real student.
+
+**Addendum (same session)**
+2. **User:** "commit and deploy"
+   **AI:** Tests passed (134), then committed `c18e82f` on `feat/m3-prototype`. It deployed a
+   Vercel *preview* (not production): https://attention-playground-bu6h41dnr-julienerbland-1855s-projects.vercel.app
+   The preview is behind Vercel login. An authenticated smoke test passed: the page loads the new
+   lesson, and `/api/feedback` answers the new `formula` task (offline tutor). Production still
+   serves the M3 v1 build until someone promotes this one.
