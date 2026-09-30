@@ -6,7 +6,7 @@ const display = Bricolage_Grotesque({ subsets: ['latin'], variable: '--font-bric
 const body = Atkinson_Hyperlegible_Next({ subsets: ['latin'], variable: '--font-atkinson', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'Attention Lab',
+  title: 'Attention Seekers',
   description: 'Find out how a word decides which other words to listen to.',
 };
 

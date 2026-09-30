@@ -267,3 +267,14 @@ with tests that check each mission's claims).
   headless runs could not: learners did not *notice* results or changes. Most fixes were about
   making cause and effect visible (banners, animations, labels), which lowers extraneous load
   rather than adding content.
+4. **User:** asked what differs between the AI tutor and the expert-answer version, and how the offline tutor works.
+   **AI:** explained from the code: only the feedback after Submit differs (adaptive tutor vs one fixed model answer, both with an optional revision). The LLM tutor runs only with `TUTOR_MODEL` + gateway auth; otherwise a keyword-based offline tutor fills correct/missing/question from the mission rubric. Flagged that production currently runs the offline tutor, that the header's Demo menu lets participants switch condition, and the cause of the "A word" capital bug.
+5. **User:** playtest round 2: swap/remove should show the weights, animate, then ask with "?" weights; bigger trophy notification; the rule builder is unclear ("what are Test A and Test B?"); a transition between slides.
+   **AI:** implemented all four (see tasks/todo.md, "M3 v4"). Design choice by the AI: the match scores are hidden with the weights during the prediction, since the new score of "training run" would give the answer away. Tests renamed to "Our sentence / Mixed scores / All below zero" with a note each, plus a worked example of the rule on "fashion show". Verified with 140 tests, lint, build and headless runs on desktop and phone. Not committed.
+
+**Summary (addendum)**
+- Done: v4 flow for predictions, trophy card, clearer rule builder, slide transitions.
+- Open questions: turn on the LLM tutor before the study; hide the condition switch from participants; the prediction now comes after seeing the new sentence, which changes what we log as "prediction" versus v3.
+- Reflection (AI draft, rewrite in your own words): the playtest again pointed at *noticing* (transitions, rewards, what a test means) more than content. Seeing the sentence change before predicting makes the prediction about something concrete.
+6. **User:** "Rename the name of the page to Attention Seekers, commit and push it, and deploy it"
+   **AI:** renamed the browser title and the header logo ("Attention [Seekers]"), ran tests/lint/build, committed the v4 round with the rename, pushed `feat/m3-prototype` and redeployed production at https://attentionseeker-education.vercel.app.

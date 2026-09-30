@@ -32,7 +32,7 @@ describe('rule builder', () => {
 });
 
 describe('softmax step', () => {
-  it('the pipeline text matches Test B: exactly two negative scores', () => {
+  it('the pipeline text matches Mixed scores: exactly two negative scores', () => {
     expect(RULE_SETS[0].scores.filter((s) => s < 0)).toHaveLength(2);
     expect(SOFTMAX_TEXT.stages[0].text).toContain('Two are negative');
   });

@@ -57,14 +57,14 @@ export interface TutorMission extends ExplainTask {
 export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
   swap: {
     id: 'swap',
-    intro: 'Right now "model" listens most to "fashion show". Next, we swap "fashion show" for "training run".',
+    intro: 'Right now "model" listens most to "fashion show". Look at the bars, then swap "fashion show" for "training run".',
     actionLabel: 'Swap it',
     before: SENTENCE_A,
     focusIndex: 4,
     change: { type: 'swap', index: 2, to: 'training run' },
     prediction: {
       kind: 'tile',
-      prompt: 'Before we swap: which word will "model" listen to most afterwards? Click it in the sentence.',
+      prompt: 'The weights are hidden now. Which word does "model" listen to most? Click it in the sentence.',
       correctIndex: 2,
     },
     revealNote: '"model" now listens most to "training run". Yet "smiled" sits right next to it.',
@@ -110,16 +110,16 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
   },
   remove: {
     id: 'remove',
-    intro: 'Back to the original sentence. Next, we remove "smiled".',
+    intro: 'Back to the original sentence. Note the weight on "fashion show", then remove "smiled".',
     actionLabel: 'Remove "smiled"',
     before: SENTENCE_A,
     focusIndex: 4,
     change: { type: 'remove', index: 5 },
     prediction: {
       kind: 'choice',
-      prompt: 'Before we remove it: what happens to the weight on "fashion show"?',
-      options: ['It goes up', 'It goes down', 'It stays the same'],
-      correct: 'It goes up',
+      prompt: 'The weights are hidden now. What happened to the weight on "fashion show"?',
+      options: ['It went up', 'It went down', 'It stayed the same'],
+      correct: 'It went up',
     },
     revealNote: 'Look at the match score under "fashion show". It did not change. Its weight did.',
     explainPrompt: 'The score of "fashion show" did not change, yet its weight went up. Why?',

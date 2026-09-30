@@ -60,7 +60,7 @@ describe('mission content', () => {
     });
     expect(wa.scores[2]).toBeCloseTo(wb.scores[2], 12);
     expect(wa.weights[2] - wb.weights[2]).toBeGreaterThan(0.05);
-    expect(m.prediction.kind === 'choice' && m.prediction.correct).toBe('It goes up');
+    expect(m.prediction.kind === 'choice' && m.prediction.correct).toBe('It went up');
   });
 
   it('quick check: the intended answer is the most similar pair', () => {

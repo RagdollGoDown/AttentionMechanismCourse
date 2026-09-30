@@ -55,7 +55,7 @@ function Pipeline({ stage }: { stage: number }) {
           );
         })}
       </div>
-      <p className="mt-2 text-center text-xs text-muted">Test B, from the rule builder. The dark line is zero.</p>
+      <p className="mt-2 text-center text-xs text-muted">Mixed scores, from the rule builder. The dark line is zero.</p>
     </div>
   );
 }

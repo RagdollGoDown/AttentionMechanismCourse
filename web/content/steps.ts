@@ -147,12 +147,19 @@ export const QK_TEXT = {
 
 export const RULE_TEXT = {
   intro: [
-    'Match scores can be any number, even below zero.',
-    'The bars need weights instead: all positive, all adding up to 100 %.',
-    'Build a rule that turns scores into weights. Then test it.',
+    'Each word has a match score s. Scores can be any number, even below zero.',
+    'A bar needs a weight: positive, and all the weights add up to 100 %.',
+    'Build a rule that turns scores into weights, in two picks:',
   ],
+  howTo: [
+    'Top: what to do with each score.',
+    'Bottom: what to divide by.',
+  ],
+  testsIntro: 'Your rule runs on three sets of scores. A test turns green when all three checks pass.',
   topSlot: 'top',
   bottomSlot: 'bottom',
+  exampleTitle: 'Your rule on one word',
+  sentenceNote: 'The real scores from our sentence.',
   checks: { positive: 'Every weight is positive', sums: 'The weights add up to 100 %', order: 'A higher score gets a higher weight' },
   pass: 'It works on every test. Nice rule!',
   fail: 'Not yet.',
@@ -161,10 +168,10 @@ export const RULE_TEXT = {
   minTries: 3,
 };
 
-/** Test sets for the rule. "sentence" is filled in from our sentence's real match scores. */
-export const RULE_SETS: { name: string; words: string[]; scores: number[] }[] = [
-  { name: 'Test B', words: ['A', 'B', 'C', 'D'], scores: [2.5, 0.4, -1.2, -3.0] },
-  { name: 'Test C', words: ['A', 'B', 'C', 'D'], scores: [-8, -4, -6, -1] },
+/** Extra test sets for the rule, each with what it catches. "Our sentence" is added from the real match scores. */
+export const RULE_SETS: { name: string; note: string; words: string[]; scores: number[] }[] = [
+  { name: 'Mixed scores', note: 'Two scores are below zero.', words: ['A', 'B', 'C', 'D'], scores: [2.5, 0.4, -1.2, -3.0] },
+  { name: 'All below zero', note: 'Every score is below zero. The best one is −1.', words: ['A', 'B', 'C', 'D'], scores: [-8, -4, -6, -1] },
 ];
 
 export const RULE_BRICKS: { tops: TopId[]; bottoms: BottomId[] } = {
@@ -173,7 +180,7 @@ export const RULE_BRICKS: { tops: TopId[]; bottoms: BottomId[] } = {
 };
 
 export const SOFTMAX_TEXT = {
-  intro: 'Researchers use one rule to turn scores into weights. It is called softmax. Watch it work on Test B, step by step.',
+  intro: 'Researchers use one rule to turn scores into weights. It is called softmax. Watch it work on the Mixed scores test, step by step.',
   stages: [
     { formula: 's', title: 'Start with the match scores', text: "Two are negative. A weight can't be negative, so we can't use them as they are." },
     { formula: 'eˢ', title: 'Raise e to each score', text: 'e is a number, about 2.72. eˢ is always positive, even for s = −3. Each +1 in score multiplies eˢ by 2.7, so the best match pulls ahead.' },

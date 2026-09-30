@@ -72,3 +72,18 @@ Chapters on a quest map. Intro and consolidation are linear. The lab is a hub.
 ## Review (v3)
 - All 8 feedback items done. 140 tests pass, lint and build are clean, and full playthroughs pass on phone (AI) and desktop (control).
 - Not committed or deployed yet. AI log entry written in logs/julien.md.
+
+# M3 v4: second playtest round (2026-09-30)
+- [x] Swap/remove: show weights before → animate the change → board with "?" weights → predict → reveal
+- [x] Trophy piece notification: big centred card with the trophy
+- [x] Rule builder: meaningful test names + what each test catches; a worked example of the rule on one word
+- [x] Slide transition between steps and lab experiments
+- [x] Tests, lint, build, log
+
+## Review (v4)
+- Swap/remove now run: real weights → change animation → "?" bars (scores hidden too, they would give the answer) → bet → bars grow in. The prediction now happens after seeing the new sentence, and the options use the past tense.
+- Trophy card: centred, trophy at 96 px, piece name and "n of 9", pop-in then fade (3.2 s). It never blocks clicks.
+- Rule builder: tests renamed "Our sentence / Mixed scores / All below zero", each with a note saying what it contains; two numbered picks; a live worked example ("fashion show": s → top → ÷ → %).
+- Slide-in (0.5 s from the right) on every step and every lab tab, off with reduced motion.
+- 140 tests, lint, typecheck, build clean. Headless runs at 1440×900 and 390×844 through swap, remove and rule: no console errors, no overflow.
+- Known: the trophy card briefly covers the top of the next experiment (3 s, click-through).

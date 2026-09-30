@@ -80,7 +80,10 @@ function LessonInner({ initialCondition }: { initialCondition: Condition }) {
     <>
       <Header condition={condition} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
-        {View ? <View key={id} condition={condition} onDone={next} /> : <End />}
+        {/* Keyed wrapper: every new step replays the slide-in. */}
+        <div key={id ?? 'end'} className="slide-in">
+          {View ? <View condition={condition} onDone={next} /> : <End />}
+        </div>
       </main>
       <SessionLog open={logOpen} onClose={() => setLogOpen(false)} />
     </>

@@ -19,7 +19,7 @@ export function Header({ condition, onConditionChange, step, onOpenLog }: {
     <header className="z-10 bg-ink text-white shadow-md sm:sticky sm:top-0">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5">
         <p className="font-display text-lg font-bold tracking-tight">
-          Attention <span className="tile inline-block px-1.5 py-0.5 text-base">Lab</span>
+          Attention <span className="tile inline-block px-1.5 py-0.5 text-base">Seekers</span>
         </p>
 
         <ol className="order-3 flex w-full gap-1 overflow-x-auto sm:order-none sm:w-auto" aria-label="Chapters">
@@ -45,13 +45,16 @@ export function Header({ condition, onConditionChange, step, onOpenLog }: {
               <span className="sr-only"> trophy pieces</span>
             </span>
             {latest && (
-              <span
+              <div
                 key={latest.id}
-                className="piece-toast pointer-events-none fixed inset-x-0 bottom-5 z-40 mx-auto w-fit max-w-[90vw] rounded-xl bg-xp px-4 py-2.5 text-center font-display text-base font-bold text-ink shadow-xl"
-                aria-live="polite"
+                role="status"
+                className="piece-toast pointer-events-none fixed inset-x-0 top-[18vh] z-40 mx-auto flex w-[min(22rem,90vw)] flex-col items-center gap-2 rounded-3xl border-4 border-xp bg-card px-6 py-5 text-center text-ink shadow-2xl"
               >
-                Trophy piece won: {latest.title}
-              </span>
+                <Trophy won={pieces.length} total={total} className="size-24" tone="light" />
+                <p className="font-display text-2xl font-bold">Trophy piece won!</p>
+                <p className="text-lg font-semibold">{latest.title}</p>
+                <p className="rounded-full bg-xp/25 px-3 py-0.5 text-sm font-bold tabular-nums">{pieces.length} of {total} pieces</p>
+              </div>
             )}
           </div>
 

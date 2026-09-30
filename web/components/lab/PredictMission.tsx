@@ -12,7 +12,7 @@ import type { TutorMission } from '@/content/missions';
 import { LAB_TITLES } from '@/content/steps';
 import { applyChange, toTiles, topKey } from '@/lib/tiles';
 
-/** Predict → change the sentence → compare → explain (tutor or expert answer). */
+/** See the weights → change the sentence → predict the hidden weights → reveal → explain (tutor or expert answer). */
 export function PredictMission({ mission, condition, onDone }: StepProps & { mission: TutorMission }) {
   const logger = useLogger();
   const before = useMemo(() => toTiles(mission.before), [mission]);
@@ -23,34 +23,31 @@ export function PredictMission({ mission, condition, onDone }: StepProps & { mis
   const change: PendingChange = mission.change.type === 'swap' ? { kind: 'swap', to: mission.change.to } : { kind: 'remove' };
   const correctChoice = pred.kind === 'tile' ? before[pred.correctIndex].key : pred.correct;
 
+  // before (real weights) → leaving (animation) → predict (weights hidden) → revealed
+  const [phase, setPhase] = useState<'before' | 'leaving' | 'predict' | 'revealed'>('before');
   const [choice, setChoice] = useState<string | null>(null);
-  const [locked, setLocked] = useState(false);
-  const [leaving, setLeaving] = useState(false);
-  const [revealed, setRevealed] = useState(false);
   const [showAfter, setShowAfter] = useState(true);
+  const revealed = phase === 'revealed';
 
-  // Tile predictions name the word that will sit at that position after the change
-  // (picking the "fashion show → training run" tile means predicting "training run").
+  // Tile predictions name the word that sits at that position after the change
+  // (picking the "training run" tile means predicting "training run").
   const choiceLabel = (c: string | null) =>
     c === null ? '…' : pred.kind === 'tile' ? (after.find((t) => t.key === c) ?? before.find((t) => t.key === c))?.word ?? c : c;
 
-  function lock() {
-    setLocked(true);
-    logger.log('prediction', { choice: choiceLabel(choice), correct: choice === correctChoice });
-  }
   function doChange() {
     // Let the old tile visibly leave before the new sentence appears (skipped with reduced motion).
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setLeaving(true);
-    setTimeout(() => {
-      setLeaving(false);
-      setRevealed(true);
-    }, reduce ? 0 : 800);
+    setPhase('leaving');
+    setTimeout(() => setPhase('predict'), reduce ? 0 : 800);
     const c = mission.change;
     logger.log(c.type === 'swap' ? 'swap_word' : 'remove_word', {
       word: mission.before[c.index],
       ...(c.type === 'swap' ? { to: c.to } : {}),
     });
+  }
+  function lock() {
+    setPhase('revealed');
+    logger.log('prediction', { choice: choiceLabel(choice), correct: choice === correctChoice });
     logger.log('reveal', { top: after.find((t) => t.key === topKey(after, focusKey))?.word });
   }
   function toggleView() {
@@ -63,8 +60,10 @@ export function PredictMission({ mission, condition, onDone }: StepProps & { mis
     <div className="space-y-4">
       <p>{mission.intro}</p>
 
-      {!locked && (
-        <div className="space-y-2">
+      {phase === 'before' || phase === 'leaving' ? (
+        <button type="button" className={buttonClass} disabled={phase === 'leaving'} onClick={doChange}>{mission.actionLabel}</button>
+      ) : phase === 'predict' ? (
+        <div className="result-pop space-y-2 rounded-xl border-2 border-cobalt/40 bg-cobalt-soft/40 p-3">
           <p className="font-semibold">{pred.prompt}</p>
           {pred.kind === 'choice' && (
             <div className="flex flex-wrap gap-2">
@@ -76,18 +75,9 @@ export function PredictMission({ mission, condition, onDone }: StepProps & { mis
             </div>
           )}
           {pred.kind === 'tile' && <p className="text-muted">Your pick: <strong className="text-ink">{choiceLabel(choice)}</strong></p>}
-          <button type="button" className={buttonClass} disabled={choice === null} onClick={lock}>Lock in my bet</button>
+          <button type="button" className={buttonClass} disabled={choice === null} onClick={lock}>Lock in and show the weights</button>
         </div>
-      )}
-
-      {locked && !revealed && (
-        <div className="space-y-2">
-          <p>Your bet: <strong>{choiceLabel(choice)}</strong></p>
-          <button type="button" className={buttonClass} disabled={leaving} onClick={doChange}>{mission.actionLabel}</button>
-        </div>
-      )}
-
-      {revealed && (
+      ) : (
         <div className="space-y-4">
           <ResultBanner ok={choice === correctChoice} title={choice === correctChoice ? 'Right bet!' : `Not quite: it's "${choiceLabel(correctChoice)}".`}>
             <p>You bet on &quot;{choiceLabel(choice)}&quot;. {mission.revealNote}</p>
@@ -98,19 +88,22 @@ export function PredictMission({ mission, condition, onDone }: StepProps & { mis
     </div>
   );
 
+  const changed = phase === 'predict' || (revealed && showAfter);
   const stage = (
     <>
       <Playground
-        tiles={revealed && showAfter ? after : before}
+        tiles={changed ? after : before}
         focusKey={focusKey}
-        showWeights
-        onTileClick={pred.kind === 'tile' && !locked ? (t) => setChoice(t.key) : undefined}
-        selectedKey={pred.kind === 'tile' && !revealed ? choice : null}
-        pending={revealed || leaving ? {} : { [changedKey]: change }}
-        leaving={leaving ? { key: changedKey, kind: mission.change.type } : null}
-        enteringKey={revealed && showAfter && mission.change.type === 'swap' ? changedKey : null}
+        // Hidden while predicting: the new scores would give the answer away.
+        showWeights={phase !== 'predict'}
+        showScores={phase !== 'predict'}
+        onTileClick={pred.kind === 'tile' && phase === 'predict' ? (t) => setChoice(t.key) : undefined}
+        selectedKey={pred.kind === 'tile' && phase === 'predict' ? choice : null}
+        pending={phase === 'before' ? { [changedKey]: change } : {}}
+        leaving={phase === 'leaving' ? { key: changedKey, kind: mission.change.type } : null}
+        enteringKey={changed && mission.change.type === 'swap' ? changedKey : null}
       />
-      {revealed && showAfter && mission.change.type === 'remove' && (
+      {changed && mission.change.type === 'remove' && (
         <p className="rounded-full bg-miss/10 px-3 py-1 text-sm font-semibold text-miss">&quot;{mission.before[mission.change.index]}&quot; was removed</p>
       )}
       {revealed && (
@@ -126,7 +119,7 @@ export function PredictMission({ mission, condition, onDone }: StepProps & { mis
       title={LAB_TITLES[mission.id]}
       panel={panel}
       stage={stage}
-      stageLabel={revealed ? (showAfter ? 'After' : 'Before') : 'Now'}
+      stageLabel={phase === 'predict' ? 'After: weights hidden' : revealed ? (showAfter ? 'After' : 'Before') : 'Before'}
     />
   );
 }

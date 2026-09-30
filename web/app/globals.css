@@ -35,12 +35,20 @@
 
 /* The one orchestrated motion: a trophy piece announcement drops in and fades. */
 @keyframes piece-won {
-  0% { opacity: 0; transform: translateY(-6px) scale(0.95); }
-  10% { opacity: 1; transform: translateY(0) scale(1); }
-  85% { opacity: 1; }
-  100% { opacity: 0; }
+  0% { opacity: 0; transform: scale(0.6); }
+  8% { opacity: 1; transform: scale(1.08); }
+  14% { transform: scale(1); }
+  85% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
 }
-.piece-toast { animation: piece-won 3s ease-out forwards; }
+.piece-toast { animation: piece-won 3.2s ease-out forwards; }
+
+/* Moving to the next step or experiment: the new "slide" comes in from the right. */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(3rem); }
+  to { opacity: 1; transform: none; }
+}
+.slide-in { animation: slide-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 
 :focus-visible { outline: 3px solid var(--color-cobalt); outline-offset: 2px; }
 

@@ -12,11 +12,34 @@ import { BOTTOMS, TOPS, applyRule, checkRule, passes, type BottomId, type RuleCh
 import { toTiles, weightsFor } from '@/lib/tiles';
 
 const SETS = [
-  { name: 'Our sentence', words: SENTENCE_A, scores: weightsFor(toTiles(SENTENCE_A), String(SENTENCE_A.indexOf(FOCUS))).scores },
+  { name: 'Our sentence', note: RULE_TEXT.sentenceNote, words: SENTENCE_A, scores: weightsFor(toTiles(SENTENCE_A), String(SENTENCE_A.indexOf(FOCUS))).scores },
   ...RULE_SETS,
 ];
 
 const fmtPercent = (w: number) => (Number.isFinite(w) ? `${Math.round(w * 100)}%` : '÷0');
+const fmt = (n: number) => (Math.abs(n) >= 100 ? n.toFixed(0) : n.toFixed(1));
+
+/** The rule worked out on the top word of our sentence, so the bricks read as a calculation. */
+function Example({ top, bottom }: { top: TopId | null; bottom: BottomId | null }) {
+  const { words, scores } = SETS[0];
+  const i = scores.indexOf(Math.max(...scores));
+  const tops = top ? scores.map(TOPS[top].f) : null;
+  const d = tops && bottom ? BOTTOMS[bottom].f(tops) : null;
+  return (
+    <div className="rounded-xl bg-page p-3 text-sm">
+      <p className="mb-1 font-semibold">{RULE_TEXT.exampleTitle}: &quot;{words[i]}&quot;</p>
+      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-display tabular-nums">
+        <span>s = {fmt(scores[i])}</span>
+        <span aria-hidden>→</span>
+        <span>top = {tops ? fmt(tops[i]) : '?'}</span>
+        <span aria-hidden>→</span>
+        <span>÷ {d === null ? '?' : fmt(d)}</span>
+        <span aria-hidden>=</span>
+        <strong className="text-cobalt">{tops && d !== null ? fmtPercent(tops[i] / d) : '?'}</strong>
+      </p>
+    </div>
+  );
+}
 
 function Slot({ label, value, hint }: { label: string | null; value: string; hint: string }) {
   return (
@@ -30,7 +53,8 @@ function Slot({ label, value, hint }: { label: string | null; value: string; hin
 function TestCard({ set, weights, check }: { set: (typeof SETS)[number]; weights: number[] | null; check: RuleCheck | null }) {
   return (
     <div className={`w-full rounded-xl border-2 p-3 ${check ? (passes(check) ? 'border-ok/50 bg-ok/5' : 'border-miss/40 bg-miss/5') : 'border-line'}`}>
-      <p className="mb-2 font-display font-bold">{set.name}</p>
+      <p className="font-display font-bold">{set.name}</p>
+      <p className="mb-2 text-sm text-muted">{set.note}</p>
       <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${set.words.length}, minmax(0, 1fr))` }}>
         {set.words.map((w, i) => {
           const wt = weights?.[i];
@@ -93,7 +117,10 @@ export function RuleBuilder({ onDone }: StepProps) {
 
   const panel = (
     <div className="space-y-4">
-      <div className="space-y-1.5">{RULE_TEXT.intro.map((p) => <p key={p}>{p}</p>)}</div>
+      <div className="space-y-1.5">
+        {RULE_TEXT.intro.map((p) => <p key={p}>{p}</p>)}
+        <ol className="list-decimal space-y-0.5 pl-6 font-semibold">{RULE_TEXT.howTo.map((p) => <li key={p}>{p}</li>)}</ol>
+      </div>
 
       <p className="flex flex-wrap items-center gap-2 font-display text-xl font-bold" aria-live="polite">
         weight =
@@ -103,7 +130,7 @@ export function RuleBuilder({ onDone }: StepProps) {
       </p>
 
       <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-semibold">Top bricks (use each word&apos;s score s)</legend>
+        <legend className="mb-1 text-sm font-semibold">1. Top: what to do with each score s</legend>
         <div className="flex flex-wrap gap-2">
           {RULE_BRICKS.tops.map((id) => (
             <button key={id} type="button" aria-pressed={top === id} onClick={() => choose(id, bottom)} className={`${secondaryButtonClass} min-w-12 font-display text-base ${top === id ? selectedClass : ''}`}>
@@ -113,7 +140,7 @@ export function RuleBuilder({ onDone }: StepProps) {
         </div>
       </fieldset>
       <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-semibold">Bottom bricks</legend>
+        <legend className="mb-1 text-sm font-semibold">2. Bottom: what to divide by</legend>
         <div className="flex flex-wrap gap-2">
           {RULE_BRICKS.bottoms.map((id) => (
             <button key={id} type="button" aria-pressed={bottom === id} onClick={() => choose(top, id)} className={`${secondaryButtonClass} ${bottom === id ? selectedClass : ''}`}>
@@ -122,6 +149,8 @@ export function RuleBuilder({ onDone }: StepProps) {
           ))}
         </div>
       </fieldset>
+
+      <Example top={top} bottom={bottom} />
 
       {results && (allPass
         ? <ResultBanner ok title={RULE_TEXT.pass} />
@@ -139,8 +168,11 @@ export function RuleBuilder({ onDone }: StepProps) {
   );
 
   const stage = (
-    <div className="grid w-full gap-3 xl:grid-cols-3">
+    <div className="w-full space-y-3">
+      <p className="font-semibold">{RULE_TEXT.testsIntro}</p>
+      <div className="grid w-full gap-3 xl:grid-cols-3">
       {SETS.map((s, i) => <TestCard key={s.name} set={s} weights={results?.[i].weights ?? null} check={results?.[i].check ?? null} />)}
+      </div>
     </div>
   );
 

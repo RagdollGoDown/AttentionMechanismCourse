@@ -133,7 +133,8 @@ export function Lab({ condition, onDone }: StepProps) {
       {opened.map((id) => {
         const View = VIEWS[id];
         return (
-          <div key={id} role="tabpanel" hidden={active !== id}>
+          // Showing a hidden panel restarts its CSS animation, so switching experiments slides too.
+          <div key={id} role="tabpanel" hidden={active !== id} className="slide-in">
             <View condition={condition} onDone={() => finish(id)} />
           </div>
         );

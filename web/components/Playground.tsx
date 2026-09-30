@@ -120,10 +120,10 @@ export function Playground({
               <span className="min-h-4 text-center text-[11px] font-semibold leading-tight">
                 {change?.kind === 'swap' ? <span className="text-cobalt">becomes<br />&quot;{change.to}&quot;</span>
                   : change?.kind === 'remove' ? <span className="text-miss">will be removed</span>
+                  : selectedKey === tile.key ? <span className="text-cobalt">your pick</span>
                   : isNew ? <span className="text-cobalt">new word</span>
                   : isFocus ? <span className="text-muted">focus</span>
-                  : correctKey === tile.key ? <span className="text-ok">✓ top</span>
-                  : selectedKey === tile.key ? <span className="text-cobalt">your pick</span> : null}
+                  : correctKey === tile.key ? <span className="text-ok">✓ top</span> : null}
               </span>
             </div>
           );
