@@ -249,6 +249,12 @@ with tests that check each mission's claims).
 2. **User:** "finish the task you were doing"
    **AI:** re-ran the checks (140 tests, lint, typecheck, `next build`, all clean), ticked the
    todo item and wrote this entry. Not committed or deployed.
+3. **User:** "commit and push on git, deploy on vercel too with name being AttentionSeeker-education"
+   **AI:** committed `5950625` and pushed `feat/m3-prototype` to origin (first push of the branch).
+   Vercel project names must be lowercase, so it created a new project `attentionseeker-education`
+   (the old `attention-playground` project had no env vars, so nothing was lost) and deployed to
+   production: https://attentionseeker-education.vercel.app. Smoke test: page 200, `/api/feedback`
+   answers with the offline tutor. The old URL still serves v1. README link updated.
 
 ### Summary
 - Done: all 8 playtest items; trophy replaces XP/badges; per-part explanations and rubric.

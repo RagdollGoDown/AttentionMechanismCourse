@@ -4,5 +4,5 @@
 
 **Figma:** 
 
-**Prototype (M3):** https://attention-playground-opal.vercel.app/?condition=ai (AI tutor) ·
-https://attention-playground-opal.vercel.app/?condition=control (expert answer). Code in `web/`.
+**Prototype (M3):** https://attentionseeker-education.vercel.app/?condition=ai (AI tutor) ·
+https://attentionseeker-education.vercel.app/?condition=control (expert answer). Code in `web/`.
