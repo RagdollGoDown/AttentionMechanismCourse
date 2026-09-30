@@ -159,3 +159,8 @@ with tests that check each mission's claims).
 3. **User:** Logged in to Vercel (`npx vercel login`) and asked how to check the current
    state of the app. **AI:** Pointed to the local production server, the git log, the ledger
    and this log. The deploy is waiting for explicit confirmation.
+4. **User:** "deploy"
+   **AI:** Linked `web/` to the Vercel project `attention-playground` (personal team) and deployed
+   to production: https://attention-playground-opal.vercel.app. No LLM key yet, so the offline
+   tutor answers. Smoke test: page 200, API mock JSON, 400 on blank input, full headless
+   playthrough in both conditions with complete logs. URLs added to `README.md`.
