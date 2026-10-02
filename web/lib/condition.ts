@@ -5,3 +5,8 @@ export function parseCondition(value: string | readonly string[] | null | undefi
   const v = Array.isArray(value) ? value[0] : value;
   return typeof v === 'string' && v.trim().toLowerCase() === 'control' ? 'control' : 'ai';
 }
+
+/** `?debug` → developer tools on. The flag's presence is enough; any value is ignored. */
+export function parseDebug(value: string | readonly string[] | null | undefined): boolean {
+  return value !== undefined && value !== null;
+}

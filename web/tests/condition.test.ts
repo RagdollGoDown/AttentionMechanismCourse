@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCondition } from '@/lib/condition';
+import { parseCondition, parseDebug } from '@/lib/condition';
 
 describe('parseCondition', () => {
   it.each([
@@ -15,4 +15,14 @@ describe('parseCondition', () => {
   it('uses the first value of a repeated parameter', () => {
     expect(parseCondition(['control', 'ai'])).toBe('control');
   });
+});
+
+describe('parseDebug', () => {
+  it.each([
+    ['', true], // bare ?debug
+    ['anything', true],
+    [['', ''], true], // ?debug&debug
+    [undefined, false],
+    [null, false],
+  ] as const)('%j → %s', (input, expected) => expect(parseDebug(input)).toBe(expected));
 });

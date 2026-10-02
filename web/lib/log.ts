@@ -27,7 +27,10 @@ export type EventType =
   | 'softmax_stage'
   | 'formula_part'
   | 'dk_change'
-  | 'trophy_piece';
+  | 'trophy_piece'
+  // Developer tools (?debug) only; filter these out of study data.
+  | 'debug_goto'
+  | 'debug_reset';
 
 export interface LogEvent {
   sessionId: string;

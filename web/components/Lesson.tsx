@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ComponentType } from 'react';
 import { TrophyProvider, useTrophy } from '@/components/TrophyProvider';
+import { DebugBar } from '@/components/DebugBar';
 import { Header } from '@/components/Header';
 import { LoggerProvider, useLogger } from '@/components/LoggerProvider';
 import { SessionLog } from '@/components/SessionLog';
@@ -33,22 +34,24 @@ const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   posttest: Posttest,
 };
 
-export function Lesson({ initialCondition }: { initialCondition: Condition }) {
+export function Lesson({ initialCondition, debug = false }: { initialCondition: Condition; debug?: boolean }) {
   return (
     <LoggerProvider condition={initialCondition}>
       <TrophyProvider>
-        <LessonInner initialCondition={initialCondition} />
+        <LessonInner initialCondition={initialCondition} debug={debug} />
       </TrophyProvider>
     </LoggerProvider>
   );
 }
 
-function LessonInner({ initialCondition }: { initialCondition: Condition }) {
+function LessonInner({ initialCondition, debug }: { initialCondition: Condition; debug: boolean }) {
   const logger = useLogger();
   const { win } = useTrophy();
   const [condition, setCondition] = useState(initialCondition);
   const [index, setIndex] = useState(0);
   const [logOpen, setLogOpen] = useState(false);
+  // Bumped by the debug "Reset step" button: a new key remounts the step with fresh state.
+  const [resets, setResets] = useState(0);
   const id = index < STEP_ORDER.length ? STEP_ORDER[index] : null;
 
   useEffect(() => {
@@ -67,6 +70,19 @@ function LessonInner({ initialCondition }: { initialCondition: Condition }) {
     window.scrollTo({ top: 0 });
   }
 
+  // Debug tools: no trophy pieces are won by jumping.
+  function goTo(i: number) {
+    const to = Math.max(0, Math.min(i, STEP_ORDER.length));
+    logger.log('debug_goto', { from: id ?? 'end', to: STEP_ORDER[to] ?? 'end' });
+    setIndex(to);
+    window.scrollTo({ top: 0 });
+  }
+  function resetStep() {
+    logger.log('debug_reset', { step: id });
+    setResets((r) => r + 1);
+    window.scrollTo({ top: 0 });
+  }
+
   function changeCondition(c: Condition) {
     setCondition(c);
     logger.setCondition(c);
@@ -81,10 +97,11 @@ function LessonInner({ initialCondition }: { initialCondition: Condition }) {
       <Header condition={condition} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
         {/* Keyed wrapper: every new step replays the slide-in. */}
-        <div key={id ?? 'end'} className="slide-in">
-          {View ? <View condition={condition} onDone={next} /> : <End />}
+        <div key={`${id ?? 'end'}-${resets}`} className="slide-in">
+          {View ? <View condition={condition} onDone={next} debug={debug} /> : <End />}
         </div>
       </main>
+      {debug && <DebugBar index={index} onGoTo={goTo} onReset={resetStep} />}
       <SessionLog open={logOpen} onClose={() => setLogOpen(false)} />
     </>
   );
