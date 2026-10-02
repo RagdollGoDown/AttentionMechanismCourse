@@ -3,7 +3,7 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import { useLogger } from '@/components/LoggerProvider';
 import { useTrophy } from '@/components/TrophyProvider';
-import { buttonClass } from '@/components/ui';
+import { buttonClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { Contrast } from '@/components/lab/Contrast';
 import { QueryKey } from '@/components/lab/QueryKey';
@@ -43,15 +43,17 @@ function Lock() {
  * The hub: the sentence stays on the board while experiments unlock one by one.
  * Opened experiments stay mounted (hidden), so going back never resets them or re-logs a prediction.
  */
-export function Lab({ condition, onDone }: StepProps) {
+export function Lab({ condition, onDone, debug = false }: StepProps) {
   const logger = useLogger();
   const { win } = useTrophy();
   const [done, setDone] = useState<LabId[]>([]);
   const [active, setActive] = useState<LabId>('contrast');
   const [opened, setOpened] = useState<LabId[]>(['contrast']);
+  // Debug only: bumping an experiment's count remounts it with fresh state.
+  const [resets, setResets] = useState<Partial<Record<LabId, number>>>({});
   const unlocked = (id: LabId) => {
     const i = LAB_ORDER.indexOf(id);
-    return i === 0 || done.includes(LAB_ORDER[i - 1]);
+    return debug || i === 0 || done.includes(LAB_ORDER[i - 1]);
   };
 
   // Stamp events with the experiment, not just "lab".
@@ -78,7 +80,13 @@ export function Lab({ condition, onDone }: StepProps) {
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  function resetExperiment(id: LabId) {
+    logger.log('debug_reset', { lab: id });
+    setDone(done.filter((d) => d !== id));
+    setResets({ ...resets, [id]: (resets[id] ?? 0) + 1 });
+  }
 
+  const activeIndex = LAB_ORDER.indexOf(active);
   const allDone = done.length === LAB_ORDER.length;
   return (
     <div className="space-y-4">
@@ -121,6 +129,14 @@ export function Lab({ condition, onDone }: StepProps) {
             );
           })}
         </div>
+        {debug && (
+          <div role="toolbar" aria-label="Lab developer tools" className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border-2 border-dashed border-xp p-2">
+            <span className="rounded bg-xp/25 px-1.5 py-0.5 font-mono text-[11px] font-bold">DEBUG</span>
+            <button type="button" className={secondaryButtonClass} disabled={activeIndex <= 0} onClick={() => open(LAB_ORDER[activeIndex - 1])} aria-label="Previous experiment">←</button>
+            <button type="button" className={secondaryButtonClass} disabled={activeIndex >= LAB_ORDER.length - 1} onClick={() => open(LAB_ORDER[activeIndex + 1])} aria-label="Next experiment">→</button>
+            <button type="button" className={secondaryButtonClass} onClick={() => resetExperiment(active)}>Reset experiment</button>
+          </div>
+        )}
       </div>
 
       {allDone && (
@@ -134,7 +150,7 @@ export function Lab({ condition, onDone }: StepProps) {
         const View = VIEWS[id];
         return (
           // Showing a hidden panel restarts its CSS animation, so switching experiments slides too.
-          <div key={id} role="tabpanel" hidden={active !== id} className="slide-in">
+          <div key={`${id}-${resets[id] ?? 0}`} role="tabpanel" hidden={active !== id} className="slide-in">
             <View condition={condition} onDone={() => finish(id)} />
           </div>
         );
