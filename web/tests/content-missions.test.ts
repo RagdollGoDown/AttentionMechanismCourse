@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { EXPLAIN_TASKS, FORMULA_TASK, TUTOR_MISSIONS } from '@/content/missions';
-import { LAB_ORDER, QUICK_CHECK, STEP_ORDER, quickCheckAnswer } from '@/content/steps';
+import { DOT_PLOT, HAND_DOT, LAB_ORDER, STEP_ORDER, VECTORS_TEXT, dotPlotMin } from '@/content/steps';
+import { EMBEDDINGS } from '@/content/vectors';
+import { dot, type Vec } from '@/lib/attention';
 import { applyChange, toTiles, topKey, weightsFor } from '@/lib/tiles';
 
 const setup = (id: 'swap' | 'remove') => {
@@ -63,10 +65,6 @@ describe('mission content', () => {
     expect(m.prediction.kind === 'choice' && m.prediction.correct).toBe('It went up');
   });
 
-  it('quick check: the intended answer is the most similar pair', () => {
-    expect(quickCheckAnswer()).toBe(0);
-    expect(QUICK_CHECK.pairs[0]).toEqual(['runway', 'dress']);
-  });
 });
 
 describe('displayed percentages', () => {
@@ -83,4 +81,30 @@ it('remove: the “smiled” share quoted in the texts matches its bar', async (
   const shown = `about ${percentages(weightsFor(before, focusKey).weights)[5]} %`;
   expect(m.expertAnswer).toContain(shown);
   expect(m.rubric.find((r) => r.id === 'freed')!.probe).toContain(shown);
+});
+
+describe('warm-up: words as vectors', () => {
+  const { a, bStart, grid } = DOT_PLOT;
+  const points: Vec[] = [];
+  for (let x = -grid; x <= grid; x++) for (let y = -grid; y <= grid; y++) points.push([x, y]);
+
+  it('dot plot: a · b = 0 is reachable with a non-zero b, and b does not start on a finished task', () => {
+    expect(points.some((p) => (p[0] !== 0 || p[1] !== 0) && dot(a, p) === 0)).toBe(true);
+    expect(dot(a, bStart)).not.toBe(0);
+    expect(dot(a, bStart)).not.toBe(dotPlotMin());
+  });
+
+  it('dot plot: the most negative value is below zero', () => {
+    expect(dotPlotMin()).toBeLessThan(0);
+  });
+
+  it('hand computation: the shown solution matches the math', () => {
+    expect(dot(HAND_DOT.a, HAND_DOT.b)).toBe(5);
+    expect(VECTORS_TEXT.dot.handSolution).toContain(`= ${dot(HAND_DOT.a, HAND_DOT.b)}`);
+  });
+
+  it('punchline: "model" sits between the two groups (it matches "dress" about as much as "data")', () => {
+    const m = EMBEDDINGS.model;
+    expect(Math.abs(dot(m, EMBEDDINGS.dress) - dot(m, EMBEDDINGS.data))).toBeLessThan(0.5);
+  });
 });

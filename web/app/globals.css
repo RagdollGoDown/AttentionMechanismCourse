@@ -13,6 +13,8 @@
   --color-xp: #ffb020;
   --color-ok: #1fa37a;
   --color-miss: #e5484d;
+  --color-note: #8250df;
+  --color-note-soft: #f6f0ff;
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
 }
@@ -98,3 +100,12 @@
   100% { transform: translateX(calc(var(--steps) * (100% + var(--gap)))); opacity: 0; }
 }
 .value-flow { animation: value-flow 1.6s ease-in-out infinite; }
+
+/* Formulas: serif italic letters and real subscripts, like a maths textbook. */
+.math {
+  font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
+  font-size: 1.35em;
+  letter-spacing: 0.01em;
+}
+.math var { font-style: italic; }
+.math sub { font-size: 0.65em; font-style: normal; }

@@ -1,5 +1,4 @@
-import { dot, softmax } from '@/lib/attention';
-import { EMBEDDINGS } from '@/content/vectors';
+import { dot, softmax, type Vec } from '@/lib/attention';
 import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
@@ -31,7 +30,7 @@ export const LAB_TITLES: Record<LabId, string> = {
 
 /** One trophy piece per finished module. Completion only, so it is identical in both conditions. */
 export const TROPHY_PIECES: { id: MissionId; title: string }[] = [
-  { id: 'vectors', title: 'Words as arrows' },
+  { id: 'vectors', title: 'Words as vectors' },
   { id: 'contrast', title: 'Two contexts' },
   { id: 'qk', title: 'Query and key' },
   { id: 'swap', title: 'Swap a word' },
@@ -87,30 +86,49 @@ export const TEST_PLACEHOLDER = {
 };
 
 export const VECTORS_TEXT = {
-  title: 'Words as arrows',
-  intro: [
-    'A language model turns each word into a list of numbers: a vector.',
-    'Here each word has just two numbers. How "fashion" is it? How "machine learning" is it?',
-    'Related words point the same way.',
-  ],
-  pickPrompt: 'Click two words on the map.',
-  dotRule: 'Dot product: multiply number by number, then add.',
-  caption: 'Long arrows pointing the same way give a big dot product.',
-  punchline: '"model" sits between the two groups. One arrow has to cover both meanings. So how does "model" know which one it means?',
-  skip: 'I know dot products. Skip',
+  kicker: 'Before the lab',
+  title: 'Words as vectors',
+  intro: 'Two ideas you will need: a word is a vector, and the dot product measures how well two vectors match.',
+  skip: 'I know vectors and dot products. Skip',
+  partOf: (n: number) => `${n} of 2`,
+  next: 'Next',
+  word: {
+    title: 'A word is a vector',
+    body: [
+      'A language model stores each word as a vector: a list of numbers it learns during training.',
+      'How many numbers a vector has is its dimension. Ours have 2 dimensions, so you can see them as arrows. The original Transformer used 512, and today\'s large models use thousands.',
+      'Words with similar meanings end up with vectors that point in a similar direction.',
+      'Our axes have names only to make the map easy to read. In a real model, a single dimension has no clear meaning on its own.',
+    ],
+    hint: 'Hover over a word to see its vector.',
+  },
+  dot: {
+    title: 'The dot product measures a match',
+    rule: 'Multiply the matching entries, then add them up:',
+    note: { title: 'Note', text: 'There are two terms here because our vectors have 2 dimensions: one term per dimension.' },
+    meaning: 'It is big when the arrows point the same way, 0 when they are at a right angle, and negative when they point away from each other.',
+    drag: 'Drag the tip of b.',
+    tasks: {
+      zero: { title: 'Drag b so that a · b = 0', done: 'b is now at a right angle to a.' },
+      min: { title: 'Make a · b as negative as you can', done: 'b points away from a.' },
+      hand: { title: 'Compute [2, 1] · [1, 3] by hand', placeholder: 'Your answer', check: 'Check' },
+    },
+    handSolution: '2 × 1 + 1 × 3 = 5',
+    legend: { pos: 'same way → positive', zero: 'right angle → 0', neg: 'away → negative' },
+  },
+  punchline: '"model" sits between the two groups on the map. One arrow has to cover both meanings. So how does "model" know which one it means?',
   cta: 'Find out',
 };
 
-export const QUICK_CHECK = {
-  prompt: 'Which pair has the largest dot product?',
-  pairs: [['runway', 'dress'], ['model', 'smiled'], ['training', 'dress'], ['data', 'word']] as [string, string][],
-  reason: '"runway" and "dress" are long, and they point almost the same way.',
-};
-
-/** Index of the truly largest dot product in QUICK_CHECK (computed, never hard-coded). */
-export function quickCheckAnswer(): number {
-  const sims = QUICK_CHECK.pairs.map(([a, b]) => dot(EMBEDDINGS[a], EMBEDDINGS[b]));
-  return sims.indexOf(Math.max(...sims));
+/** Part 2: a is fixed, b is dragged on a whole-number grid from −GRID to GRID. */
+export const DOT_PLOT = { a: [-1, 3] as Vec, bStart: [2, 1] as Vec, grid: 4 };
+export const HAND_DOT = { a: [2, 1] as Vec, b: [1, 3] as Vec };
+/** The most negative a · b that b can reach on the grid (computed, never hard-coded). */
+export function dotPlotMin(): number {
+  const { a, grid } = DOT_PLOT;
+  let min = Infinity;
+  for (let x = -grid; x <= grid; x++) for (let y = -grid; y <= grid; y++) min = Math.min(min, dot(a, [x, y]));
+  return min;
 }
 
 export const LAB_TEXT = {
