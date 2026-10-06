@@ -278,3 +278,16 @@ with tests that check each mission's claims).
 - Reflection (AI draft, rewrite in your own words): the playtest again pointed at *noticing* (transitions, rewards, what a test means) more than content. Seeing the sentence change before predicting makes the prediction about something concrete.
 6. **User:** "Rename the name of the page to Attention Seekers, commit and push it, and deploy it"
    **AI:** renamed the browser title and the header logo ("Attention [Seekers]"), ran tests/lint/build, committed the v4 round with the rename, pushed `feat/m3-prototype` and redeployed production at https://attentionseeker-education.vercel.app.
+
+## Session 2026-10-06 — Julien — sync teammates' work and redeploy
+**Tool:** Claude Code (Claude Opus 5.5)
+
+### Interactions
+1. **User:** "Put the repo up to date and explain everything that was added. Then deploy it to vercel production."
+   **AI:** Fetched and fast-forwarded `feat/m3-prototype` (13 commits: PR #1 André's debug tools, PR #2 Morgane's "Words as vectors" warm-up rework, Figma link, both members' AI logs). Explained the changes. Verified with `npm ci`, 148 tests, `tsc`, lint and build (all pass), then ran `vercel deploy --prod`. Smoke test: `?condition=ai`, `?condition=control` and `?debug` return 200, the debug toolbar appears only with `?debug`, `/api/feedback` rejects an empty body with 400. No source files changed.
+
+### Summary
+- Done: local branch synced with origin, production redeployed at https://attentionseeker-education.vercel.app.
+- Decisions: deployed from the CLI, as before; left the empty root `package-lock.json` (added in André's PR) untouched.
+- Open questions: the root `package-lock.json` may trigger Next's multiple-lockfile warning; local `main` is still 2 commits ahead of `origin/main`; `debug_*` events must be filtered out of study data.
+- Reflection (AI draft for Julien to rewrite): The AI gave a quick overview of what teammates had merged without me reading every diff. Running the checks before deploying made sure their combined branches still built.
