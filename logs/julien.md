@@ -290,6 +290,8 @@ with tests that check each mission's claims).
    **AI:** Read `web/content/steps.ts`, `missions.ts`, `ExplainRounds.tsx` and the tutor code, then wrote a step-by-step summary of the flow (9 steps, 6 lab experiments), with the learning goals, mechanisms, condition difference and logged events for each step. No files changed.
 3. **User:** "Generate a diagram of it in a file."
    **AI:** Wrote `docs/prototype-flow.dot` (Graphviz) and rendered it to PDF, SVG and PNG. The diagram has 5 chapter boxes, the 6 lab experiments, the 3 explain points in orange, and a separate "explain loop" box showing the AI and control branches. It took four rounds of layout fixes (a staircase layout, then tangled dashed links), checked visually after each render.
+4. **User:** "Redesign the diagram so it is more readable, more aesthetic and has fewer words; this one is too full to understand."
+   **AI:** Replaced the Graphviz version with a hand-drawn `docs/prototype-flow.svg`: five chapter cards with 1–2 word steps, the explain steps in orange, and one panel showing Write → Tutor hint (AI group) / Expert answer (control group) → Revise (optional). Added `docs/render-flow.sh` (headless Chromium) to export PDF/PNG and removed the `.dot` file. Fixed a cropped PNG and a crooked connector after checking the renders.
 
 ### Summary
 - Done: local branch synced with origin, production redeployed at https://attentionseeker-education.vercel.app.
