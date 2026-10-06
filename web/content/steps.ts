@@ -137,6 +137,8 @@ export const LAB_TEXT = {
   locked: 'Finish the experiment before to unlock this one.',
   next: 'Next experiment',
   done: 'Lab complete. On to the formula',
+  redoNote: 'You finished this one. Your written answers stay as they are.',
+  redo: '↻ Redo the experiment',
 };
 
 export const CONTRAST_TEXT = {

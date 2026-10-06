@@ -31,6 +31,8 @@ export type EventType =
   | 'formula_part'
   | 'dk_change'
   | 'trophy_piece'
+  | 'nav_back'
+  | 'lab_redo'
   // Developer tools (?debug) only; filter these out of study data.
   | 'debug_goto'
   | 'debug_reset';
