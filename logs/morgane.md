@@ -31,7 +31,6 @@ Context: while reviewing the query & key experiment, I questioned the "fashion" 
 - Done: the warm-up is now two parts. Part 1 (a word is a vector): learned vectors, the term "dimension", and an honest note that our axis names are a simplification. Part 2 (the dot product): the formula set as maths, a note linking terms to dimensions, and three tasks the learner must solve without hints. The skip option is kept.
 - Decisions: removed the dimensions and "model matches" parts as low value; no hints on the negative-dot-product task (productive struggle); no named meaning for single dimensions; no maths library for one formula.
 - Open questions: phone-width layout not yet checked; the drag and plot code has no automated tests; the formula step's map still shows named axes; the query & key card still labels the rows "fashion" / "machine learning".
-- Reflection (AI draft, to rewrite): The AI was most useful when I questioned the content: it confirmed that dimensions of real embeddings can't be interpreted and turned that into precise wording. Its first rebuild added more than the lesson needed, and I had to cut half of it, so its proposals needed my judgement on what serves the learning goal.
 
 ## Session 2026-10-06 — Morgane — back navigation and the control revision
 **Tool:** Claude Code (Claude Opus 5.5)
@@ -58,4 +57,3 @@ Context: two changes, split into two PRs from `feat/m3-prototype`: going back to
 - Done: Back from the lab to the warm-up and from the formula to the lab; Redo for finished lab experiments; written answers read-only once the learner moves on; new log events `nav_back` and `lab_redo`. In control, the expert answer is shown once and the revision is confirmed.
 - Decisions: keep the optional revision in both conditions (only the feedback differs); no Back at the start, around the tests or from the Explain step; an allow-list of steps with Back.
 - Open questions: phone-width layout not checked; whether pilot learners want to go back from the Explain step to the lab.
-- Reflection (AI draft, to rewrite): The AI's first version followed my request literally and removed the control revision. Asking it about the impact on the comparison surfaced the confound, and we turned the change into a smaller fix. Its questions before coding and its check of the Explain step helped protect the study design.
