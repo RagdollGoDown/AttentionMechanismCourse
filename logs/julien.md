@@ -286,6 +286,9 @@ with tests that check each mission's claims).
 1. **User:** "Put the repo up to date and explain everything that was added. Then deploy it to vercel production."
    **AI:** Fetched and fast-forwarded `feat/m3-prototype` (13 commits: PR #1 André's debug tools, PR #2 Morgane's "Words as vectors" warm-up rework, Figma link, both members' AI logs). Explained the changes. Verified with `npm ci`, 148 tests, `tsc`, lint and build (all pass), then ran `vercel deploy --prod`. Smoke test: `?condition=ai`, `?condition=control` and `?debug` return 200, the debug toolbar appears only with `?debug`, `/api/feedback` rejects an empty body with 400. No source files changed.
 
+2. **User:** "Give a summary of the prototype flow to use it for the report design."
+   **AI:** Read `web/content/steps.ts`, `missions.ts`, `ExplainRounds.tsx` and the tutor code, then wrote a step-by-step summary of the flow (9 steps, 6 lab experiments), with the learning goals, mechanisms, condition difference and logged events for each step. No files changed.
+
 ### Summary
 - Done: local branch synced with origin, production redeployed at https://attentionseeker-education.vercel.app.
 - Decisions: deployed from the CLI, as before; left the empty root `package-lock.json` (added in André's PR) untouched.
