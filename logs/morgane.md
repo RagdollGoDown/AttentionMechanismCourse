@@ -32,3 +32,30 @@ Context: while reviewing the query & key experiment, I questioned the "fashion" 
 - Decisions: removed the dimensions and "model matches" parts as low value; no hints on the negative-dot-product task (productive struggle); no named meaning for single dimensions; no maths library for one formula.
 - Open questions: phone-width layout not yet checked; the drag and plot code has no automated tests; the formula step's map still shows named axes; the query & key card still labels the rows "fashion" / "machine learning".
 - Reflection (AI draft, to rewrite): The AI was most useful when I questioned the content: it confirmed that dimensions of real embeddings can't be interpreted and turned that into precise wording. Its first rebuild added more than the lesson needed, and I had to cut half of it, so its proposals needed my judgement on what serves the learning goal.
+
+## Session 2026-10-06 — Morgane — back navigation and the control revision
+**Tool:** Claude Code (Claude Opus 5.5)
+
+Context: two changes, split into two PRs from `feat/m3-prototype`: going back to earlier parts of the lesson (branch `feat/back-navigation`), and the revision step in the control condition (branch `feat/control-expert-once`).
+
+### Interactions
+1. **User:** Let learners go back to earlier parts: written answers should be visible again, and lab experiments can be redone. Also remove the revision step in the control condition, since the expert answer is the same whatever the learner writes.
+   **AI:** Asked four questions before coding. I chose two PRs, read-only answers when going back, a Redo button that restarts a lab experiment, and no Back into or out of the tests. First implemented: one explanation round in control (`MAX_ROUNDS`), a Back button with visited steps kept mounted, a Redo button per finished experiment, and answers that lock once the learner moves on.
+
+2. **User:** Asked whether removing the control revision harms the AI vs control comparison.
+   **AI:** Yes: the AI group would get an extra writing round (a second difference besides the feedback), and RQ2 (revision behaviour) would lose its control group. I agreed to keep the revision in both conditions. The AI reworked PR 1: in control, the expert answer is shown once and stays visible, a revision shows "✓ Revision saved." instead of a second expert card, and the card invites the learner to rewrite in their own words. The control revision is logged with `source: 'none'`.
+
+3. **User:** Asked whether back navigation affects the comparison.
+   **AI:** Not by design (both conditions get it), but going back from "Explain the formula" to the formula step would show the part texts learners must generate. Blocked Back on the Explain step.
+
+4. **User:** Remove Back on the start steps (Hook, Why); keep it only from the lab to the warm-up and from the formula to the lab.
+   **AI:** Replaced the blocked-steps list with an allow-list, `BACK_STEPS = ['lab', 'formula']` in `lib/nav.ts`, with tests for each allowed and blocked step.
+
+5. **User:** Asked to check the code was ready for PR, and for commit messages and PR descriptions.
+   **AI:** Ran tests, lint, typecheck and build on both branches, reviewed both diffs and added a README line for `lib/nav.ts`. Committed and opened both PRs after I approved the titles and descriptions.
+
+### Summary
+- Done: Back from the lab to the warm-up and from the formula to the lab; Redo for finished lab experiments; written answers read-only once the learner moves on; new log events `nav_back` and `lab_redo`. In control, the expert answer is shown once and the revision is confirmed.
+- Decisions: keep the optional revision in both conditions (only the feedback differs); no Back at the start, around the tests or from the Explain step; an allow-list of steps with Back.
+- Open questions: phone-width layout not checked; whether pilot learners want to go back from the Explain step to the lab.
+- Reflection (AI draft, to rewrite): The AI's first version followed my request literally and removed the control revision. Asking it about the impact on the comparison surfaced the confound, and we turned the change into a smaller fix. Its questions before coding and its check of the Explain step helped protect the study design.
