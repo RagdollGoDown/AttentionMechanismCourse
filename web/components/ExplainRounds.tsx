@@ -80,8 +80,10 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
     logger.log('explanation_submit', { round, text: explanation, ...(parts ? { parts } : {}) });
 
     if (condition === 'control') {
-      setRounds([...rounds, { explanation, shown: { kind: 'expert', text: task.expertAnswer } }]);
-      logger.log('feedback_received', { round, source: 'expert' });
+      // The expert answer is the same whatever was written: show it once, keep it visible above the revision.
+      const first = rounds.length === 0;
+      setRounds([...rounds, { explanation, shown: first ? { kind: 'expert', text: task.expertAnswer } : { kind: 'saved' } }]);
+      logger.log('feedback_received', { round, source: first ? 'expert' : 'none' });
       return;
     }
 
