@@ -29,6 +29,7 @@
   font-family: var(--font-display);
   font-weight: 600;
 }
+
 .tile-focus {
   background: var(--color-ink);
   color: var(--color-tile);
@@ -37,69 +38,194 @@
 
 /* The one orchestrated motion: a trophy piece announcement drops in and fades. */
 @keyframes piece-won {
-  0% { opacity: 0; transform: scale(0.6); }
-  8% { opacity: 1; transform: scale(1.08); }
-  14% { transform: scale(1); }
-  85% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.95); }
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  8% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  14% {
+    transform: scale(1);
+  }
+
+  85% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
 }
-.piece-toast { animation: piece-won 3.2s ease-out forwards; }
+
+.piece-toast {
+  animation: piece-won 3.2s ease-out forwards;
+}
 
 /* Moving to the next step or experiment: the new "slide" comes in from the right. */
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(3rem); }
-  to { opacity: 1; transform: none; }
-}
-.slide-in { animation: slide-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  from {
+    opacity: 0;
+    transform: translateX(3rem);
+  }
 
-:focus-visible { outline: 3px solid var(--color-cobalt); outline-offset: 2px; }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.slide-in {
+  animation: slide-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-cobalt);
+  outline-offset: 2px;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Answers and changes on the board. */
 @keyframes result-pop {
-  0% { opacity: 0; transform: scale(0.92); }
-  60% { opacity: 1; transform: scale(1.03); }
-  100% { transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
-.result-pop { animation: result-pop 0.45s ease-out both; }
+
+.result-pop {
+  animation: result-pop 0.45s ease-out both;
+}
 
 @keyframes tile-leave {
-  0% { transform: none; opacity: 1; }
-  100% { transform: translateY(-2.5rem) rotate(-8deg) scale(0.8); opacity: 0; }
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-2.5rem) rotate(-8deg) scale(0.8);
+    opacity: 0;
+  }
 }
-.tile-leave { animation: tile-leave 0.7s ease-in forwards; }
+
+.tile-leave {
+  animation: tile-leave 0.7s ease-in forwards;
+}
 
 @keyframes col-leave {
-  0% { opacity: 1; transform: none; filter: none; }
-  30% { opacity: 1; transform: translateY(-0.4rem); filter: saturate(0) ; }
-  100% { opacity: 0; transform: translateY(1.5rem) scale(0.6); filter: saturate(0); }
+  0% {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-0.4rem);
+    filter: saturate(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.6);
+    filter: saturate(0);
+  }
 }
-.col-leave { animation: col-leave 0.8s ease-in forwards; }
+
+.col-leave {
+  animation: col-leave 0.8s ease-in forwards;
+}
 
 @keyframes tile-enter {
-  0% { transform: translateY(-3rem) scale(0.8); opacity: 0; }
-  60% { transform: translateY(0.3rem) scale(1.05); opacity: 1; }
-  100% { transform: none; }
+  0% {
+    transform: translateY(-3rem) scale(0.8);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateY(0.3rem) scale(1.05);
+    opacity: 1;
+  }
+
+  100% {
+    transform: none;
+  }
 }
-.tile-enter { animation: tile-enter 0.6s ease-out both; box-shadow: 0 0 0 3px var(--color-cobalt), inset 0 -3px 0 var(--color-tile-edge); }
+
+.tile-enter {
+  animation: tile-enter 0.6s ease-out both;
+  box-shadow: 0 0 0 3px var(--color-cobalt), inset 0 -3px 0 var(--color-tile-edge);
+}
 
 @keyframes bubble-in {
-  0% { opacity: 0; transform: translateY(0.5rem) scale(0.9); }
-  100% { opacity: 1; transform: none; }
+  0% {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: none;
+  }
 }
-.bubble-in { animation: bubble-in 0.35s ease-out both; }
+
+.bubble-in {
+  animation: bubble-in 0.35s ease-out both;
+}
 
 /* V: a value travels from its word into "model". --steps = columns to travel (signed). */
 @keyframes value-flow {
-  0% { transform: translateX(0); opacity: 0; }
-  15% { opacity: 1; }
-  85% { opacity: 1; }
-  100% { transform: translateX(calc(var(--steps) * (100% + var(--gap)))); opacity: 0; }
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(calc(var(--steps) * (100% + var(--gap))));
+    opacity: 1;
+  }
 }
-.value-flow { animation: value-flow 1.6s ease-in-out infinite; }
+
+/* Runs once and stays where it lands, so the mix is still visible on "model" afterwards. */
+.value-flow {
+  animation: value-flow 1.6s ease-in-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value-flow {
+    animation: none;
+    opacity: 1;
+    transform: translateX(calc(var(--steps) * (100% + var(--gap))));
+  }
+}
 
 /* Formulas: serif italic letters and real subscripts, like a maths textbook. */
 .math {
@@ -107,5 +233,12 @@
   font-size: 1.35em;
   letter-spacing: 0.01em;
 }
-.math var { font-style: italic; }
-.math sub { font-size: 0.65em; font-style: normal; }
+
+.math var {
+  font-style: italic;
+}
+
+.math sub {
+  font-size: 0.65em;
+  font-style: normal;
+}
