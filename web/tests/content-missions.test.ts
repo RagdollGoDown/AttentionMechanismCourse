@@ -15,7 +15,7 @@ const setup = (id: 'swap' | 'remove') => {
 
 describe('mission content', () => {
   it('flow order', () => {
-    expect(STEP_ORDER).toEqual(['welcome', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest']);
+    expect(STEP_ORDER).toEqual(['welcome', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest']);
     expect(LAB_ORDER).toEqual(['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax']);
   });
 

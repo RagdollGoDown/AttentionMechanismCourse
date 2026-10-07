@@ -15,11 +15,11 @@ ML / Modern NLP. Two versions:
 
 Only the adaptivity of the feedback differs. Keep everything else identical across conditions.
 
-Lesson flow (v2, Sep 30): welcome → hook ("model" alone, then in context) → why attention →
-pre-test (placeholder) → words as vectors + dot product → **sentence lab** hub on one sentence,
+Lesson flow (v2, Sep 30): welcome → pre-test (without `?condition=`, the experimenter assigns the condition
+from its score) → hook ("model" alone, then in context) → why attention → words as vectors + dot product → **sentence lab** hub on one sentence,
 six experiments that unlock one by one (two contexts, query & key, predict a swap, predict a
 removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
-and V output → explain the formula (AI tutor vs expert answer) → post-test (placeholder).
+and V output → explain the formula (AI tutor vs expert answer) → post-test. Tests: `docs/tests.md`.
 Gamified: XP for effort (never correctness, identical across conditions), levels, 3 badges = LG1–LG3.
 Learning goals: LG1 explain Q/K/V, softmax, √d_k · LG2 compute a 3-token example ·
 LG3 predict weight shifts for an ambiguous word.

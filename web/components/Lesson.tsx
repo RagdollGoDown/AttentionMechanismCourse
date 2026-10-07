@@ -8,21 +8,20 @@ import { LoggerProvider, useLogger } from '@/components/LoggerProvider';
 import { SessionLog } from '@/components/SessionLog';
 import { Explain, Formula } from '@/components/steps/Formula';
 import { Hook } from '@/components/steps/Hook';
-import { End, TestPlaceholder, Welcome, Why } from '@/components/steps/Intro';
+import { End, Welcome, Why } from '@/components/steps/Intro';
 import { Compute } from '@/components/steps/Compute';
 import { Lab } from '@/components/steps/Lab';
+import { Posttest } from '@/components/steps/Posttest';
+import { Pretest } from '@/components/steps/Pretest';
 import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
 import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
 import { canGoBack } from '@/lib/nav';
 
-function Posttest(p: StepProps) {
-  return <TestPlaceholder which="posttest" {...p} />;
-}
-
 const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   welcome: Welcome,
+  pretest: Pretest,
   hook: Hook,
   why: Why,
   vectors: Vectors,
@@ -34,7 +33,8 @@ const VIEWS: Record<StepId, ComponentType<StepProps>> = {
 };
 
 export function Lesson({ initialCondition, debug = false, participantId = null }: {
-  initialCondition: Condition;
+  /** null: no ?condition= in the link; the experimenter assigns it at the end of the pre-test. */
+  initialCondition: Condition | null;
   debug?: boolean;
   participantId?: string | null;
 }) {
@@ -65,10 +65,10 @@ function MissionTracker({ id }: { id: StepId | null }) {
   return null;
 }
 
-function LessonInner({ initialCondition, debug }: { initialCondition: Condition; debug: boolean }) {
+function LessonInner({ initialCondition, debug }: { initialCondition: Condition | null; debug: boolean }) {
   const logger = useLogger();
   const { win } = useTrophy();
-  const [condition, setCondition] = useState(initialCondition);
+  const [condition, setCondition] = useState<Condition | null>(initialCondition);
   const [index, setIndex] = useState(0);
   // Steps already opened stay mounted (hidden), so going back shows them as the learner left them.
   const [visited, setVisited] = useState<number[]>([0]);
@@ -116,8 +116,9 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition;
   return (
     <>
       <MissionTracker id={id} />
-      <Header condition={condition} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} debug={debug} />
-      <main className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
+      <Header condition={condition ?? 'ai'} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} debug={debug} />
+      {/* With ?debug, room at the bottom so the fixed toolbar never covers the last button. */}
+      <main className={`mx-auto max-w-7xl px-4 py-5 sm:py-8 ${debug ? 'pb-40 sm:pb-40' : ''}`}>
         {canGoBack(index) && (
           <button type="button" className="mb-3 text-sm text-muted underline hover:text-ink" onClick={back}>
             ← Back
@@ -129,7 +130,15 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition;
           return (
             // Showing a hidden step restarts its CSS animation, so going back slides in too.
             <div key={`${stepId}-${resets[stepId] ?? 0}`} hidden={i !== index} className="slide-in">
-              <View condition={condition} onDone={() => next(i)} debug={debug} visible={i === index} />
+              <View
+                // Only the welcome and the pre-test can run unassigned, and neither depends on the condition.
+                condition={condition ?? 'ai'}
+                onDone={() => next(i)}
+                debug={debug}
+                visible={i === index}
+                assigned={initialCondition !== null}
+                onAssign={changeCondition}
+              />
             </div>
           );
         })}

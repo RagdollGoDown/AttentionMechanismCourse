@@ -5,7 +5,7 @@ import { Trophy } from '@/components/Trophy';
 import { useTrophy } from '@/components/TrophyProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { buttonClass, secondaryButtonClass } from '@/components/ui';
-import { END_TEXT, GOALS, TEST_PLACEHOLDER, TROPHY_PIECES, WELCOME, WHY } from '@/content/steps';
+import { END_TEXT, GOALS, TROPHY_PIECES, WELCOME, WHY } from '@/content/steps';
 import { downloadLog } from '@/lib/download';
 import type { StepProps } from '@/components/steps/types';
 
@@ -60,17 +60,6 @@ export function Why({ onDone }: StepProps) {
         </div>
       </div>
       <button type="button" className={buttonClass} onClick={onDone}>{WHY.cta}</button>
-    </Centered>
-  );
-}
-
-export function TestPlaceholder({ which, onDone }: StepProps & { which: 'posttest' }) {
-  const t = TEST_PLACEHOLDER[which];
-  return (
-    <Centered>
-      <h2 className="font-display text-3xl font-bold">{t.title}</h2>
-      <p className="max-w-md text-muted">{t.body}</p>
-      <button type="button" className={buttonClass} onClick={onDone}>{t.cta}</button>
     </Centered>
   );
 }

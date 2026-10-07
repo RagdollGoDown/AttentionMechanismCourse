@@ -35,8 +35,9 @@ export type EventType =
   | 'calc_use'
   | 'compute_reveal'
   | 'model_answer_shown'
-  | 'pretest_answer'
-  | 'pretest_submit'
+  | 'test_answer'
+  | 'test_submit'
+  | 'data_sent'
   | 'nav_back'
   | 'lab_redo'
   // Developer tools (?debug) only; filter these out of study data.
@@ -84,12 +85,14 @@ export interface LogSink {
 }
 
 export interface Logger {
+  readonly sessionId: string;
   readonly participantId: string | null;
   /** `?debug` session: excluded from the study. */
   readonly debug: boolean;
   log(type: EventType, payload?: Record<string, unknown>): void;
   setMission(id: MissionId | null): void;
   setCondition(condition: Condition): void;
+  getCondition(): Condition | null;
   getEvents(): readonly LogEvent[];
   subscribe(listener: () => void): () => void;
   toJSON(): string;
@@ -118,6 +121,7 @@ export function createLogger(opts: {
   let events: LogEvent[] = [];
 
   const logger: Logger = {
+    sessionId: opts.sessionId,
     participantId,
     debug,
     log(type, payload = {}) {
@@ -144,6 +148,7 @@ export function createLogger(opts: {
       condition = next;
       logger.log('condition_change', { from, to: next });
     },
+    getCondition: () => condition,
     getEvents: () => events,
     subscribe(listener) {
       listeners.add(listener);

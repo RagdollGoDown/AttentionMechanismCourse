@@ -1,9 +1,13 @@
 export type Condition = 'ai' | 'control';
 
-/** `?condition=` value → Condition. Case-insensitive; first value wins; anything else → 'ai'. */
-export function parseCondition(value: string | readonly string[] | null | undefined): Condition {
+/**
+ * `?condition=` value → Condition. Case-insensitive; first value wins.
+ * Anything else → null: not assigned yet, the experimenter picks it after the pre-test (from its score).
+ */
+export function parseCondition(value: string | readonly string[] | null | undefined): Condition | null {
   const v = Array.isArray(value) ? value[0] : value;
-  return typeof v === 'string' && v.trim().toLowerCase() === 'control' ? 'control' : 'ai';
+  const c = typeof v === 'string' ? v.trim().toLowerCase() : '';
+  return c === 'ai' || c === 'control' ? c : null;
 }
 
 /** `?debug` → developer tools on. The flag's presence is enough; any value is ignored. */
