@@ -292,9 +292,24 @@ with tests that check each mission's claims).
    **AI:** Wrote `docs/prototype-flow.dot` (Graphviz) and rendered it to PDF, SVG and PNG. The diagram has 5 chapter boxes, the 6 lab experiments, the 3 explain points in orange, and a separate "explain loop" box showing the AI and control branches. It took four rounds of layout fixes (a staircase layout, then tangled dashed links), checked visually after each render.
 4. **User:** "Redesign the diagram so it is more readable, more aesthetic and has fewer words; this one is too full to understand."
    **AI:** Replaced the Graphviz version with a hand-drawn `docs/prototype-flow.svg`: five chapter cards with 1–2 word steps, the explain steps in orange, and one panel showing Write → Tutor hint (AI group) / Expert answer (control group) → Revise (optional). Added `docs/render-flow.sh` (headless Chromium) to export PDF/PNG and removed the `.dot` file. Fixed a cropped PNG and a crooked connector after checking the renders.
+5. **User:** Pasted the team's list of additions needed before data collection (compute step, model answer in the AI condition, pre/post-tests, LLM check, log collection, timestamps).
+   **AI:** Compared each item with the code and asked how to proceed. Julien chose: plan, then build items 1, 2, 5, 7 (6 waits: the team picks the log backend); asked for a detailed explanation of the pre-test assignment decision. The AI wrote the plan at the top of `tasks/todo.md` (checked the practice example numbers with a script) and explained the assignment options.
 
 ### Summary
 - Done: local branch synced with origin, production redeployed at https://attentionseeker-education.vercel.app.
 - Decisions: deployed from the CLI, as before; left the empty root `package-lock.json` (added in André's PR) untouched.
 - Open questions: the root `package-lock.json` may trigger Next's multiple-lockfile warning; local `main` is still 2 commits ahead of `origin/main`; `debug_*` events must be filtered out of study data.
 - Reflection (AI draft for Julien to rewrite): The AI gave a quick overview of what teammates had merged without me reading every diff. Running the checks before deploying made sure their combined branches still built.
+
+## Session 2026-10-07 — Julien — finish and verify the pre-study additions
+**Tool:** Claude Code (Claude Opus 5.5)
+
+### Interactions
+1. **User:** "keep doing the job you were doing" (the previous session ended while building the pre-study items).
+   **AI:** Found the build already done in the working tree: a "Compute it yourself" step (worked example, then a practice table that unlocks column by column, "Show me" after 3 wrong tries), the expert answer at the end of the AI rounds (`model_answer_shown`), the tutor status in the debug bar (`GET /api/feedback`, `?probe`), and log changes (`?pid=`, `at` on every event, a header with `mockReplies`). Tests and the typecheck passed, but lint did not: the compute step read the clock during render. The AI moved the stage timer into an effect. It then ran a headless pilot in both conditions (phone AI, desktop control: compute with one wrong try, explain, log download) and fixed two bugs it found: "Not quite." shown twice in the compute banner, and on phones the Demo menu (condition switch, session log) opening behind the page. Final checks: 183 tests, lint, typecheck and build all clean. Not committed or deployed.
+
+### Summary
+- Done: pre-study items 1, 2, 5, 7 and the client side of 6 are built and checked; plan ticked in `tasks/todo.md` with a review.
+- Decisions: the AI rounds now end on the same expert answer as control, so both groups see the model answer once; the AI tutor still never gives it.
+- Open questions: log transport (team backend choice); pre-/post-test items; on phones the debug toolbar covers the page bottom (experimenter only); the explain intro says "formula on the right", but on phones it is below.
+- Reflection (AI draft for Julien to rewrite): the pilot run through the real UI found two bugs that 183 unit tests missed, both about what is on screen (duplicate text, a menu hidden behind content), not about logic.

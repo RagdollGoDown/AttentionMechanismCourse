@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCondition, parseDebug } from '@/lib/condition';
+import { parseCondition, parseDebug, parsePid } from '@/lib/condition';
 
 describe('parseCondition', () => {
   it.each([
@@ -25,4 +25,17 @@ describe('parseDebug', () => {
     [undefined, false],
     [null, false],
   ] as const)('%j → %s', (input, expected) => expect(parseDebug(input)).toBe(expected));
+});
+
+describe('parsePid', () => {
+  it.each([
+    ['P07', 'P07'],
+    [' p-07_a ', 'p-07_a'],
+    [['P01', 'P02'], 'P01'],
+    ['', null],
+    ['P 07', null],
+    ['../etc', null],
+    ['x'.repeat(41), null],
+    [undefined, null],
+  ] as const)('%j → %j', (input, expected) => expect(parsePid(input)).toBe(expected));
 });

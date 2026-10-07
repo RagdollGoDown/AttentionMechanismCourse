@@ -64,7 +64,7 @@ export function Why({ onDone }: StepProps) {
   );
 }
 
-export function TestPlaceholder({ which, onDone }: StepProps & { which: 'pretest' | 'posttest' }) {
+export function TestPlaceholder({ which, onDone }: StepProps & { which: 'posttest' }) {
   const t = TEST_PLACEHOLDER[which];
   return (
     <Centered>

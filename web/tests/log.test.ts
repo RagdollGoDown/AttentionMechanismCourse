@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createLogger, type LogEvent } from '@/lib/log';
+import { createLogger, tutorSummary, type LogEvent } from '@/lib/log';
 
 const clock = () => {
   let t = 1000;
@@ -9,10 +9,11 @@ const clock = () => {
 describe('createLogger', () => {
   it('starts with session_start at t = 0', () => {
     const c = clock();
-    const l = createLogger({ sessionId: 's1', condition: 'ai', now: c.now });
-    expect(l.getEvents()).toEqual([
-      { sessionId: 's1', condition: 'ai', missionId: null, type: 'session_start', t: 0, payload: { condition: 'ai' } },
-    ]);
+    const l = createLogger({ sessionId: 's1', condition: 'ai', now: c.now, wallNow: () => Date.UTC(2026, 9, 6, 12) });
+    expect(l.getEvents()).toEqual([{
+      sessionId: 's1', participantId: null, condition: 'ai', missionId: null, type: 'session_start', t: 0,
+      at: '2026-10-06T12:00:00.000Z', payload: { condition: 'ai', participantId: null, debug: false },
+    }]);
   });
 
   it('stamps the mission, relative time and payload', () => {
@@ -66,5 +67,31 @@ describe('createLogger', () => {
     const parsed = JSON.parse(l.toJSON());
     expect(parsed.sessionId).toBe('s1');
     expect(parsed.events).toHaveLength(1);
+  });
+
+  it('stamps every event with the participant and wall-clock time', () => {
+    let wall = Date.UTC(2026, 9, 6, 12);
+    const l = createLogger({ sessionId: 's1', condition: 'ai', participantId: 'P07', wallNow: () => wall });
+    wall += 90_000;
+    l.log('reveal');
+    expect(l.getEvents().at(-1)).toMatchObject({ participantId: 'P07', at: '2026-10-06T12:01:30.000Z' });
+  });
+
+  it('export header: who, which condition, debug flag, total time and tutor summary', () => {
+    const c = clock();
+    const l = createLogger({ sessionId: 's1', condition: 'ai', participantId: 'P07', debug: true, now: c.now });
+    c.advance(5000);
+    l.log('feedback_received', { round: 1, source: 'llm', model: 'anthropic/claude-sonnet-5-5' });
+    l.log('feedback_received', { round: 2, source: 'mock', model: null });
+    l.log('feedback_received', { round: 2, source: 'error', error: 'HTTP 500' });
+    const parsed = JSON.parse(l.toJSON());
+    expect(parsed).toMatchObject({ participantId: 'P07', condition: 'ai', debug: true, totalMs: 5000 });
+    expect(parsed.tutor).toEqual({ replies: 2, mockReplies: 1, errors: 1, models: ['anthropic/claude-sonnet-5-5'] });
+  });
+
+  it('tutor summary ignores the expert answer (control condition)', () => {
+    const l = createLogger({ sessionId: 's1', condition: 'control' });
+    l.log('feedback_received', { round: 1, source: 'expert' });
+    expect(tutorSummary(l.getEvents())).toEqual({ replies: 0, mockReplies: 0, errors: 0, models: [] });
   });
 });

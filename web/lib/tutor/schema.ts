@@ -17,7 +17,7 @@ export const FeedbackSchema = z.object({
 });
 export type Feedback = z.infer<typeof FeedbackSchema>;
 
-export type FeedbackResponse = Feedback & { source: 'llm' | 'mock'; latencyMs: number };
+export type FeedbackResponse = Feedback & { source: 'llm' | 'mock'; latencyMs: number; /** Set by the API route. */ model?: string | null };
 
 export const FeedbackRequestSchema = z.object({
   missionId: z.enum(['swap', 'remove', 'formula']),

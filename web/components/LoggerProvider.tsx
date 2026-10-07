@@ -7,8 +7,13 @@ import type { Condition } from '@/lib/condition';
 const LoggerContext = createContext<Logger | null>(null);
 const EMPTY: readonly LogEvent[] = [];
 
-export function LoggerProvider({ condition, children }: { condition: Condition; children: ReactNode }) {
-  const [logger] = useState(() => createLogger({ sessionId: crypto.randomUUID(), condition }));
+export function LoggerProvider({ condition, participantId = null, debug = false, children }: {
+  condition: Condition | null;
+  participantId?: string | null;
+  debug?: boolean;
+  children: ReactNode;
+}) {
+  const [logger] = useState(() => createLogger({ sessionId: crypto.randomUUID(), condition, participantId, debug }));
   return <LoggerContext.Provider value={logger}>{children}</LoggerContext.Provider>;
 }
 

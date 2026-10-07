@@ -1,3 +1,60 @@
+# Pre-study additions (Oct 6): items 1, 2, 5, 7 + the non-backend part of 6
+
+Constraint: both conditions identical except the feedback at Swap, Remove, Explain.
+Out of scope now: pre-test (#3, team decision on assignment), post-test (#4, items to write),
+log transport (#6 backend, team decision), optional improvements.
+
+## 1. "Compute it yourself" step (LG2)
+- [x] `content/steps.ts`: new StepId `compute` in chapter Formula, between `formula` and `explain`.
+- [x] Content: worked example (q=[1,2]; K fashion [2,1], smiled [1,0], the [0,1]; V [1,0],[0,1],[1,1])
+      and practice example q=[2,1]; K [1,1],[0,2],[2,0]; same V
+      → scores 3,2,4 → ÷√2 2.12,1.41,2.83 → eˣ 8.34,4.11,16.92 → weights .28,.14,.58 → output [0.86, 0.72].
+      Every number is computed from `lib/attention.ts`, never typed in (as for the softmax check).
+- [x] `components/steps/Compute.tsx`: part 1 = worked example as a 5-stage table (scores, ÷√2, eˣ, weights, output).
+      Part 2 = same table, empty; each stage unlocks once the previous one is right; ResultBanner per stage.
+      Tolerance: ±0.02 on rounded values (2 decimals); eˣ ±1 %. "Show me" after 3 wrong tries per stage.
+- [x] Log: `compute_entry` {stage, values, correct, attempt}, `compute_reveal` {stage}. Time per stage = from `at`.
+- [x] Tests: worked numbers match the brief; practice differs from worked; tolerance check.
+
+## 2. Model answer at the end of the AI rounds
+- [x] `ExplainRounds.tsx`, AI condition only: after round 2, or when the learner clicks Continue after round 1,
+      show the same `expertAnswer` card, then a final Continue. Log `model_answer_shown` {round, trigger: 'after_revision'|'skipped_revision'}.
+- [x] Control unchanged. Tutor prompt unchanged (it still never sees or gives the answer).
+
+## 5. LLM status for the experimenter
+- [x] `GET /api/feedback` → `{ llm: boolean, model: string | null }`; `?probe=1` makes one tiny real call and returns `source` + latency.
+- [x] Debug bar shows "Tutor: LLM <model>" (green) or "Tutor: OFFLINE" (red), with a "Test call" button.
+- [x] Hide the "offline tutor" badge from participants (only in `?debug`), since it is a study artefact.
+- [x] Session header in the log: `mockReplies` count, so a mock-tainted session is visible at a glance.
+
+## 6 (part) + 7. Log contents and timestamps
+- [x] `?pid=` URL param → `participantId` in every event (falls back to null).
+- [x] Each event gets `at` (ISO wall-clock time) next to `t` (ms since start).
+- [x] Exported JSON gets a header: sessionId, participantId, condition, debug, tutor model, startedAt, totalMs, mockReplies.
+- [ ] Transport (send to a server, survive tab close) waits for the team's backend choice; the `LogSink` hook is the plug-in point.
+
+## Verify
+- [x] `npm test`, `tsc`, lint, build.
+- [x] Pilot click-through in both conditions (headless) to check the new step and the end-of-rounds answer.
+- [ ] Deploy to production only when you say so.
+
+## Decisions I took by default (say if you disagree)
+- The compute step wins a trophy piece (10 pieces), as every other module does. Completion only.
+- Learners may use a calculator for eˣ; the step says so.
+
+## Review (pre-study, 2026-10-07)
+- Items 1, 2, 5, 7 and the client part of 6 are in place. 183 tests, typecheck, lint and build are clean.
+- Lint fix: the compute step read `performance.now()` during render (stage timer); it now starts in an effect per stage.
+- Headless pilot, AI at 390×844 and control at 1440×900: compute with one wrong try then right answers, explain, log download.
+  No console errors, no page overflow. Log header has pid, condition, startedAt, totalMs, tutor.mockReplies; every event has `at`;
+  AI logs `model_answer_shown {trigger: skipped_revision}`, control logs none.
+- Found while piloting: "Not quite." showed twice in the compute banner (fixed); on phones the Demo menu (condition switch,
+  session log) opened behind the page (header had no position below `sm`; fixed with `relative`).
+- Known: on phones the debug toolbar covers the bottom of the page (experimenter only). Explain intro says "formula on
+  the right", but on phones it is below.
+
+---
+
 # M3 v2: new flow, sentence lab hub, formula part, gamified skin
 
 ## Visual direction (frontend-design)

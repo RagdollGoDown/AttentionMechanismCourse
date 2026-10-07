@@ -1,21 +1,23 @@
 import { dot, softmax, type Vec } from '@/lib/attention';
+import type { Example } from '@/lib/compute';
 import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
 /** Linear steps of the lesson. The lab is one step that holds six unlockable experiments. */
-export type StepId = 'welcome' | 'hook' | 'why' | 'pretest' | 'vectors' | 'lab' | 'formula' | 'explain' | 'posttest';
+export type StepId = 'welcome' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
 export type LabId = 'contrast' | 'qk' | 'swap' | 'remove' | 'rule' | 'softmax';
 /** Anything the logger can stamp an event with. */
 export type MissionId = StepId | LabId;
 
-export const STEP_ORDER: StepId[] = ['welcome', 'hook', 'why', 'pretest', 'vectors', 'lab', 'formula', 'explain', 'posttest'];
+// The pre-test is not a step: it runs on its own page (/pretest) before the condition is assigned.
+export const STEP_ORDER: StepId[] = ['welcome', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
 export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax'];
 
 export const CHAPTERS: { title: string; steps: StepId[] }[] = [
-  { title: 'Start', steps: ['welcome', 'hook', 'why', 'pretest'] },
+  { title: 'Start', steps: ['welcome', 'hook', 'why'] },
   { title: 'Warm-up', steps: ['vectors'] },
   { title: 'Lab', steps: ['lab'] },
-  { title: 'Formula', steps: ['formula', 'explain'] },
+  { title: 'Formula', steps: ['formula', 'compute', 'explain'] },
   { title: 'Finish', steps: ['posttest'] },
 ];
 
@@ -38,6 +40,7 @@ export const TROPHY_PIECES: { id: MissionId; title: string }[] = [
   { id: 'rule', title: 'Invent the rule' },
   { id: 'softmax', title: 'Meet softmax' },
   { id: 'formula', title: 'The formula' },
+  { id: 'compute', title: 'Compute it yourself' },
   { id: 'explain', title: 'Your explanation' },
 ];
 
@@ -81,7 +84,6 @@ export const WHY = {
 };
 
 export const TEST_PLACEHOLDER = {
-  pretest: { title: 'Pre-test', body: 'A short quiz goes here, so we can measure what you learn. It comes in the next version.', cta: 'Skip for now' },
   posttest: { title: 'Post-test', body: 'The final quiz goes here. It comes in the next version.', cta: 'See my results' },
 };
 
@@ -238,6 +240,53 @@ export const FORMULA_TEXT = {
   mapNote: 'The dashed arrow is "model" after attention. It moved toward fashion.',
   pick: 'Pick a part of the formula.',
   remaining: (n: number) => `${n} part${n === 1 ? '' : 's'} left to explore`,
+  cta: 'Explain it yourself',
+};
+
+/** LG2. Worked example from the M3 report; the practice uses other numbers. dₖ = 2 in both. */
+export const WORKED_EXAMPLE: Example = {
+  q: [1, 2],
+  tokens: [
+    { word: 'fashion', k: [2, 1], v: [1, 0] },
+    { word: 'smiled', k: [1, 0], v: [0, 1] },
+    { word: 'the', k: [0, 1], v: [1, 1] },
+  ],
+};
+export const PRACTICE_EXAMPLE: Example = {
+  q: [2, 1],
+  tokens: [
+    { word: 'after', k: [1, 1], v: [1, 0] },
+    { word: 'training', k: [0, 2], v: [0, 1] },
+    { word: 'the', k: [2, 0], v: [1, 1] },
+  ],
+};
+
+export const COMPUTE_TEXT = {
+  kicker: 'Formula',
+  title: 'Compute it yourself',
+  intro: 'Three words, two numbers per vector, so dₖ = 2. First read one example worked out, then do one yourself.',
+  setup: (q: string) => `The query of "model" is q = ${q}. Each word has a key k and a value v.`,
+  workedTitle: 'Worked example',
+  practiceTitle: 'Your turn',
+  practiceIntro: 'Fill in one column at a time. Round to 2 decimals and use your rounded numbers in the next column.',
+  calculator: 'Use a calculator for eˣ (on a phone: the eˣ key).',
+  ready: 'I read it. My turn',
+  check: 'Check',
+  showMe: 'Show me',
+  showMeAfter: 3,
+  outputLabel: 'output',
+  /** Column headers and one line on how to get each column. */
+  stages: {
+    scores: { head: 'q · k', how: 'Dot product of q with each key.' },
+    scaled: { head: '÷ √2', how: 'Divide each score by √dₖ = √2 ≈ 1.41.' },
+    exps: { head: 'eˣ', how: 'Raise e to each scaled score.' },
+    weights: { head: 'weight', how: 'Divide each eˣ by the sum of the three.' },
+    output: { head: 'Σ weight × v', how: 'Add up the values, each multiplied by its weight.' },
+  },
+  right: 'Right!',
+  wrong: 'Check the cells marked in amber.',
+  revealed: 'Here are the numbers. Carry on with the next column.',
+  done: 'You computed attention by hand: scores, scaling, softmax and the weighted sum.',
   cta: 'Explain it yourself',
 };
 

@@ -19,11 +19,16 @@ function gatewayLlm(model: string): LlmFn {
   };
 }
 
+/** The configured tutor model ('provider/model'), or null when the LLM is off (→ mock tutor). */
+export function tutorModel(env: Record<string, string | undefined> = process.env): string | null {
+  const hasAuth = Boolean(env.AI_GATEWAY_API_KEY || env.VERCEL_OIDC_TOKEN);
+  return env.TUTOR_MODEL && hasAuth ? env.TUTOR_MODEL : null;
+}
+
 /** The real tutor if a model and gateway auth are configured, else null (→ mock tutor). */
 export function llmFromEnv(env: Record<string, string | undefined> = process.env): LlmFn | null {
-  const model = env.TUTOR_MODEL;
-  const hasAuth = Boolean(env.AI_GATEWAY_API_KEY || env.VERCEL_OIDC_TOKEN);
-  return model && hasAuth ? gatewayLlm(model) : null;
+  const model = tutorModel(env);
+  return model ? gatewayLlm(model) : null;
 }
 
 /** Drop ids the model invented, so logs only contain ids from the mission content. */

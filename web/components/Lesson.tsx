@@ -9,15 +9,13 @@ import { SessionLog } from '@/components/SessionLog';
 import { Explain, Formula } from '@/components/steps/Formula';
 import { Hook } from '@/components/steps/Hook';
 import { End, TestPlaceholder, Welcome, Why } from '@/components/steps/Intro';
+import { Compute } from '@/components/steps/Compute';
 import { Lab } from '@/components/steps/Lab';
 import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
 import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
 
-function Pretest(p: StepProps) {
-  return <TestPlaceholder which="pretest" {...p} />;
-}
 function Posttest(p: StepProps) {
   return <TestPlaceholder which="posttest" {...p} />;
 }
@@ -26,17 +24,21 @@ const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   welcome: Welcome,
   hook: Hook,
   why: Why,
-  pretest: Pretest,
   vectors: Vectors,
   lab: Lab,
   formula: Formula,
+  compute: Compute,
   explain: Explain,
   posttest: Posttest,
 };
 
-export function Lesson({ initialCondition, debug = false }: { initialCondition: Condition; debug?: boolean }) {
+export function Lesson({ initialCondition, debug = false, participantId = null }: {
+  initialCondition: Condition;
+  debug?: boolean;
+  participantId?: string | null;
+}) {
   return (
-    <LoggerProvider condition={initialCondition}>
+    <LoggerProvider condition={initialCondition} participantId={participantId} debug={debug}>
       <TrophyProvider>
         <LessonInner initialCondition={initialCondition} debug={debug} />
       </TrophyProvider>
@@ -94,7 +96,7 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition;
   const View = id ? VIEWS[id] : null;
   return (
     <>
-      <Header condition={condition} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} />
+      <Header condition={condition} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} debug={debug} />
       <main className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
         {/* Keyed wrapper: every new step replays the slide-in. */}
         <div key={`${id ?? 'end'}-${resets}`} className="slide-in">

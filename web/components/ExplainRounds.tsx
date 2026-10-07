@@ -45,6 +45,8 @@ function PartBoxes({ task, values, onChange }: { task: ExplainTask; values: Reco
 /**
  * Write → feedback → optional revision. The only part that differs between conditions:
  * the AI tutor's adaptive feedback, or the fixed expert answer.
+ * The AI condition also sees the expert answer at the very end (after the revision, or when the
+ * learner skips it), so both groups leave with the same model answer.
  */
 export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' }: {
   task: ExplainTask;
@@ -58,6 +60,12 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
   const [rounds, setRounds] = useState<Round[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modelShown, setModelShown] = useState(false);
+
+  function showModelAnswer(trigger: 'after_revision' | 'skipped_revision', round: number) {
+    setModelShown(true);
+    logger.log('model_answer_shown', { trigger, round });
+  }
 
   const parts = task.parts
     ? Object.fromEntries(task.parts.map((p) => [p.id, (partDrafts[p.id] ?? '').trim()]))
@@ -96,6 +104,7 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
       const feedback = (await res.json()) as FeedbackResponse;
       setRounds([...rounds, { explanation, shown: { kind: 'tutor', feedback } }]);
       logger.log('feedback_received', { round, ...feedback });
+      if (round === MAX_ROUNDS) showModelAnswer('after_revision', round);
     } catch (err) {
       setError('The tutor did not answer. Try again.');
       logger.log('feedback_received', { round, source: 'error', error: String(err) });
@@ -104,7 +113,9 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
     }
   }
 
-  const canWrite = rounds.length < MAX_ROUNDS;
+  const canWrite = rounds.length < MAX_ROUNDS && !modelShown;
+  // AI condition: the first click after feedback ends the rounds and reveals the model answer.
+  const mustReveal = condition === 'ai' && !modelShown;
   return (
     <div className="space-y-4">
       <p className="font-display text-lg font-semibold leading-snug">{task.explainPrompt}</p>
@@ -132,8 +143,11 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
       ) : (
         <ExplanationBox value={draft} onChange={setDraft} onSubmit={submit} pending={pending} label={rounds.length === 0 ? 'Your explanation' : 'Revise it (optional)'} />
       ))}
+      {modelShown && <FeedbackCard shown={{ kind: 'expert', text: task.expertAnswer, final: true }} round={rounds.length} />}
       {error && <p className="text-miss">{error}</p>}
-      {rounds.length > 0 && <button type="button" className={buttonClass} onClick={onDone}>{doneLabel}</button>}
+      {rounds.length > 0 && (mustReveal
+        ? <button type="button" className={buttonClass} disabled={pending} onClick={() => showModelAnswer('skipped_revision', rounds.length)}>{"I'm done. Show the expert answer"}</button>
+        : <button type="button" className={buttonClass} onClick={onDone}>{doneLabel}</button>)}
     </div>
   );
 }
