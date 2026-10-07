@@ -7,10 +7,11 @@ describe('parseCondition', () => {
     ['CONTROL', 'control'],
     [' control ', 'control'],
     ['ai', 'ai'],
-    ['foo', 'ai'],
-    ['', 'ai'],
-    [undefined, 'ai'],
-    [null, 'ai'],
+    [' AI', 'ai'],
+    ['foo', null],
+    ['', null],
+    [undefined, null],
+    [null, null],
   ] as const)('%j → %s', (input, expected) => expect(parseCondition(input)).toBe(expected));
   it('uses the first value of a repeated parameter', () => {
     expect(parseCondition(['control', 'ai'])).toBe('control');

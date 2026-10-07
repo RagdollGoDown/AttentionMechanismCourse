@@ -4,17 +4,18 @@ import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
 /** Linear steps of the lesson. The lab is one step that holds six unlockable experiments. */
-export type StepId = 'welcome' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
+export type StepId = 'welcome' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
 export type LabId = 'contrast' | 'qk' | 'swap' | 'remove' | 'rule' | 'softmax';
 /** Anything the logger can stamp an event with. */
 export type MissionId = StepId | LabId;
 
-// The pre-test is not a step: it runs on its own page (/pretest) before the condition is assigned.
-export const STEP_ORDER: StepId[] = ['welcome', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
+// The pre-test comes before the hook, so nothing in the lesson has taught its answers yet. Without ?condition=,
+// the condition is assigned at its end by the experimenter, from the score.
+export const STEP_ORDER: StepId[] = ['welcome', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
 export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax'];
 
 export const CHAPTERS: { title: string; steps: StepId[] }[] = [
-  { title: 'Start', steps: ['welcome', 'hook', 'why'] },
+  { title: 'Start', steps: ['welcome', 'pretest', 'hook', 'why'] },
   { title: 'Warm-up', steps: ['vectors'] },
   { title: 'Lab', steps: ['lab'] },
   { title: 'Formula', steps: ['formula', 'compute', 'explain'] },
