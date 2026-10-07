@@ -117,7 +117,8 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
     <>
       <MissionTracker id={id} />
       <Header condition={condition ?? 'ai'} onConditionChange={changeCondition} step={id ?? 'posttest'} onOpenLog={() => setLogOpen(true)} debug={debug} />
-      <main className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
+      {/* With ?debug, room at the bottom so the fixed toolbar never covers the last button. */}
+      <main className={`mx-auto max-w-7xl px-4 py-5 sm:py-8 ${debug ? 'pb-40 sm:pb-40' : ''}`}>
         {canGoBack(index) && (
           <button type="button" className="mb-3 text-sm text-muted underline hover:text-ink" onClick={back}>
             ← Back
