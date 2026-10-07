@@ -8,18 +8,15 @@ import { LoggerProvider, useLogger } from '@/components/LoggerProvider';
 import { SessionLog } from '@/components/SessionLog';
 import { Explain, Formula } from '@/components/steps/Formula';
 import { Hook } from '@/components/steps/Hook';
-import { End, TestPlaceholder, Welcome, Why } from '@/components/steps/Intro';
+import { End, Welcome, Why } from '@/components/steps/Intro';
 import { Compute } from '@/components/steps/Compute';
 import { Lab } from '@/components/steps/Lab';
+import { Posttest } from '@/components/steps/Posttest';
 import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
 import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
 import { canGoBack } from '@/lib/nav';
-
-function Posttest(p: StepProps) {
-  return <TestPlaceholder which="posttest" {...p} />;
-}
 
 const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   welcome: Welcome,

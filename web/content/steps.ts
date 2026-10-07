@@ -83,10 +83,6 @@ export const WHY = {
   cta: "Let's go",
 };
 
-export const TEST_PLACEHOLDER = {
-  posttest: { title: 'Post-test', body: 'The final quiz goes here. It comes in the next version.', cta: 'See my results' },
-};
-
 export const VECTORS_TEXT = {
   kicker: 'Before the lab',
   title: 'Words as vectors',
