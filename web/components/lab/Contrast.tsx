@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLogger } from '@/components/LoggerProvider';
+import { useSaved } from '@/components/SavedAnswers';
 import { MissionShell } from '@/components/MissionShell';
 import { Playground } from '@/components/Playground';
 import { ResultBanner } from '@/components/ResultBanner';
@@ -26,7 +27,9 @@ export function Contrast({ onDone }: StepProps) {
   const logger = useLogger();
   const [picks, setPicks] = useState<Record<Which, string | null>>({ A: null, B: null });
   const [revealed, setRevealed] = useState(false);
-  const [reflection, setReflection] = useState('');
+  const [reflection, setReflection] = useSaved('reflection', '');
+  // Once submitted, the reflection is read-only (going back or redoing shows it as written).
+  const [submitted, setSubmitted] = useSaved('submitted', false);
 
   function pick(which: Which, tile: Tile) {
     setPicks({ ...picks, [which]: tile.key });
@@ -40,9 +43,10 @@ export function Contrast({ onDone }: StepProps) {
     });
   }
   function finish() {
-    if (reflection.trim()) {
+    if (!submitted && reflection.trim()) {
       logger.log('reflection_submit', { text: reflection.trim() });
     }
+    setSubmitted(true);
     onDone();
   }
 
@@ -80,8 +84,9 @@ export function Contrast({ onDone }: StepProps) {
             rows={3}
             maxLength={600}
             value={reflection}
+            readOnly={submitted}
             onChange={(e) => setReflection(e.target.value)}
-            className="w-full rounded-lg border border-line bg-card p-2.5 focus:border-cobalt focus:outline-none"
+            className="w-full rounded-lg border border-line bg-card p-2.5 focus:border-cobalt focus:outline-none read-only:bg-page read-only:text-muted"
           />
           <button type="button" className={buttonClass} onClick={finish}>Next experiment</button>
         </div>

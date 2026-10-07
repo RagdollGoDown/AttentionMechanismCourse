@@ -53,6 +53,15 @@ log transport (#6 backend, team decision), optional improvements.
 - Known: on phones the debug toolbar covers the bottom of the page (experimenter only). Explain intro says "formula on
   the right", but on phones it is below.
 
+## Merge of Morgane's PRs (2026-10-07)
+- [x] `feat/control-expert-once`: control shows the expert answer once; a revision gets "✓ Revision saved".
+      Kept our `final` flag (no "revise" hint under the AI's end-of-rounds answer).
+- [x] `feat/back-navigation`: Back on lab and formula, lab redo with saved answers.
+      Fix: `modelShown` is saved with the rounds, so a redo neither re-offers the expert answer nor logs it twice.
+- [x] Back also from compute → formula (not a test, the formula is what the learner computes).
+- [x] 189 tests, lint, typecheck, build. Pilot: redo in AI keeps the expert card and no second button;
+      compute → Back → formula → compute keeps the table; both conditions end to end, no console errors.
+
 ---
 
 # M3 v2: new flow, sentence lab hub, formula part, gamified skin

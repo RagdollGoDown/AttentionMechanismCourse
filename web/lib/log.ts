@@ -36,6 +36,8 @@ export type EventType =
   | 'model_answer_shown'
   | 'pretest_answer'
   | 'pretest_submit'
+  | 'nav_back'
+  | 'lab_redo'
   // Developer tools (?debug) only; filter these out of study data.
   | 'debug_goto'
   | 'debug_reset'

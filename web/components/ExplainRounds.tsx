@@ -4,6 +4,7 @@ import { useId, useState } from 'react';
 import { ExplanationBox } from '@/components/ExplanationBox';
 import { FeedbackCard, type ShownFeedback } from '@/components/FeedbackCard';
 import { useLogger } from '@/components/LoggerProvider';
+import { useSaved } from '@/components/SavedAnswers';
 import { buttonClass } from '@/components/ui';
 import type { ExplainTask } from '@/content/missions';
 import type { Condition } from '@/lib/condition';
@@ -47,6 +48,7 @@ function PartBoxes({ task, values, onChange }: { task: ExplainTask; values: Reco
  * the AI tutor's adaptive feedback, or the fixed expert answer.
  * The AI condition also sees the expert answer at the very end (after the revision, or when the
  * learner skips it), so both groups leave with the same model answer.
+ * Once the learner moves on, the answers lock: going back (or redoing the experiment) shows them read-only.
  */
 export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' }: {
   task: ExplainTask;
@@ -57,10 +59,11 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
   const logger = useLogger();
   const [draft, setDraft] = useState('');
   const [partDrafts, setPartDrafts] = useState<Record<string, string>>({});
-  const [rounds, setRounds] = useState<Round[]>([]);
+  const [rounds, setRounds] = useSaved<Round[]>('rounds', []);
+  const [closed, setClosed] = useSaved('closed', false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [modelShown, setModelShown] = useState(false);
+  const [modelShown, setModelShown] = useSaved('modelShown', false);
 
   function showModelAnswer(trigger: 'after_revision' | 'skipped_revision', round: number) {
     setModelShown(true);
@@ -115,9 +118,13 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
     }
   }
 
-  const canWrite = rounds.length < MAX_ROUNDS && !modelShown;
+  const canWrite = !closed && rounds.length < MAX_ROUNDS && !modelShown;
   // AI condition: the first click after feedback ends the rounds and reveals the model answer.
-  const mustReveal = condition === 'ai' && !modelShown;
+  const mustReveal = condition === 'ai' && !modelShown && !closed;
+  function done() {
+    setClosed(true);
+    onDone();
+  }
   return (
     <div className="space-y-4">
       <p className="font-display text-lg font-semibold leading-snug">{task.explainPrompt}</p>
@@ -149,7 +156,7 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
       {error && <p className="text-miss">{error}</p>}
       {rounds.length > 0 && (mustReveal
         ? <button type="button" className={buttonClass} disabled={pending} onClick={() => showModelAnswer('skipped_revision', rounds.length)}>{"I'm done. Show the expert answer"}</button>
-        : <button type="button" className={buttonClass} onClick={onDone}>{doneLabel}</button>)}
+        : <button type="button" className={buttonClass} onClick={done}>{doneLabel}</button>)}
     </div>
   );
 }

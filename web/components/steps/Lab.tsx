@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ComponentType } from 'react';
 import { useLogger } from '@/components/LoggerProvider';
+import { SavedAnswers } from '@/components/SavedAnswers';
 import { useTrophy } from '@/components/TrophyProvider';
 import { buttonClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
@@ -42,14 +43,16 @@ function Lock() {
 /**
  * The hub: the sentence stays on the board while experiments unlock one by one.
  * Opened experiments stay mounted (hidden), so going back never resets them or re-logs a prediction.
+ * A finished experiment can be redone: it restarts, but the answers already written stay (read-only).
  */
-export function Lab({ condition, onDone, debug = false }: StepProps) {
+export function Lab({ condition, onDone, debug = false, visible = true }: StepProps) {
   const logger = useLogger();
   const { win } = useTrophy();
   const [done, setDone] = useState<LabId[]>([]);
   const [active, setActive] = useState<LabId>('contrast');
   const [opened, setOpened] = useState<LabId[]>(['contrast']);
-  // Debug only: bumping an experiment's count remounts it with fresh state.
+  // Redo remounts the experiment but keeps its saved answers; debug reset also clears those.
+  const [redos, setRedos] = useState<Partial<Record<LabId, number>>>({});
   const [resets, setResets] = useState<Partial<Record<LabId, number>>>({});
   const unlocked = (id: LabId) => {
     const i = LAB_ORDER.indexOf(id);
@@ -58,10 +61,11 @@ export function Lab({ condition, onDone, debug = false }: StepProps) {
 
   // Stamp events with the experiment, not just "lab".
   useEffect(() => {
+    if (!visible) return;
     logger.setMission(active);
     logger.log('tab_open', { lab: active });
     return () => logger.setMission('lab');
-  }, [active, logger]);
+  }, [active, visible, logger]);
 
   function open(id: LabId) {
     if (!unlocked(id)) return;
@@ -78,6 +82,11 @@ export function Lab({ condition, onDone, debug = false }: StepProps) {
       setActive(next);
       if (!opened.includes(next)) setOpened([...opened, next]);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function redo(id: LabId) {
+    logger.log('lab_redo', { lab: id });
+    setRedos({ ...redos, [id]: (redos[id] ?? 0) + 1 });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   function resetExperiment(id: LabId) {
@@ -146,12 +155,21 @@ export function Lab({ condition, onDone, debug = false }: StepProps) {
         </div>
       )}
 
+      {done.includes(active) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-page px-4 py-2.5">
+          <p className="text-sm text-muted">{LAB_TEXT.redoNote}</p>
+          <button type="button" className={secondaryButtonClass} onClick={() => redo(active)}>{LAB_TEXT.redo}</button>
+        </div>
+      )}
+
       {opened.map((id) => {
         const View = VIEWS[id];
         return (
           // Showing a hidden panel restarts its CSS animation, so switching experiments slides too.
           <div key={`${id}-${resets[id] ?? 0}`} role="tabpanel" hidden={active !== id} className="slide-in">
-            <View condition={condition} onDone={() => finish(id)} />
+            <SavedAnswers>
+              <View key={redos[id] ?? 0} condition={condition} onDone={() => finish(id)} />
+            </SavedAnswers>
           </div>
         );
       })}
