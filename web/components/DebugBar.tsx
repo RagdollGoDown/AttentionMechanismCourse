@@ -37,6 +37,7 @@ export function DebugBar({ index, onGoTo, onReset }: {
       <button type="button" className={secondaryButtonClass} disabled={index >= last} onClick={() => onGoTo(index + 1)} aria-label="Next step">→</button>
       <button type="button" className={secondaryButtonClass} disabled={index >= last} onClick={onReset}>Reset step</button>
       <TutorStatus />
+      <StoreStatus />
     </div>
   );
 }
@@ -94,4 +95,21 @@ function TutorStatus() {
       </button>
     </>
   );
+}
+
+/** Where test answers and session logs go (POST /api/collect). Red: they are only in the browser. */
+function StoreStatus() {
+  const [status, setStatus] = useState<{ store: string; ready: boolean } | 'loading' | 'error'>('loading');
+  useEffect(() => {
+    fetch('/api/collect', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then(setStatus, () => setStatus('error'));
+  }, []);
+  const ok = typeof status === 'object' && status.ready;
+  const text =
+    status === 'loading' ? 'Store: …'
+    : status === 'error' ? 'Store: no answer'
+    : status.ready ? `Store: ${status.store}`
+    : `Store: ${status.store.toUpperCase()} (not saved)`;
+  return <span role="status" className={`rounded px-2 py-1 font-mono text-[11px] font-bold ${ok ? 'bg-ok text-white' : 'bg-miss text-white'}`}>{text}</span>;
 }
