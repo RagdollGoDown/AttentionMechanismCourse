@@ -270,12 +270,17 @@ export const COMPUTE_TEXT = {
   setup: (q: string) => `The query of "model" is q = ${q}. Each word has a key k and a value v.`,
   workedTitle: 'Worked example',
   practiceTitle: 'Your turn',
-  practiceIntro: 'Fill in one column at a time. Round to 2 decimals and use your rounded numbers in the next column.',
-  calculator: 'Use a calculator for eˣ (on a phone: the eˣ key).',
+  practiceIntro: 'Now the whole table is yours. Fill in every cell, then check. Round to 2 decimals and use your rounded numbers in the next column.',
   ready: 'I read it. My turn',
   check: 'Check',
   showMe: 'Show me',
   showMeAfter: 3,
+  calc: {
+    title: 'Calculator',
+    placeholder: 'e.g. exp(2.12) or 8.34 / (8.34 + 4.11 + 16.92)',
+    run: '=',
+    error: 'Cannot read that. Check the brackets.',
+  },
   outputLabel: 'output',
   /** Column headers and one line on how to get each column. */
   stages: {
@@ -286,8 +291,8 @@ export const COMPUTE_TEXT = {
     output: { head: 'Σ weight × v', how: 'Add up the values, each multiplied by its weight.' },
   },
   right: 'Right!',
-  wrong: 'Check the cells marked in amber.',
-  revealed: 'Here are the numbers. Carry on with the next column.',
+  wrong: (n: number) => `${n} ${n === 1 ? 'cell is' : 'cells are'} off: see the amber ones. Each cell is checked with your own numbers from the column before.`,
+  revealed: 'Here are the numbers. Compare them with yours.',
   done: 'You computed attention by hand: scores, scaling, softmax and the weighted sum.',
   cta: 'Explain it yourself',
 };

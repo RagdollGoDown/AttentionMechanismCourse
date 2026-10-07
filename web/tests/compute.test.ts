@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { PRACTICE_EXAMPLE, WORKED_EXAMPLE } from '@/content/steps';
-import { STAGES, checkStage, fmt, parseEntry, stagesOf, type Stage } from '@/lib/compute';
+import { STAGES, checkAll, fmt, learnerPath, parseEntry, stagesOf, type Entries, type Stage } from '@/lib/compute';
 
 const rounded = (xs: number[]) => xs.map((x) => Number(fmt(x)));
 
@@ -30,33 +30,64 @@ describe('practice example', () => {
   });
 });
 
-describe('checkStage', () => {
-  it('accepts the exact values', () => {
-    for (const stage of STAGES) {
-      expect(checkStage(PRACTICE_EXAMPLE, stage, stagesOf(PRACTICE_EXAMPLE)[stage])).toEqual(stagesOf(PRACTICE_EXAMPLE)[stage].map(() => true));
+describe('learnerPath: the numbers on the page (recomputed by hand, rounded and carried forward)', () => {
+  it.each([
+    ['worked', WORKED_EXAMPLE, { scores: [4, 1, 2], scaled: [2.83, 0.71, 1.41], exps: [16.95, 2.03, 4.1], weights: [0.73, 0.09, 0.18], output: [0.91, 0.27] }],
+    ['practice', PRACTICE_EXAMPLE, { scores: [3, 2, 4], scaled: [2.12, 1.41, 2.83], exps: [8.33, 4.1, 16.95], weights: [0.28, 0.14, 0.58], output: [0.86, 0.72] }],
+  ] as const)('%s', (_, ex, expected) => expect(learnerPath(ex)).toEqual(expected));
+
+  it('each stage follows from the one before, as a calculator would give it', () => {
+    for (const ex of [WORKED_EXAMPLE, PRACTICE_EXAMPLE]) {
+      const p = learnerPath(ex);
+      p.scaled.forEach((x, i) => expect(x).toBeCloseTo(p.scores[i] / Math.SQRT2, 2));
+      p.exps.forEach((x, i) => expect(x).toBeCloseTo(Math.exp(p.scaled[i]), 2));
+      expect(p.weights.reduce((a, b) => a + b, 0)).toBeCloseTo(1, 10);
     }
   });
 
-  it('accepts a learner who rounds each stage and carries the rounded numbers forward', () => {
-    const scaled = rounded(stagesOf(PRACTICE_EXAMPLE).scores.map((x) => x / Math.SQRT2));
+  it('is accepted by the check (the "Show me" answers pass)', () => {
+    const v = checkAll(PRACTICE_EXAMPLE, learnerPath(PRACTICE_EXAMPLE));
+    expect(STAGES.every((s) => v[s].every(Boolean))).toBe(true);
+  });
+});
+
+describe('checkAll', () => {
+  const ex = PRACTICE_EXAMPLE;
+  const exact = stagesOf(ex);
+  /** A learner who rounds each stage to 2 decimals and carries the rounded numbers forward. */
+  function carried(scores: number[]): Entries {
+    const scaled = rounded(scores.map((x) => x / Math.SQRT2));
     const exps = rounded(scaled.map(Math.exp));
     const sum = exps.reduce((a, b) => a + b, 0);
     const weights = rounded(exps.map((e) => e / sum));
-    const output = rounded([0, 1].map((d) => PRACTICE_EXAMPLE.tokens.reduce((acc, t, i) => acc + weights[i] * t.v[d], 0)));
-    for (const [stage, entries] of [['scaled', scaled], ['exps', exps], ['weights', weights], ['output', output]] as [Stage, number[]][]) {
-      expect(checkStage(PRACTICE_EXAMPLE, stage, entries).every(Boolean), stage).toBe(true);
-    }
+    const output = rounded([0, 1].map((d) => ex.tokens.reduce((acc, t, i) => acc + weights[i] * t.v[d], 0)));
+    return { scores, scaled, exps, weights, output };
+  }
+  const allTrue = (v: Record<Stage, boolean[]>) => STAGES.every((s) => v[s].every(Boolean));
+
+  it('accepts the exact values', () => {
+    expect(allTrue(checkAll(ex, exact))).toBe(true);
+  });
+
+  it('accepts a learner who rounds and carries the rounded numbers forward', () => {
+    expect(allTrue(checkAll(ex, carried([3, 2, 4])))).toBe(true);
+  });
+
+  it('marks only the cell of an early slip, judging later cells on the learner\'s own numbers', () => {
+    const v = checkAll(ex, carried([3, 5, 4])); // 2nd score wrong, the rest computed from it
+    expect(v.scores).toEqual([true, false, true]);
+    for (const s of ['scaled', 'exps', 'weights', 'output'] as Stage[]) expect(v[s].every(Boolean), s).toBe(true);
   });
 
   it('rejects common mistakes', () => {
     // Forgot to scale: exponentiate the raw scores.
-    expect(checkStage(PRACTICE_EXAMPLE, 'exps', [Math.exp(3), Math.exp(2), Math.exp(4)])).toEqual([false, false, false]);
+    expect(checkAll(ex, { ...exact, exps: [Math.exp(3), Math.exp(2), Math.exp(4)] }).exps).toEqual([false, false, false]);
     // Divided by 2 instead of √2.
-    expect(checkStage(PRACTICE_EXAMPLE, 'scaled', [1.5, 1, 2])).toEqual([false, false, false]);
+    expect(checkAll(ex, { ...exact, scaled: [1.5, 1, 2] }).scaled).toEqual([false, false, false]);
     // Weights from the scores, not from eˣ (no softmax).
-    expect(checkStage(PRACTICE_EXAMPLE, 'weights', [3 / 9, 2 / 9, 4 / 9]).every(Boolean)).toBe(false);
+    expect(checkAll(ex, { ...exact, weights: [3 / 9, 2 / 9, 4 / 9] }).weights.every(Boolean)).toBe(false);
     // Missing entry.
-    expect(checkStage(PRACTICE_EXAMPLE, 'scores', [3, null, 4])).toEqual([true, false, true]);
+    expect(checkAll(ex, { ...exact, scores: [3, null, 4] }).scores).toEqual([true, false, true]);
   });
 });
 

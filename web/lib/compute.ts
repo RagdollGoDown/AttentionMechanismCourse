@@ -20,6 +20,23 @@ export function stagesOf(ex: Example): Record<Stage, number[]> {
   return { scores, scaled, exps, weights, output };
 }
 
+const round2 = (x: number) => Math.round(x * 100) / 100;
+
+/**
+ * The numbers a learner gets by following the instructions: each stage rounded to 2 decimals and the
+ * rounded numbers carried into the next one. This is what the page shows (worked example, "Show me"),
+ * so a learner who redoes it on the calculator finds the same numbers.
+ */
+export function learnerPath(ex: Example): Record<Stage, number[]> {
+  const scores = ex.tokens.map((t) => dot(ex.q, t.k));
+  const scaled = scores.map((s) => round2(s / Math.sqrt(ex.q.length)));
+  const exps = scaled.map((x) => round2(Math.exp(x)));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  const weights = exps.map((e) => round2(e / sum));
+  const output = [0, 1].map((d) => round2(ex.tokens.reduce((acc, t, i) => acc + weights[i] * t.v[d], 0)));
+  return { scores, scaled, exps, weights, output };
+}
+
 /**
  * How far an entry may be from the exact value. Learners round each stage to 2 decimals and carry
  * their rounded numbers forward, so later stages need a little more room than the rounding itself.
@@ -43,13 +60,32 @@ export function parseEntry(raw: string, stage: Stage): number | null {
   return n;
 }
 
-/** One verdict per entry. */
-export function checkStage(ex: Example, stage: Stage, entries: (number | null)[]): boolean[] {
-  const exact = stagesOf(ex)[stage];
-  return exact.map((x, i) => {
-    const e = entries[i];
+export type Entries = Record<Stage, (number | null)[]>;
+
+/**
+ * One verdict per cell of the whole table. Each stage is checked against what follows from the
+ * learner's own previous stage (their own numbers carried forward), so one early slip marks only
+ * the cell where it happened, not every cell after it. A missing earlier entry falls back to the exact value.
+ */
+export function checkAll(ex: Example, entries: Entries): Record<Stage, boolean[]> {
+  const exact = stagesOf(ex);
+  const own = (stage: Stage) => exact[stage].map((x, i) => entries[stage][i] ?? x);
+  const scores = own('scores');
+  const scaled = own('scaled');
+  const exps = own('exps');
+  const sumExps = exps.reduce((a, b) => a + b, 0);
+  const weights = own('weights');
+  const expected: Record<Stage, number[]> = {
+    scores: exact.scores,
+    scaled: scores.map((s) => s / Math.sqrt(ex.q.length)),
+    exps: scaled.map(Math.exp),
+    weights: exps.map((e) => e / sumExps),
+    output: [0, 1].map((d) => ex.tokens.reduce((sum, t, i) => sum + weights[i] * t.v[d], 0)),
+  };
+  return Object.fromEntries(STAGES.map((stage) => [stage, expected[stage].map((x, i) => {
+    const e = entries[stage][i];
     return e !== null && e !== undefined && Math.abs(e - x) <= TOLERANCE[stage](x);
-  });
+  })])) as Record<Stage, boolean[]>;
 }
 
 /** 2-decimal display, trailing zeros kept (0.70, not 0.7), so every column reads the same. */

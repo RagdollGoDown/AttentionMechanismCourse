@@ -153,3 +153,13 @@ Chapters on a quest map. Intro and consolidation are linear. The lab is a hub.
 - Slide-in (0.5 s from the right) on every step and every lab tab, off with reduced motion.
 - 140 tests, lint, typecheck, build clean. Headless runs at 1440×900 and 390×844 through swap, remove and rule: no console errors, no overflow.
 - Known: the trophy card briefly covers the top of the next experiment (3 s, click-through).
+
+# Compute practice: less guided (2026-10-07, Julien's feedback)
+- [x] Practice = the whole empty table at once, one Check; no column unlocking, no per-stage "how" line (worked example unchanged).
+- [x] Each cell checked against the learner's own previous column (`checkAll`), so one slip marks one cell.
+- [x] On-page calculator (`lib/calc.ts`, own parser, no eval): + − × ÷ ^, brackets, exp, sqrt, e; buttons for eˣ √ × ÷ ( ). Logged as `calc_use`.
+- [x] Log: `compute_check` {entries, correct, wrongCells, attempt, msSinceStart} replaces `compute_entry`; "Show me" after 3 checks.
+- [x] 211 tests, lint, typecheck, build; pilot both conditions + phone screenshot.
+- [x] Verified the numbers by hand (Python, independent of the app). Fixed: the page showed eˣ of the *unrounded* scaled
+      score (e^2.83 shown as 16.92, really 16.95) and "4 ÷ 1.41 ≈ 2.83" (really 2.84). Worked example and "Show me" now
+      use `learnerPath` (round to 2 decimals, carry forward, ÷ √2), pinned by tests with the hand-computed values.

@@ -6,7 +6,8 @@ import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass, noteClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { COMPUTE_TEXT as T, PRACTICE_EXAMPLE, WORKED_EXAMPLE } from '@/content/steps';
-import { STAGES, checkStage, fmt, fmtVec, parseEntry, stagesOf, type Example, type Stage } from '@/lib/compute';
+import { evaluate } from '@/lib/calc';
+import { STAGES, checkAll, fmt, fmtVec, learnerPath, parseEntry, stagesOf, type Entries, type Example, type Stage } from '@/lib/compute';
 
 const ROW_STAGES = STAGES.filter((s) => s !== 'output');
 const vec = (v: number[]) => `[${v.join(', ')}]`;
@@ -81,11 +82,11 @@ function StageTable({ ex, cell, onInput }: {
 /** One line per stage, with the first word's numbers plugged in, so every step of the worked example is visible. */
 function WorkedSteps() {
   const ex = WORKED_EXAMPLE;
-  const s = stagesOf(ex);
+  const s = learnerPath(ex);
   const [t0] = ex.tokens;
   const lines: Record<Stage, string> = {
     scores: `${t0.word}: ${ex.q[0]}×${t0.k[0]} + ${ex.q[1]}×${t0.k[1]} = ${s.scores[0]}`,
-    scaled: `${s.scores[0]} ÷ 1.41 ≈ ${fmt(s.scaled[0])}`,
+    scaled: `${s.scores[0]} ÷ √2 ≈ ${fmt(s.scaled[0])}`,
     exps: `e^${fmt(s.scaled[0])} ≈ ${fmt(s.exps[0])}`,
     weights: `${fmt(s.exps[0])} ÷ (${s.exps.map(fmt).join(' + ')}) ≈ ${fmt(s.weights[0])}`,
     output: ex.tokens.map((t, i) => `${fmt(s.weights[i])}×${vec(t.v)}`).join(' + ') + ` ≈ ${fmtVec(s.output)}`,
@@ -105,88 +106,128 @@ function WorkedSteps() {
   );
 }
 
-type Result = { kind: 'right' | 'wrong' | 'revealed'; stage: Stage };
+/** Expression in, number out. Every use is logged: it shows how learners got to their numbers. */
+function Calculator() {
+  const logger = useLogger();
+  const [expr, setExpr] = useState('');
+  const [out, setOut] = useState<string | null>(null);
+  const insert = (text: string) => setExpr((e) => e + text);
+  function run() {
+    const v = evaluate(expr);
+    setOut(v === null ? T.calc.error : `= ${Number(v.toFixed(4))}`);
+    logger.log('calc_use', { expr, result: v });
+  }
+  return (
+    <form
+      className="space-y-2 rounded-xl border border-line bg-page p-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        run();
+      }}
+    >
+      <p className="font-display text-sm font-bold">{T.calc.title}</p>
+      <div className="flex gap-2">
+        <input
+          aria-label={T.calc.title}
+          autoComplete="off"
+          value={expr}
+          onChange={(e) => setExpr(e.target.value)}
+          placeholder={T.calc.placeholder}
+          className="min-w-0 flex-1 rounded-md border-2 border-cobalt/40 bg-card px-2 py-1.5 font-mono text-sm focus:border-cobalt focus:outline-none"
+        />
+        <button type="submit" className={buttonClass} disabled={expr.trim() === ''}>{T.calc.run}</button>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {[['eˣ', 'exp('], ['√', 'sqrt('], ['×', '×'], ['÷', '÷'], ['(', '('], [')', ')']].map(([label, text]) => (
+          <button key={label} type="button" className={`${secondaryButtonClass} min-w-10 font-mono`} onClick={() => insert(text)}>{label}</button>
+        ))}
+        <button type="button" className={secondaryButtonClass} onClick={() => { setExpr(''); setOut(null); }}>C</button>
+      </div>
+      {out && <p role="status" className="font-mono text-sm font-semibold">{out}</p>}
+    </form>
+  );
+}
 
+const ALL_CELLS = (ex: Example) => STAGES.flatMap((s) => stagesOf(ex)[s].map((_, i) => [s, i] as const));
+
+/** LG2 practice: the learner fills the whole table alone, with the calculator, and checks it in one go. */
 function Practice({ onDone }: { onDone: () => void }) {
   const logger = useLogger();
   const ex = PRACTICE_EXAMPLE;
   const exact = stagesOf(ex);
-  const [at, setAt] = useState(0); // index into STAGES; STAGES.length = finished
+  const shown = learnerPath(ex);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [accepted, setAccepted] = useState<Partial<Record<Stage, string[]>>>({});
-  const [wrong, setWrong] = useState<boolean[]>([]);
+  const [wrong, setWrong] = useState<Set<string>>(new Set());
   const [attempts, setAttempts] = useState(0);
-  const [result, setResult] = useState<Result | null>(null);
-  const stageStart = useRef(0);
+  const [result, setResult] = useState<'wrong' | 'right' | 'revealed' | null>(null);
+  const started = useRef(0);
   useEffect(() => {
-    stageStart.current = performance.now(); // a new stage starts its clock
-  }, [at]);
-  const stage = STAGES[at] as Stage | undefined;
+    started.current = performance.now();
+  }, []);
   const key = (s: Stage, i: number) => `${s}-${i}`;
-  const raw = stage ? exact[stage].map((_, i) => drafts[key(stage, i)] ?? '') : [];
-
-  function advance(values: string[]) {
-    setAccepted((a) => ({ ...a, [stage!]: values }));
-    setAt((n) => n + 1);
-    setWrong([]);
-    setAttempts(0);
-  }
+  const finished = result === 'right' || result === 'revealed';
+  const cells = ALL_CELLS(ex);
+  const raw = (s: Stage) => exact[s].map((_, i) => drafts[key(s, i)] ?? '');
 
   function check() {
-    if (!stage) return;
-    const parsed = raw.map((r) => parseEntry(r, stage));
-    const verdict = checkStage(ex, stage, parsed);
-    const ok = verdict.every(Boolean);
+    const entries = Object.fromEntries(STAGES.map((s) => [s, raw(s).map((r) => parseEntry(r, s))])) as Entries;
+    const verdict = checkAll(ex, entries);
+    const bad = new Set(cells.filter(([s, i]) => !verdict[s][i]).map(([s, i]) => key(s, i)));
     const attempt = attempts + 1;
-    logger.log('compute_entry', { stage, entries: raw, correct: verdict, ok, attempt, msOnStage: msSince(stageStart.current) });
-    setResult({ kind: ok ? 'right' : 'wrong', stage });
-    if (ok) advance(parsed.map((x) => show(stage, x!)));
-    else {
-      setWrong(verdict.map((v) => !v));
-      setAttempts(attempt);
-    }
+    logger.log('compute_check', {
+      entries: Object.fromEntries(STAGES.map((s) => [s, raw(s)])),
+      correct: verdict,
+      ok: bad.size === 0,
+      wrongCells: bad.size,
+      attempt,
+      msSinceStart: msSince(started.current),
+    });
+    setWrong(bad);
+    setAttempts(attempt);
+    setResult(bad.size === 0 ? 'right' : 'wrong');
   }
 
   function reveal() {
-    if (!stage) return;
-    logger.log('compute_reveal', { stage, attempts, msOnStage: msSince(stageStart.current) });
-    setResult({ kind: 'revealed', stage });
-    advance(exact[stage].map((x) => show(stage, x)));
+    logger.log('compute_reveal', { attempts, msSinceStart: msSince(started.current) });
+    setDrafts(Object.fromEntries(cells.map(([s, i]) => [key(s, i), show(s, shown[s][i])])));
+    setWrong(new Set());
+    setResult('revealed');
   }
 
-  const cell = (s: Stage, i: number): Cell => {
-    if (accepted[s]) return { text: accepted[s]![i] };
-    if (s === stage) return { input: drafts[key(s, i)] ?? '', wrong: wrong[i] ?? false };
-    return null;
-  };
+  const cell = (s: Stage, i: number): Cell =>
+    finished ? { text: drafts[key(s, i)] ?? '' } : { input: drafts[key(s, i)] ?? '', wrong: wrong.has(key(s, i)) };
 
   return (
     <div className="space-y-4">
       <p>{T.practiceIntro}</p>
-      <p className={`${noteClass} text-sm`}>{T.setup(vec(ex.q))} {T.calculator}</p>
-      <StageTable ex={ex} cell={cell} onInput={(s, i, v) => setDrafts((d) => ({ ...d, [key(s, i)]: v }))} />
+      <p className={`${noteClass} text-sm`}>{T.setup(vec(ex.q))}</p>
+      <StageTable
+        ex={ex}
+        cell={cell}
+        onInput={(s, i, v) => {
+          setDrafts((d) => ({ ...d, [key(s, i)]: v }));
+          setWrong((w) => {
+            if (!w.has(key(s, i))) return w;
+            const next = new Set(w);
+            next.delete(key(s, i));
+            return next;
+          });
+        }}
+      />
+      {!finished && <Calculator />}
 
-      {stage && (
-        <form
-          className="flex flex-wrap items-center gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            check();
-          }}
-        >
-          <p className="w-full text-sm"><strong className="font-display">{T.stages[stage].head}</strong> · {T.stages[stage].how}</p>
-          <button type="submit" className={buttonClass} disabled={raw.some((r) => r.trim() === '')}>{T.check}</button>
+      {!finished && (
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="button" className={buttonClass} disabled={cells.some(([s, i]) => (drafts[key(s, i)] ?? '').trim() === '')} onClick={check}>{T.check}</button>
           {attempts >= T.showMeAfter && <button type="button" className={secondaryButtonClass} onClick={reveal}>{T.showMe}</button>}
-        </form>
+        </div>
       )}
 
-      {result && stage && result.kind === 'wrong' && <ResultBanner ok={false}>{T.wrong}</ResultBanner>}
-      {result && result.kind === 'right' && stage && <ResultBanner ok>{T.stages[result.stage].head} ✓</ResultBanner>}
-      {result && result.kind === 'revealed' && stage && <ResultBanner ok={false} title={T.revealed} />}
-
-      {!stage && (
+      {result === 'wrong' && <ResultBanner ok={false}>{T.wrong(wrong.size)}</ResultBanner>}
+      {result === 'revealed' && <ResultBanner ok={false} title={T.revealed} />}
+      {finished && (
         <div className="space-y-4">
-          <ResultBanner ok>{T.done}</ResultBanner>
+          {result === 'right' && <ResultBanner ok>{T.done}</ResultBanner>}
           <button type="button" className={`${buttonClass} px-6 py-3 text-base`} onClick={onDone}>{T.cta}</button>
         </div>
       )}
@@ -198,7 +239,7 @@ function Practice({ onDone }: { onDone: () => void }) {
 export function Compute({ onDone }: StepProps) {
   const logger = useLogger();
   const [practice, setPractice] = useState(false);
-  const worked = stagesOf(WORKED_EXAMPLE);
+  const worked = learnerPath(WORKED_EXAMPLE);
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <header className="space-y-1">
