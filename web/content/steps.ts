@@ -239,7 +239,7 @@ export const FORMULA_TEXT = {
   mapNote: 'The dashed arrow is "model" after attention. It moved toward fashion.',
   pick: 'Pick a part of the formula.',
   remaining: (n: number) => `${n} part${n === 1 ? '' : 's'} left to explore`,
-  cta: 'Explain it yourself',
+  cta: 'Compute it yourself',
 };
 
 /** LG2. Worked example from the M3 report; the practice uses other numbers. dₖ = 2 in both. */

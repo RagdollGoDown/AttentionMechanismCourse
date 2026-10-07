@@ -57,3 +57,12 @@ Context: two changes, split into two PRs from `feat/m3-prototype`: going back to
 - Done: Back from the lab to the warm-up and from the formula to the lab; Redo for finished lab experiments; written answers read-only once the learner moves on; new log events `nav_back` and `lab_redo`. In control, the expert answer is shown once and the revision is confirmed.
 - Decisions: keep the optional revision in both conditions (only the feedback differs); no Back at the start, around the tests or from the Explain step; an allow-list of steps with Back.
 - Open questions: phone-width layout not checked; whether pilot learners want to go back from the Explain step to the lab.
+
+## Session 2026-10-07 — Morgane — formula button label
+**Tool:** Claude Code (Claude Opus 5.5)
+
+Context: fix on PR #7 (branch `feat/pre-post-test-prototypes`).
+
+### Interactions
+1. **User:** The button at the end of the formula step says "Explain it yourself", but the next page is "Compute it yourself". Fix it on the PR's branch.
+   **AI:** Changed `FORMULA_TEXT.cta` in `web/content/steps.ts` to "Compute it yourself". The compute step's button keeps "Explain it yourself", since the explain step follows it. Tests passed; I checked the page before the commit.
