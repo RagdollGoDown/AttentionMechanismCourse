@@ -35,3 +35,28 @@
 ### Follow-up (same session)
 3. **User:** The URL flag should be just `debug` or no flag at all. Is that doable?
    **AI:** Yes. `parseDebug()` now returns true whenever the parameter is present (`?debug`, and also `?debug=anything`), and false when it is missing. Updated the tests and the comments that mentioned `?debug=1`. Checks: `tsc` passes, all 145 tests pass (4 old value-based cases dropped), and on the dev server the toolbar appears with `?debug` and `?condition=control&debug` and is absent without the flag.
+
+## Session 2026-10-07 — André — formula V-view visual bug (flashing dots)
+**Tool:** Claude Code (Claude Sonnet 5.5, then Claude Opus 5.5)
+
+### Interactions
+1. **User:** In section 4 (formula), clicking V makes dots of different sizes flash repeatedly on a horizontal line. Where could this bug come from?
+   **AI:** Traced it to the `flow` prop of `Playground` (used only in the V view of `Formula.tsx`). Each non-focus word draws a green dot sized `6 + weight × 22` px, and the `value-flow` CSS animation loops forever (fade in, slide to "model", fade out). Also pointed out that the global `prefers-reduced-motion` rule shortens animations to 0.01 ms, which would turn an infinite loop into a strobe. Proposed running it once with a Replay button.
+2. **User:** Yes (apply the fix).
+   **AI:** Made `value-flow` run once instead of `infinite`. Added a Replay button in the V view of `Formula.tsx` that remounts the `Playground` through a `key` counter. Tests pass (215).
+3. **User:** No dots appear when going to the formula. Is that normal, and what am I meant to see?
+   **AI:** Explained that dots only appear in the V view and play for about 1.6 s. Proposed keeping the dots visible on "model" at the end.
+4. **User:** Nothing appears at all when clicking V. The speech bubbles work, but there are no green dots.
+   **AI:** Suspected reduced motion: a single 0.01 ms run is invisible, and the original infinite loop at 0.01 ms explained the flashing. Changed the keyframes so dots end visible on "model", with a static end state under reduced motion.
+5. **User:** (switched to Opus) Only a single dot at the 55 % mark of "model" and no animation.
+   **AI:** Checked Windows: "Animation effects" is off (`SPI_GETCLIENTAREAANIMATION = False`), so the browser reports `prefers-reduced-motion: reduce`. This confirmed the root cause of the original bug. All dots were stacked on "model", so only the largest was visible. Proposed a faint resting dot on each word, a moving copy hidden under reduced motion, and Replay hidden with `motion-reduce:hidden`.
+6. **User:** Remove the resting dot.
+   **AI:** Removed it from `Playground.tsx`, so under reduced motion the V view shows no dots.
+7. **User:** Write the log.
+   **AI:** Wrote this entry. Noted that André had already committed `d3a280a fix: visual bug on formula` on `fix/formula-value-visual-bug`. The committed `globals.css` (reformatted) holds the step-4 version: dots travel once and stay on "model", and under reduced motion they sit statically on "model". It is not the step-5/6 version (fade out, moving dot hidden under reduced motion). `Playground.tsx` is back to the original single dot. The Replay button is in the commit.
+
+### Summary
+- Done: Found the cause of the flashing dots: an infinite CSS animation, shortened to 0.01 ms by the global reduced-motion rule on a machine with Windows animation effects off. The animation now runs once, with a Replay button. Committed by André as `d3a280a`.
+- Decisions: Run once rather than loop. Gave up on the resting dot at André's request.
+- Open questions: Which reduced-motion behaviour should be kept? The commit leaves the dots stacked on "model" (looks like one dot), whereas the last change hid them. Check how the other animations behave for participants with reduced motion on. The blanket 0.01 ms rule hides the intended motion and does not mean "no motion".
+- Reflection (AI draft for André to rewrite): The first diagnosis found the right code but missed the environment factor. The AI only found the real cause by checking the OS setting, after several fixes based on what the user saw. Asking earlier about reduced motion, or checking it first, would have saved two iterations.

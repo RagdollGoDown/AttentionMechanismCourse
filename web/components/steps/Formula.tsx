@@ -63,6 +63,7 @@ function useGrow(active: boolean): boolean {
 function FormulaBoard({ part, onPart }: { part: FormulaPart | null; onPart: (p: FormulaPart) => void }) {
   const logger = useLogger();
   const [dk, setDk] = useState(64);
+  const [replay, setReplay] = useState(0);
   const grown = useGrow(part === 'softmax');
   const btn = (p: FormulaPart) => (
     <button
@@ -117,7 +118,8 @@ function FormulaBoard({ part, onPart }: { part: FormulaPart | null; onPart: (p: 
       case 'v':
         return (
           <div className="flex w-full flex-col items-center gap-4">
-            <Playground tiles={TILES} focusKey={FOCUS_KEY} showWeights showScores={false} bubbles={VALUES} flow />
+            <Playground key={replay} tiles={TILES} focusKey={FOCUS_KEY} showWeights showScores={false} bubbles={VALUES} flow />
+            <button type="button" className={`${buttonClass} motion-reduce:hidden`} onClick={() => setReplay((r) => r + 1)}>Replay</button>
             <MeaningMap words={[...new Set(SENTENCE_A)]} selected={[]} extra={{ vec: OUTPUT, label: 'model, after' }} />
             <p className="text-sm text-muted">{FORMULA_TEXT.mapNote}</p>
           </div>
