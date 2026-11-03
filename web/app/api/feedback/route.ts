@@ -1,19 +1,19 @@
 import { FeedbackRequestSchema, type FeedbackRequest } from '@/lib/tutor/schema';
-import { getFeedback, llmFromEnv, tutorModel } from '@/lib/tutor/getFeedback';
+import { getFeedback, tutorModels, tutorsFromEnv } from '@/lib/tutor/getFeedback';
 
 /** A fixed explanation for the experimenter's test call. */
-const PROBE: FeedbackRequest = { missionId: 'remove', explanation: 'The weights always add up to 100 percent.', round: 1 };
+const PROBE: FeedbackRequest = { missionId: 'remove', explanation: 'The weights always add up to 100 percent.', round: 1, mode: 'formative' };
 
 /**
- * Tutor status for the experimenter: `{ llm, model }`.
- * With `?probe`, also makes one real tutor call and reports which tutor answered (`llm` or `mock`).
+ * Tutor status for the experimenter: `{ llm, model }` (model: the chain, e.g. "primary → backup").
+ * With `?probe`, also makes one real tutor call and reports who answered (`llm` + model, or `mock`).
  */
 export async function GET(request: Request): Promise<Response> {
-  const model = tutorModel();
-  const status = { llm: model !== null, model };
+  const models = tutorModels();
+  const status = { llm: models.length > 0, model: models.join(' → ') || null };
   if (!new URL(request.url).searchParams.has('probe')) return Response.json(status);
-  const fb = await getFeedback(PROBE, llmFromEnv());
-  return Response.json({ ...status, probe: { source: fb.source, latencyMs: fb.latencyMs } });
+  const fb = await getFeedback(PROBE, tutorsFromEnv());
+  return Response.json({ ...status, probe: { source: fb.source, model: fb.model, latencyMs: fb.latencyMs } });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -27,7 +27,6 @@ export async function POST(request: Request): Promise<Response> {
   if (!parsed.success) {
     return Response.json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
-  const fb = await getFeedback(parsed.data, llmFromEnv());
-  // The model name goes into the learner's log, so each reply says which model wrote it.
-  return Response.json({ ...fb, model: fb.source === 'llm' ? tutorModel() : null });
+  // `model` goes into the learner's log, so each reply says which model wrote it (backup included).
+  return Response.json(await getFeedback(parsed.data, tutorsFromEnv()));
 }

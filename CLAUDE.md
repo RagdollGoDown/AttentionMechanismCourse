@@ -11,14 +11,16 @@ ML / Modern NLP. Two versions:
 - **AI condition:** an AI tutor gives adaptive feedback on learners' written explanations
   (names what is correct, points to the one wrong or missing part, asks a question that
   sends them back to the playground, **never gives the formula**). The learner revises.
+  The last reply is a closing one (states the remaining idea, no question). The AI group never
+  sees the expert answer.
 - **Control:** identical lesson, but learners see a fixed expert answer, then may revise.
 
 Only the adaptivity of the feedback differs. Keep everything else identical across conditions.
 
 Lesson flow (v2, Sep 30): welcome → pre-test (without `?condition=`, the experimenter assigns the condition
 from its score) → hook ("model" alone, then in context) → why attention → words as vectors + dot product → **sentence lab** hub on one sentence,
-six experiments that unlock one by one (two contexts, query & key, predict a swap, predict a
-removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
+five experiments that unlock one by one (two contexts: a wrong pick gets one feedback reply,
+query & key, predict a removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
 and V output → explain the formula (AI tutor vs expert answer) → post-test. Tests: `docs/tests.md`.
 Gamified: XP for effort (never correctness, identical across conditions), levels, 3 badges = LG1–LG3.
 Learning goals: LG1 explain Q/K/V, softmax, √d_k · LG2 compute a 3-token example ·

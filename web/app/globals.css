@@ -17,6 +17,7 @@
   --color-note-soft: #f6f0ff;
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-math: var(--font-stix), 'STIX Two Text', 'Cambria Math', serif;
 }
 
 /* A word is a game tile: maple face, darker lower edge, its match score in the corner. */
@@ -242,3 +243,17 @@
   font-size: 0.65em;
   font-style: normal;
 }
+/* Textbook math (components/Math.tsx): serif, italic variables, stacked fractions, column vectors. */
+.math {
+  font-family: var(--font-math);
+  font-size: 1.12em;
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+.math i { font-style: italic; padding-right: 0.04em; }
+.math sub, .math sup { font-size: 0.68em; font-style: normal; }
+.math sub i, .math sup i { font-style: italic; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.15em; font-size: 0.92em; line-height: 1.2; }
+.frac > :first-child { border-bottom: 1px solid currentColor; padding: 0 0.2em 0.05em; }
+.frac > :last-child { padding: 0.1em 0.2em 0; }
+.colvec { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.2; padding: 0.05em 0.4em; margin: 0 0.15em; border-inline: 1.5px solid currentColor; border-radius: 0.55em / 50%; }

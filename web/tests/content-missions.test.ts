@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { EXPLAIN_TASKS, FORMULA_TASK, TUTOR_MISSIONS } from '@/content/missions';
+import { CONTRAST_TASK, EXPLAIN_TASKS, FORMULA_TASK, TUTOR_MISSIONS } from '@/content/missions';
+import { FOCUS, SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 import { DOT_PLOT, HAND_DOT, LAB_ORDER, STEP_ORDER, VECTORS_TEXT, dotPlotMin } from '@/content/steps';
 import { EMBEDDINGS } from '@/content/vectors';
 import { dot, type Vec } from '@/lib/attention';
 import { applyChange, toTiles, topKey, weightsFor } from '@/lib/tiles';
 
-const setup = (id: 'swap' | 'remove') => {
+const setup = (id: 'remove') => {
   const m = TUTOR_MISSIONS[id];
   const before = toTiles(m.before);
   const after = applyChange(before, m.change);
@@ -16,7 +17,7 @@ const setup = (id: 'swap' | 'remove') => {
 describe('mission content', () => {
   it('flow order', () => {
     expect(STEP_ORDER).toEqual(['welcome', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest']);
-    expect(LAB_ORDER).toEqual(['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax']);
+    expect(LAB_ORDER).toEqual(['contrast', 'qk', 'remove', 'rule', 'softmax']);
   });
 
   it.each(Object.values(EXPLAIN_TASKS))('$id: ids unique; no g-flag regexes', (t) => {
@@ -27,11 +28,11 @@ describe('mission content', () => {
 
   it('only the formula task may name the formula', () => {
     expect(FORMULA_TASK.formulaTaught).toBe(true);
-    expect(TUTOR_MISSIONS.swap.formulaTaught).toBeFalsy();
+    expect(CONTRAST_TASK.formulaTaught).toBeFalsy();
     expect(TUTOR_MISSIONS.remove.formulaTaught).toBeFalsy();
   });
 
-  it.each(['swap', 'remove'] as const)('%s: focusIndex points at model; ids unique; no g-flag regexes', (id) => {
+  it.each(['remove'] as const)('%s: focusIndex points at model; ids unique; no g-flag regexes', (id) => {
     const { m } = setup(id);
     expect(m.before[m.focusIndex]).toBe('model');
     const ids = [...m.rubric, ...m.misconceptions].map((r) => r.id);
@@ -39,17 +40,20 @@ describe('mission content', () => {
     [...m.rubric, ...m.misconceptions].forEach((r) => expect(r.keywords.flags).not.toContain('g'));
   });
 
-  it('swap: model leans on “fashion show” before and on “training run” after', () => {
-    const { m, before, after, focusKey } = setup('swap');
-    expect(topKey(before, focusKey)).toBe('2');
-    expect(after[2].word).toBe('training run');
-    expect(m.prediction.kind === 'tile' && before[m.prediction.correctIndex].key).toBe(topKey(after, focusKey));
-  });
-
-  it('swap: the adjacent word “smiled” gets less weight than “training run”', () => {
-    const { after, focusKey } = setup('swap');
-    const { weights } = weightsFor(after, focusKey);
-    expect(weights[5]).toBeLessThan(weights[2]);
+  // The contrast expert answer and rubric quote these facts: the top word per sentence, and that the
+  // word right next to "model" gets less weight than it.
+  it.each([
+    [SENTENCE_A, 'fashion show', 'smiled'],
+    [SENTENCE_B, 'training run', 'predicted'],
+  ])('contrast: in "%s", "model" listens most to "%s"; the neighbour "%s" gets less', (sentence, top, neighbour) => {
+    const tiles = toTiles(sentence);
+    const focus = sentence.indexOf(FOCUS);
+    expect(tiles.find((t) => t.key === topKey(tiles, String(focus)))?.word).toBe(top);
+    expect(sentence[focus + 1]).toBe(neighbour);
+    const { weights } = weightsFor(tiles, String(focus));
+    expect(weights[focus + 1]).toBeLessThan(weights[sentence.indexOf(top)]);
+    expect(CONTRAST_TASK.expertAnswer).toContain(`"${top}"`);
+    expect(CONTRAST_TASK.expertAnswer).toContain(`"${neighbour}"`);
   });
 
   it('remove: every remaining weight rises; the “fashion show” score is unchanged; the gain is visible', () => {
@@ -68,7 +72,7 @@ describe('mission content', () => {
 });
 
 describe('displayed percentages', () => {
-  it.each(['swap', 'remove'] as const)('%s: bars add up to 100 before and after', async (id) => {
+  it.each(['remove'] as const)('%s: bars add up to 100 before and after', async (id) => {
     const { percentages } = await import('@/lib/tiles');
     const { before, after, focusKey } = setup(id);
     for (const t of [before, after]) expect(percentages(weightsFor(t, focusKey).weights).reduce((a, b) => a + b, 0)).toBe(100);

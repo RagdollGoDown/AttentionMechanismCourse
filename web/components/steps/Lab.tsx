@@ -16,9 +16,6 @@ import { FOCUS, SENTENCE_A } from '@/content/sentences';
 import { LAB_ORDER, LAB_TEXT, LAB_TITLES, type LabId } from '@/content/steps';
 import { displayWord } from '@/lib/tiles';
 
-function Swap(p: StepProps) {
-  return <PredictMission mission={TUTOR_MISSIONS.swap} {...p} />;
-}
 function Remove(p: StepProps) {
   return <PredictMission mission={TUTOR_MISSIONS.remove} {...p} />;
 }
@@ -26,7 +23,6 @@ function Remove(p: StepProps) {
 const VIEWS: Record<LabId, ComponentType<StepProps>> = {
   contrast: Contrast,
   qk: QueryKey,
-  swap: Swap,
   remove: Remove,
   rule: RuleBuilder,
   softmax: Softmax,
@@ -111,7 +107,7 @@ export function Lab({ condition, onDone, debug = false, visible = true }: StepPr
             </span>
           ))}
         </p>
-        <div role="tablist" aria-label="Experiments" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div role="tablist" aria-label="Experiments" className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
           {LAB_ORDER.map((id, i) => {
             const isOpen = unlocked(id);
             const isDone = done.includes(id);

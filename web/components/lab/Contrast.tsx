@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { ExplainRounds } from '@/components/ExplainRounds';
 import { useLogger } from '@/components/LoggerProvider';
-import { useSaved } from '@/components/SavedAnswers';
 import { MissionShell } from '@/components/MissionShell';
 import { Playground } from '@/components/Playground';
 import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
+import { CONTRAST_TASK } from '@/content/missions';
 import { FOCUS, SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 import { CONTRAST_TEXT, LAB_TITLES } from '@/content/steps';
 import { toTiles, topKey, type Tile } from '@/lib/tiles';
@@ -23,13 +24,14 @@ const TOP: Record<Which, string | null> = {
 };
 const wordOf = (which: Which, key: string | null) => SENTENCES[which].tiles.find((t) => t.key === key)?.word ?? '–';
 
-export function Contrast({ onDone }: StepProps) {
+/**
+ * Predict, then reveal. Right on both: on to the next experiment. A wrong pick: the learner says what made
+ * them think so and gets one reply (the only part that differs between conditions: tutor vs expert answer).
+ */
+export function Contrast({ condition, onDone }: StepProps) {
   const logger = useLogger();
   const [picks, setPicks] = useState<Record<Which, string | null>>({ A: null, B: null });
   const [revealed, setRevealed] = useState(false);
-  const [reflection, setReflection] = useSaved('reflection', '');
-  // Once submitted, the reflection is read-only (going back or redoing shows it as written).
-  const [submitted, setSubmitted] = useSaved('submitted', false);
 
   function pick(which: Which, tile: Tile) {
     setPicks({ ...picks, [which]: tile.key });
@@ -42,13 +44,10 @@ export function Contrast({ onDone }: StepProps) {
       B: { pick: wordOf('B', picks.B), correct: picks.B === TOP.B },
     });
   }
-  function finish() {
-    if (!submitted && reflection.trim()) {
-      logger.log('reflection_submit', { text: reflection.trim() });
-    }
-    setSubmitted(true);
-    onDone();
-  }
+  const allRight = picks.A === TOP.A && picks.B === TOP.B;
+  const prediction = (['A', 'B'] as const)
+    .map((w) => `Sentence ${w}: picked "${wordOf(w, picks[w])}"${picks[w] === TOP[w] ? ' (right)' : `, but "model" listened most to "${wordOf(w, TOP[w])}"`}.`)
+    .join(' ');
 
   const panel = (
     <div className="space-y-4">
@@ -76,19 +75,11 @@ export function Contrast({ onDone }: StepProps) {
           {CONTRAST_TEXT.revealLabel}
         </button>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-4">
           <p className="text-sm text-muted">{CONTRAST_TEXT.bars}</p>
-          <label htmlFor="reflection" className="block font-semibold">{CONTRAST_TEXT.reflectPrompt}</label>
-          <textarea
-            id="reflection"
-            rows={3}
-            maxLength={600}
-            value={reflection}
-            readOnly={submitted}
-            onChange={(e) => setReflection(e.target.value)}
-            className="w-full rounded-lg border border-line bg-card p-2.5 focus:border-cobalt focus:outline-none read-only:bg-page read-only:text-muted"
-          />
-          <button type="button" className={buttonClass} onClick={finish}>Next experiment</button>
+          {allRight
+            ? <button type="button" className={buttonClass} onClick={onDone}>Next experiment</button>
+            : <ExplainRounds task={CONTRAST_TASK} condition={condition} onDone={onDone} doneLabel="Next experiment" maxRounds={1} prediction={prediction} />}
         </div>
       )}
     </div>

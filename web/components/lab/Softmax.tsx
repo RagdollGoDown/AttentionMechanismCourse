@@ -98,11 +98,19 @@ export function Softmax({ onDone }: StepProps) {
           <div className="space-y-3 rounded-xl border-2 border-line p-3">
             <p className="font-semibold">{SOFTMAX_TEXT.checkPrompt}</p>
             <table className="w-full text-center text-sm tabular-nums">
+              <thead>
+                <tr className="text-muted">
+                  <th />
+                  {SOFTMAX_CHECK_SCORES.map((s, i) => <th key={s} className="font-semibold">{i === 0 ? 'first word' : `word ${i + 1}`}</th>)}
+                  <th className="font-semibold">sum</th>
+                </tr>
+              </thead>
               <tbody>
-                <tr><th className="text-left font-semibold text-muted">s</th>{SOFTMAX_CHECK_SCORES.map((s) => <td key={s} className="font-display font-bold">{s}</td>)}</tr>
-                <tr><th className="text-left font-semibold text-muted">eˢ</th>{SOFTMAX_CHECK_SCORES.map((s) => <td key={s} className="font-display font-bold">{Math.exp(s).toFixed(1)}</td>)}</tr>
+                <tr><th className="text-left font-semibold text-muted">match score s</th>{SOFTMAX_CHECK_SCORES.map((s) => <td key={s} className="font-display font-bold">{s}</td>)}<td /></tr>
+                <tr><th className="text-left font-semibold text-muted">eˢ</th>{SOFTMAX_CHECK_SCORES.map((s) => <td key={s} className="font-display font-bold">{Math.exp(s).toFixed(1)}</td>)}<td className="font-display font-bold">{SOFTMAX_CHECK_SCORES.reduce((a, s) => a + Math.exp(s), 0).toFixed(1)}</td></tr>
               </tbody>
             </table>
+            <p className="text-sm text-muted">{SOFTMAX_TEXT.checkHint}</p>
             <div className="grid grid-cols-4 gap-2">
               {SOFTMAX_TEXT.options.map((o) => {
                 const state = answer === null ? '' : o === correct ? 'border-ok bg-ok/10' : o === answer ? 'border-miss bg-miss/10' : 'opacity-50';

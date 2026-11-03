@@ -42,7 +42,7 @@ export function DebugBar({ index, onGoTo, onReset }: {
   );
 }
 
-type Status = { llm: boolean; model: string | null; probe?: { source: 'llm' | 'mock'; latencyMs: number } };
+type Status = { llm: boolean; model: string | null; probe?: { source: 'llm' | 'mock'; model?: string | null; latencyMs: number } };
 
 async function fetchStatus(probe: boolean): Promise<Status> {
   const res = await fetch(`/api/feedback${probe ? '?probe' : ''}`, { cache: 'no-store' });
@@ -81,7 +81,7 @@ function TutorStatus() {
     : status === 'error' ? 'Tutor: no answer'
     : !status.llm ? 'Tutor: OFFLINE (mock)'
     : status.probe?.source === 'mock' ? `Tutor: ${status.model} FAILED, mock answered`
-    : `Tutor: LLM ${status.model}${status.probe ? ` ✓ ${status.probe.latencyMs} ms` : ''}`;
+    : `Tutor: LLM ${status.probe?.model ?? status.model}${status.probe ? ` ✓ ${status.probe.latencyMs} ms` : ''}`;
   return (
     <>
       <span role="status" className={`rounded px-2 py-1 font-mono text-[11px] font-bold ${ok ? 'bg-ok text-white' : 'bg-miss text-white'}`}>{text}</span>

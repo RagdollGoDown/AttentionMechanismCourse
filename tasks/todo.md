@@ -1,3 +1,103 @@
+# Playtest fixes + tutor model (Nov 3, evening)
+
+Julien's playtest. Decisions: two contexts gets the feedback task (control: expert note, AI: one
+closing reply); swap is removed and its "position" idea moves to two contexts; tutor runs on the
+Vercel AI Gateway (Groq paid tier kept as plan B).
+
+## A. Tutor model on the AI Gateway
+- [x] Julien adds `AI_GATEWAY_API_KEY` to `web/.env.local` (Vercel dashboard → AI Gateway → API keys).
+- [x] Compare `anthropic/claude-haiku-5.5`, `openai/gpt-oss-120b`, `alibaba/qwen3.8-27b` through the gateway.
+- [x] Set `TUTOR_MODEL` locally and on Vercel to the winner (on Vercel the gateway authenticates itself).
+
+## B. Two contexts: feedback only when a prediction is wrong (points 1 + 3)
+- [x] Both right: banner, then Next (the optional "What made the difference?" box goes).
+- [x] A wrong pick: "You picked X. What made you think so?" → control: fixed expert note;
+      AI: one closing tutor reply (no revision). The tutor sees the picks and both sentences' weights.
+- [x] New explain task `contrast`: ideas = context decides (the word that fits the meaning in that sentence),
+      position does not ("smiled" is next to "model"). Misconception: nearest word.
+- [x] Remove the swap experiment (lab 6 → 5), its trophy piece, mission, eval cases; tests and docs follow.
+
+## C. Query and key card (point 2)
+- [x] Rows named as the two directions of the vector, not words: "fashion meaning", "ML meaning".
+- [x] Same decimals everywhere (0.12 + 0.12 = 0.24, not "0.2").
+
+## D. Tutor can say "you have it all" (point 4)
+- [x] Prompt: already in (no invented gap). Mock: credit "absorb/take over", no fake praise on gibberish.
+
+## E. Softmax check (point 6)
+- [x] Label the table rows ("match score s", "eˢ") and add the sum, so the step to the % is visible.
+
+## G. Second playtest + hardening (Nov 3, night)
+- [x] Sentence B mirrors A: "after the training run the model predicted" (no clause tile).
+- [x] Bar = weight, said once; "Invent the rule" opens with the score → weight bridge, real numbers.
+- [x] Tutor chain: Haiku 5.5 (gateway) → Groq gpt-oss-120b → offline tutor; `model` says who answered.
+- [x] System prompt ~1100 → ~610 tokens, same rules.
+- [x] Firewall rate limit, gateway budget, output-token cap. Compute step typeset (Math.tsx).
+- [ ] Deploy: production gets the new env only with the next deploy (merge of this branch).
+
+## F. Finish
+- [x] `npm test` (299), tsc, lint; lessons in `tasks/lessons.md`.
+- [x] Re-run the comparison on the gateway models (needs the key).
+- [ ] Julien clicks through again (both conditions; two contexts with a wrong pick).
+
+# AI tutor: tutor-only AI condition, random assignment, provider comparison (Nov 3)
+
+Branch `feat/ai-tutor`. Constraint: the conditions differ only in the feedback after Submit.
+
+## 0. Grounding
+- [x] Read `lectures/de_chapter5_2026_genAI_1.pdf`, add its summary to `lectures/RESUME.md` (missing so far).
+      Use it with Hattie & Timperley (where am I going / how am I doing / where next) for the prompt.
+
+## 1. AI condition sees the tutor only (no expert answer)
+- [x] `ExplainRounds.tsx`: drop the expert card, `modelShown` and "I'm done. Show the expert answer".
+      Control unchanged (expert answer after round 1, optional revision).
+- [x] **Closing reply** = the last thing the AI group sees: confirms what is right, states the one
+      remaining gap plainly, no "go back and look" question (no revision left). Never the formula
+      before the formula step.
+      - after round 2: the round-2 reply is a closing reply;
+      - learner skips the revision after round 1: "I'm done" asks the tutor for a closing reply on the
+        same explanation (one extra call), shows it, then Continue.
+- [x] Request gets `mode: 'formative' | 'closing'`; schema: `question` is null in closing mode.
+      Mock tutor gets a closing mode too.
+- [x] Logs: drop `model_answer_shown`; `feedback_received` carries `mode`.
+
+## 2. Prompt redesign (`lib/tutor/prompt.ts`)
+- [x] One system prompt per (formula taught?, mode), built from small shared blocks: role and learner
+      level, feedback rules (H&T), formula gate, tone/length, injection guard, field-by-field output spec.
+- [x] 2 short worked examples (input → JSON) so small open models follow the format.
+- [x] Keep the server-side checks (schema, invented ids, formula leak); add: closing reply must not ask a question.
+
+## 3. Assignment: unchanged
+- Dropped (Nov 3): the team hands out links with `?condition=` by hand. No code change.
+
+## 4. Direct free providers
+- [x] Add `@ai-sdk/openai-compatible` (one dependency for all three OpenAI-style endpoints).
+- [x] `TUTOR_MODEL=groq:<model> | openrouter:<model> | gemini:<model>` with `GROQ_API_KEY`,
+      `OPENROUTER_API_KEY`, `GEMINI_API_KEY`; any other value keeps the Vercel AI Gateway path.
+
+## 5. Comparison Groq vs OpenRouter vs Gemini
+- [x] Synthetic set `web/eval/explanations.ts`: ~8 per task (correct, partial, each misconception,
+      off-topic, injection attempt) with expected rubric hits / misconception. Team reviews it.
+- [x] `npm run compare`: every explanation × model × mode through the real `getFeedback` pipeline.
+      Report `web/eval/report-<date>.md`: valid-reply rate, formula leaks, latency (median, max, >10 s),
+      rubric/misconception agreement, and all replies side by side for the team to rate.
+- [x] Ran it (Nov 3): Groq only one usable; Gemini and OpenRouter free tiers fail. Groq free caps qwen at 20k tokens/day.
+
+## 6. Finish
+- [x] Tests for closing mode and provider parsing; `npm test` (299), lint, build pass.
+- [ ] Click through both conditions in a browser (not done: no browser tool in this session).
+- [x] Docs: `CLAUDE.md` lesson flow, `web/README.md` (env vars, compare), `docs/tests.md` if affected.
+
+## Review (Nov 3)
+- AI condition: tutor only. Round 1 → formative reply; revision → closing reply; "I'm done" → closing reply
+  on the same text. If the tutor fails, Continue is still offered. Control unchanged.
+- Prompt: role, how to judge, mode rules, formula gate, style, JSON spec, injection guard, one worked
+  example on an unused sentence. Server drops a closing question; a formative reply without one → offline tutor.
+- Providers: `groq:` / `openrouter:` / `gemini:` prefixes via `@ai-sdk/openai-compatible` (JSON mode,
+  schema in the prompt); gateway ids unchanged. Smoke-tested against a fake OpenAI-style server.
+- Comparison: 22 synthetic cases × 2 modes per model (`npm run compare`); not run yet (no keys).
+- Gemini free tier: verify it serves Switzerland and the daily quota (some Flash models ~20 requests/day).
+
 # Pre-study additions (Oct 6): items 1, 2, 5, 7 + the non-backend part of 6
 
 Constraint: both conditions identical except the feedback at Swap, Remove, Explain.

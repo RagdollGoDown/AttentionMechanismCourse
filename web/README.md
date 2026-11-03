@@ -9,8 +9,27 @@ Interactive lesson on scaled dot-product attention. Spec: `../docs/superpowers/s
     npm test           # math, content invariants, tutor, API route
 
 ## AI tutor
-Set `TUTOR_MODEL` (e.g. `anthropic/claude-haiku-4.5`) and `AI_GATEWAY_API_KEY` in `.env.local`
-(or in Vercel project settings). Without them, a rule-based offline tutor answers.
+Set `TUTOR_MODEL` and its key in `.env.local` (or in Vercel project settings). Without them, a
+rule-based offline tutor answers.
+
+    TUTOR_MODEL=anthropic/claude-haiku-5.5   AI_GATEWAY_API_KEY=…   # any Vercel AI Gateway id
+    TUTOR_MODEL=groq:<model id>              GROQ_API_KEY=…         # free providers, called directly
+    TUTOR_MODEL=openrouter:<model id>        OPENROUTER_API_KEY=…
+    TUTOR_MODEL=gemini:<model id>            GEMINI_API_KEY=…
+
+Study setup: `TUTOR_MODEL=anthropic/claude-haiku-5.5` (gateway) with `TUTOR_FALLBACK_MODEL=groq:openai/gpt-oss-120b`.
+The backup is tried when the primary fails, within one 12 s budget; then the offline tutor. Each reply logs the model that wrote it.
+Protection: Vercel firewall rule (20 requests/min per IP on `/api/feedback`), a $5/month AI Gateway team budget,
+prepaid credits without auto top-up, and at most 1024 output tokens per call.
+
+Prompt: `lib/tutor/prompt.ts` (formative reply after the first attempt, closing reply at the end).
+
+### Comparing tutor models
+Synthetic explanations (`eval/explanations.ts`, never real participant data) go through the real
+prompt and checks for each model; the report lands in `eval/report-<date>.md`.
+
+    npm run compare:models                                    # model ids your keys can use
+    COMPARE_MODELS="groq:<id>,openrouter:<id>,gemini:<id>" npm run compare
 
 ## Pre-/post-test and data collection
 Spec: `../docs/tests.md`. The pre-test is step 2 (before the hook); the post-test is the last step.
@@ -32,7 +51,7 @@ A new backend is one function in `lib/collect/store.ts`.
 ## Where things live
 - `content/steps.ts`: lesson flow, chapters, all learner-facing text, XP and badges
 - `content/tests.ts`: pre-/post-test items, answer keys and rubrics; `lib/assessment.ts` scores them
-- `content/missions.ts`: the three explain tasks (swap, remove, formula): rubrics, misconceptions, expert answers
+- `content/missions.ts`: the three explain tasks (contrast, remove, formula): rubrics, misconceptions, expert answers
 - `lib/`: attention math, rule bricks (step 9), tiles, logger, tutor; `lib/nav.ts` says which steps have a Back button
 - `components/steps/`: one view per linear step; `Lab.tsx` is the hub with six unlockable experiments in `components/lab/`
 - `components/GameProvider.tsx`: XP (pays for effort, not correctness, identical in both conditions) and badges

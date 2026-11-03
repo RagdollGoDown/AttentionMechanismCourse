@@ -22,7 +22,7 @@ describe('content: Mission 1 contrast', () => {
   });
   it('sentence B: model leans most on “training”', () => {
     const t = toTiles(SENTENCE_B);
-    expect(t.find((x) => x.key === topKey(t, focusKeyOf(SENTENCE_B)))?.word).toBe('training');
+    expect(t.find((x) => x.key === topKey(t, focusKeyOf(SENTENCE_B)))?.word).toBe('training run');
   });
 });
 

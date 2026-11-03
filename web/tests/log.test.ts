@@ -19,10 +19,10 @@ describe('createLogger', () => {
   it('stamps the mission, relative time and payload', () => {
     const c = clock();
     const l = createLogger({ sessionId: 's1', condition: 'ai', now: c.now });
-    l.setMission('swap');
+    l.setMission('remove');
     c.advance(1500);
     l.log('prediction', { choice: '2' });
-    expect(l.getEvents().at(-1)).toMatchObject({ missionId: 'swap', type: 'prediction', t: 1500, payload: { choice: '2' } });
+    expect(l.getEvents().at(-1)).toMatchObject({ missionId: 'remove', type: 'prediction', t: 1500, payload: { choice: '2' } });
   });
 
   it('logs condition changes stamped with the new condition, and ignores no-op changes', () => {
