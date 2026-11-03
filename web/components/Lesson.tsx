@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, type ComponentType } from 'react';
-import { TrophyProvider, useTrophy } from '@/components/TrophyProvider';
+import { GiftProvider, useGifts } from '@/components/GiftProvider';
+import { Garden } from '@/components/garden/Garden';
 import { DebugBar } from '@/components/DebugBar';
 import { Header } from '@/components/Header';
 import { LoggerProvider, useLogger } from '@/components/LoggerProvider';
@@ -40,9 +41,9 @@ export function Lesson({ initialCondition, debug = false, participantId = null }
 }) {
   return (
     <LoggerProvider condition={initialCondition} participantId={participantId} debug={debug}>
-      <TrophyProvider>
+      <GiftProvider>
         <LessonInner initialCondition={initialCondition} debug={debug} />
-      </TrophyProvider>
+      </GiftProvider>
     </LoggerProvider>
   );
 }
@@ -65,9 +66,12 @@ function MissionTracker({ id }: { id: StepId | null }) {
   return null;
 }
 
+/** Steps without the garden: the welcome screen and both tests. */
+const NO_GARDEN: StepId[] = ['welcome', 'pretest', 'posttest'];
+
 function LessonInner({ initialCondition, debug }: { initialCondition: Condition | null; debug: boolean }) {
   const logger = useLogger();
-  const { win } = useTrophy();
+  const { win } = useGifts();
   const [condition, setCondition] = useState<Condition | null>(initialCondition);
   const [index, setIndex] = useState(0);
   // Steps already opened stay mounted (hidden), so going back shows them as the learner left them.
@@ -92,7 +96,7 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
     show(index - 1);
   }
 
-  // Debug tools: no trophy pieces are won by jumping, and the tests are no barrier.
+  // Debug tools: no gifts are won by jumping, and the tests are no barrier.
   function goTo(i: number) {
     const to = Math.max(0, Math.min(i, STEP_ORDER.length));
     logger.log('debug_goto', { from: id ?? 'end', to: STEP_ORDER[to] ?? 'end' });
@@ -144,6 +148,8 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
         })}
         {!id && <div className="slide-in"><End /></div>}
       </main>
+      {/* Byte's garden: not during the tests, so it cannot change how the tests are taken. */}
+      <Garden on={id === null || !NO_GARDEN.includes(id)} />
       {debug && <DebugBar index={index} onGoTo={goTo} onReset={resetStep} />}
       <SessionLog open={logOpen} onClose={() => setLogOpen(false)} />
     </>

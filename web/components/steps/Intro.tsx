@@ -1,11 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Trophy } from '@/components/Trophy';
-import { useTrophy } from '@/components/TrophyProvider';
+import { useGifts } from '@/components/GiftProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { buttonClass, secondaryButtonClass } from '@/components/ui';
-import { END_TEXT, GOALS, TROPHY_PIECES, WELCOME, WHY } from '@/content/steps';
+import { END_TEXT, GOALS, WELCOME, WHY } from '@/content/steps';
 import { downloadLog } from '@/lib/download';
 import type { StepProps } from '@/components/steps/types';
 
@@ -51,7 +50,6 @@ export function Why({ onDone }: StepProps) {
         {WHY.body.map((p) => <p key={p}>{p}</p>)}
       </div>
       <div className="flex w-full flex-col items-center gap-5 rounded-2xl border border-line bg-card p-5 sm:flex-row sm:text-left">
-        <Trophy won={0} total={TROPHY_PIECES.length} tone="light" className="size-24 shrink-0" />
         <div>
           <p className="mb-2 font-display text-lg font-bold">By the end, you can:</p>
           <ul className="space-y-1.5">
@@ -66,10 +64,10 @@ export function Why({ onDone }: StepProps) {
 
 export function End() {
   const logger = useLogger();
-  const { pieces, total } = useTrophy();
+  const { gifts, total } = useGifts();
   return (
     <Centered>
-      <Trophy won={pieces.length} total={total} tone="light" className="size-40 drop-shadow-[0_8px_24px_rgb(255_176_32/0.45)]" />
+      <p className="rounded-full bg-tile px-4 py-1 font-display font-bold text-ink">{END_TEXT.garden(gifts.length, total)}</p>
       <h2 className="font-display text-[clamp(2rem,5vw,3rem)] font-extrabold leading-tight tracking-tight text-balance">{END_TEXT.title}</h2>
       <p className="max-w-lg text-lg text-pretty text-muted">{END_TEXT.body}</p>
       <div className="w-full max-w-md rounded-2xl border border-line bg-card p-4 text-left">

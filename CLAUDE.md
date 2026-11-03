@@ -22,7 +22,8 @@ from its score) → hook ("model" alone, then in context) → why attention → 
 five experiments that unlock one by one (two contexts: a wrong pick gets one feedback reply,
 query & key, predict a removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
 and V output → explain the formula (AI tutor vs expert answer) → post-test. Tests: `docs/tests.md`.
-Gamified: XP for effort (never correctness, identical across conditions), levels, 3 badges = LG1–LG3.
+Reward: Byte, a robot dog in a garden band at the bottom, gets one gift per finished module (completion only,
+never correctness, identical across conditions; hidden during the pre- and post-test). Rationale: `tasks/todo.md`.
 Learning goals: LG1 explain Q/K/V, softmax, √d_k · LG2 compute a 3-token example ·
 LG3 predict weight shifts for an ambiguous word.
 

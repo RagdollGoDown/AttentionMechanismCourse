@@ -37,37 +37,6 @@
   box-shadow: inset 0 -3px 0 #0d1830, 0 1px 2px rgb(27 43 75 / 0.25);
 }
 
-/* The one orchestrated motion: a trophy piece announcement drops in and fades. */
-@keyframes piece-won {
-  0% {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-
-  8% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-
-  14% {
-    transform: scale(1);
-  }
-
-  85% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-.piece-toast {
-  animation: piece-won 3.2s ease-out forwards;
-}
-
 /* Moving to the next step or experiment: the new "slide" comes in from the right. */
 @keyframes slide-in {
   from {
@@ -257,3 +226,21 @@
 .frac > :first-child { border-bottom: 1px solid currentColor; padding: 0 0.2em 0.05em; }
 .frac > :last-child { padding: 0.1em 0.2em 0; }
 .colvec { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.2; padding: 0.05em 0.4em; margin: 0 0.15em; border-inline: 1.5px solid currentColor; border-radius: 0.55em / 50%; }
+
+/* Byte's garden (components/garden): a band along the bottom, Byte's 3D layer, and labels above it. */
+.garden-band { position: fixed; left: 0; right: 0; bottom: 0; height: 112px; z-index: 14; pointer-events: none; }
+.garden-band svg { display: block; width: 100%; height: 100%; }
+.garden-canvas { position: fixed; left: 0; right: 0; bottom: 0; width: 100%; height: 200px; z-index: 15; pointer-events: none; }
+.garden-fx { position: fixed; inset: 0; z-index: 30; pointer-events: none; overflow: hidden; }
+.garden-say { position: absolute; transform: translate(-50%, -100%); background: var(--color-card); color: var(--color-ink); font-family: var(--font-display); font-weight: 700; font-size: 14px; padding: 3px 10px; border-radius: 999px; box-shadow: 0 4px 14px rgb(27 43 75 / 0.16); white-space: nowrap; transition: opacity 0.25s; }
+.garden-say[data-off] { opacity: 0; }
+.garden-heart { position: absolute; font-size: 20px; color: var(--color-miss); animation: garden-float 1.4s ease-out forwards; }
+@keyframes garden-float { from { transform: translate(-50%, 0) scale(0.6); opacity: 1; } to { transform: translate(calc(-50% + var(--dx)), -80px) scale(1.15); opacity: 0; } }
+.garden-note { position: absolute; bottom: 170px; transform: translateX(-50%); width: min(260px, 80vw); background: var(--color-card); border: 2px solid var(--color-cobalt); border-radius: 16px; padding: 10px 13px; box-shadow: 0 10px 30px rgb(27 43 75 / 0.18); animation: garden-pop 0.45s cubic-bezier(0.2, 1.5, 0.4, 1); }
+.garden-note strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; color: var(--color-ink); }
+.garden-note p { margin: 0; font-size: 13px; color: var(--color-muted); }
+@keyframes garden-pop { from { transform: translateX(-50%) scale(0.85); opacity: 0; } }
+.garden-toggle { position: fixed; right: 12px; bottom: 10px; z-index: 31; min-height: 32px; border-radius: 999px; padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--color-ink); background: rgb(255 255 255 / 0.88); box-shadow: 0 2px 8px rgb(27 43 75 / 0.12); }
+.garden-toggle:hover { background: var(--color-card); }
+/* Phones: no room for a garden band; the lesson comes first. */
+@media (max-width: 640px) { .garden-band, .garden-canvas, .garden-fx, .garden-toggle { display: none; } }

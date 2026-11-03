@@ -1,3 +1,28 @@
+# Rewards: Byte's garden (Nov 3, branch feat/rewards)
+
+Replaces the trophy. Grounding: Sailer & Homner 2020 (game fiction), Chan's My-Pet (companion → effort),
+Deci et al. 1999 (rewards inform, never per click), Nunes & Drèze 2006 (endowed progress), Kao et al. 2024
+(curiosity, celebrate real success briefly), Rey 2012 (seductive details → calm, out of the way), Ch. 4 lecture
+(unlock items for a character). Prototype: claude.ai/artifact/6MkKdPrxaQnCkmxVJx6Kyd.
+
+- [x] `three` (exact version) + types; the garden loads lazily, client only.
+- [x] Garden band fixed at the bottom (~140 px): hills and grass; content scrolls above it (no cover-up).
+- [x] Byte (original robot beagle) wanders the band; click to pet; drag items to rearrange.
+- [x] 9 gifts = the 9 old trophy pieces (same moments: finishing a step, never correctness); food bowl at start;
+      next gift waits wrapped; a short note names the gift and what was learned.
+- [x] Visible from the hook to the end screen; hidden in the pre- and post-test. "Hide garden" toggle.
+- [x] Logs: gift_received, pet_petted, pet_item_moved, garden_toggled. Same in both conditions.
+- [x] Remove the trophy (header icon + pop-up, Why and End screens); header shows the gift count.
+- [x] Reduced motion: Byte stays put, no drops or drifting; petting still answers.
+- [x] Tests (gift data), tsc, lint, build; one browser screenshot of the lab with the garden.
+
+## Review (Nov 3)
+- In the app: garden band at the bottom (112 px, content scrolls clear of it), Byte + 9 gifts + starting bowl,
+  petting, drag to rearrange, wrapped next gift, gift note with the fact learned, "Hide garden".
+- Not in the welcome screen or the tests. Logged: gift_received, pet_petted, pet_item_moved, garden_toggled.
+- Checked: 307 tests, tsc, lint, next build; headless browser on the lab (garden shown, none on welcome, no errors).
+- Not checked by hand yet: a full run-through earning all 9 gifts; phone widths hide the garden on purpose.
+
 # Playtest fixes + tutor model (Nov 3, evening)
 
 Julien's playtest. Decisions: two contexts gets the feedback task (control: expert note, AI: one

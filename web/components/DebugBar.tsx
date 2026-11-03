@@ -6,7 +6,7 @@ import { secondaryButtonClass } from '@/components/ui';
 import { STEP_ORDER } from '@/content/steps';
 
 /**
- * Developer tools, shown only with `?debug`. Jumps between steps without awarding trophy pieces,
+ * Developer tools, shown only with `?debug`. Jumps between steps without giving Byte gifts,
  * and remounts the current step to retest it. Participants never get this flag.
  */
 export function DebugBar({ index, onGoTo, onReset }: {
