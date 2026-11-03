@@ -1,6 +1,7 @@
 # Every push to main: run the tests, then deploy to Vercel production.
 # Vercel builds the app itself, using the project's settings (Root Directory = web).
-# Needs one repository secret: VERCEL_TOKEN (vercel.com/account/tokens).
+# Needs one repository secret: VERCEL_TOKEN (vercel.com/account/tokens; a project-scoped token
+# needs Vercel CLI 56.3.1 or later).
 name: Deploy to Vercel
 
 on:
@@ -37,6 +38,6 @@ jobs:
 
       - name: Deploy
         # From the repo root: the Vercel project's Root Directory is web.
-        run: npx --yes vercel@54.5.0 deploy --prod --yes --token "$VERCEL_TOKEN"
+        run: npx --yes vercel@61.1.0 deploy --prod --yes --token "$VERCEL_TOKEN"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
