@@ -7,9 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "compare": "vitest run --config eval/vitest.config.ts eval/compare.eval.ts --silent=false",
+    "compare:models": "vitest run --config eval/vitest.config.ts eval/models.eval.ts --silent=false"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "2.0.85",
     "ai": "^6.0.296",
     "next": "16.3.7",
     "react": "19.2.8",

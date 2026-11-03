@@ -8,13 +8,15 @@ import { useSaved } from '@/components/SavedAnswers';
 import { buttonClass } from '@/components/ui';
 import type { ExplainTask } from '@/content/missions';
 import type { Condition } from '@/lib/condition';
-import { EXPLANATION_MIN, PART_MAX, type FeedbackResponse } from '@/lib/tutor/schema';
+import { EXPLANATION_MIN, PART_MAX, type FeedbackResponse, type Mode } from '@/lib/tutor/schema';
 
 const MAX_ROUNDS = 2;
 const PART_MIN = 3;
 
 interface Round {
   explanation: string;
+  /** Formula task: the answer per box. */
+  parts?: Record<string, string>;
   shown: ShownFeedback;
 }
 
@@ -45,16 +47,21 @@ function PartBoxes({ task, values, onChange }: { task: ExplainTask; values: Reco
 
 /**
  * Write → feedback → optional revision. The only part that differs between conditions:
- * the AI tutor's adaptive feedback, or the fixed expert answer.
- * The AI condition also sees the expert answer at the very end (after the revision, or when the
- * learner skips it), so both groups leave with the same model answer.
+ * - control: the fixed expert answer after the first attempt;
+ * - AI: the tutor's adaptive feedback only, never the expert answer. Round 1 gets a formative reply
+ *   (a question back to the playground). The last reply is a closing one that states the remaining idea:
+ *   on the revision, or, when the learner skips it, on request ("I'm done").
+ * With `maxRounds={1}` there is no revision: one reply (AI: closing, control: the expert answer), then on.
  * Once the learner moves on, the answers lock: going back (or redoing the experiment) shows them read-only.
  */
-export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' }: {
+export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue', maxRounds = MAX_ROUNDS, prediction }: {
   task: ExplainTask;
   condition: Condition;
   onDone: () => void;
   doneLabel?: string;
+  maxRounds?: 1 | 2;
+  /** What the learner predicted, for the tutor (two contexts). */
+  prediction?: string;
 }) {
   const logger = useLogger();
   const [draft, setDraft] = useState('');
@@ -63,12 +70,8 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
   const [closed, setClosed] = useSaved('closed', false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [modelShown, setModelShown] = useSaved('modelShown', false);
-
-  function showModelAnswer(trigger: 'after_revision' | 'skipped_revision', round: number) {
-    setModelShown(true);
-    logger.log('model_answer_shown', { trigger, round });
-  }
+  /** AI condition, learner skipped the revision: the closing reply on their round-1 explanation. */
+  const [closing, setClosing] = useSaved<FeedbackResponse | null>('closing', null);
 
   const parts = task.parts
     ? Object.fromEntries(task.parts.map((p) => [p.id, (partDrafts[p.id] ?? '').trim()]))
@@ -90,6 +93,12 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
       return;
     }
 
+    const feedback = await askTutor(explanation, round, round === maxRounds ? 'closing' : 'formative', parts);
+    if (feedback) setRounds([...rounds, { explanation, parts, shown: { kind: 'tutor', feedback } }]);
+  }
+
+  /** AI condition: one tutor call. Null (and an error message) when it failed. */
+  async function askTutor(text: string, round: number, mode: Mode, partsSent?: Record<string, string>): Promise<FeedbackResponse | null> {
     setPending(true);
     setError(null);
     try {
@@ -99,28 +108,40 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           missionId: task.id,
-          explanation,
+          explanation: text,
           round,
-          parts,
+          mode,
+          parts: partsSent,
+          prediction,
           previous: prev && prev.shown.kind === 'tutor' ? { explanation: prev.explanation, feedback: prev.shown.feedback } : undefined,
         }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const feedback = (await res.json()) as FeedbackResponse;
-      setRounds([...rounds, { explanation, shown: { kind: 'tutor', feedback } }]);
       logger.log('feedback_received', { round, ...feedback });
-      if (round === MAX_ROUNDS) showModelAnswer('after_revision', round);
+      return feedback;
     } catch (err) {
       setError('The tutor did not answer. Try again.');
-      logger.log('feedback_received', { round, source: 'error', error: String(err) });
+      logger.log('feedback_received', { round, mode, source: 'error', error: String(err) });
+      return null;
     } finally {
       setPending(false);
     }
   }
 
-  const canWrite = !closed && rounds.length < MAX_ROUNDS && !modelShown;
-  // AI condition: the first click after feedback ends the rounds and reveals the model answer.
-  const mustReveal = condition === 'ai' && !modelShown && !closed;
+  /** AI condition, after round 1: the learner skips the revision and gets the closing reply instead. */
+  async function skipRevision() {
+    const last = rounds.at(-1)!;
+    logger.log('revision_skipped', { round: rounds.length });
+    const feedback = await askTutor(last.explanation, rounds.length, 'closing', last.parts);
+    if (feedback) setClosing(feedback);
+  }
+
+  // AI condition: the task ends with a closing reply (on the revision, or requested by skipping it).
+  const lastShown = rounds.at(-1)?.shown;
+  const aiFinished = closing !== null || (lastShown?.kind === 'tutor' && lastShown.feedback.mode === 'closing');
+  const canWrite = !closed && rounds.length < maxRounds && !aiFinished;
+  const mustClose = condition === 'ai' && !aiFinished && !closed;
   function done() {
     setClosed(true);
     onDone();
@@ -152,11 +173,13 @@ export function ExplainRounds({ task, condition, onDone, doneLabel = 'Continue' 
       ) : (
         <ExplanationBox value={draft} onChange={setDraft} onSubmit={submit} pending={pending} label={rounds.length === 0 ? 'Your explanation' : 'Revise it (optional)'} />
       ))}
-      {modelShown && <FeedbackCard shown={{ kind: 'expert', text: task.expertAnswer, final: true }} round={rounds.length} />}
+      {closing && <FeedbackCard shown={{ kind: 'tutor', feedback: closing }} round={rounds.length} />}
       {error && <p className="text-miss">{error}</p>}
-      {rounds.length > 0 && (mustReveal
-        ? <button type="button" className={buttonClass} disabled={pending} onClick={() => showModelAnswer('skipped_revision', rounds.length)}>{"I'm done. Show the expert answer"}</button>
+      {rounds.length > 0 && (mustClose
+        ? <button type="button" className={buttonClass} disabled={pending} onClick={skipRevision}>{pending ? 'Reading…' : "I'm done"}</button>
         : <button type="button" className={buttonClass} onClick={done}>{doneLabel}</button>)}
+      {/* If the tutor keeps failing, the learner must still be able to move on. */}
+      {mustClose && error && <button type="button" className={buttonClass} onClick={done}>{doneLabel}</button>}
     </div>
   );
 }

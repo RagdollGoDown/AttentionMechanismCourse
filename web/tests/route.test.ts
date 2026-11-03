@@ -21,13 +21,14 @@ describe('POST /api/feedback', () => {
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.source).toBe('mock');
+    expect(body.mode).toBe('formative');
     expect(body.model).toBeNull();
     expect(body.rubricHits).toContain('sum');
   });
   it.each([
     ['invalid JSON', '{nope'],
-    ['whitespace-only explanation', { missionId: 'swap', explanation: ' '.repeat(15), round: 1 }],
-    ['too long explanation', { missionId: 'swap', explanation: 'x'.repeat(601), round: 1 }],
+    ['whitespace-only explanation', { missionId: 'contrast', explanation: ' '.repeat(15), round: 1 }],
+    ['too long explanation', { missionId: 'contrast', explanation: 'x'.repeat(601), round: 1 }],
     ['unknown mission', { missionId: 'free', explanation: 'long enough text', round: 1 }],
   ])('400 on %s', async (_, body) => {
     expect((await call(body)).status).toBe(400);

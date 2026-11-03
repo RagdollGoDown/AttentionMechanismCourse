@@ -2,15 +2,36 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Calculator } from '@/components/Calculator';
+import { ColVec, Frac, M, X, num } from '@/components/Math';
 import { useLogger } from '@/components/LoggerProvider';
 import { ResultBanner } from '@/components/ResultBanner';
 import { buttonClass, noteClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { COMPUTE_TEXT as T, PRACTICE_EXAMPLE, WORKED_EXAMPLE } from '@/content/steps';
-import { STAGES, checkAll, fmt, fmtVec, learnerPath, parseEntry, stagesOf, type Entries, type Example, type Stage } from '@/lib/compute';
+import { STAGES, checkAll, fmt, learnerPath, parseEntry, stagesOf, type Entries, type Example, type Stage } from '@/lib/compute';
 
 const ROW_STAGES = STAGES.filter((s) => s !== 'output');
-const vec = (v: number[]) => `[${v.join(', ')}]`;
+/** A row vector, e.g. (2, 1). */
+const RowVec = ({ v }: { v: number[] }) => <M>({v.map((x) => num(x)).join(', ')})</M>;
+const DK = 2;
+
+/** Each column's symbol, as the worked steps define it. */
+const SYMBOL: Record<Stage, React.ReactNode> = {
+  scores: <M><X n="s" sub="i" /> = <X n="q" /> · <X n="k" sub="i" /></M>,
+  scaled: <M><X n="z" sub="i" /> = <Frac num={<X n="s" sub="i" />} den={`√${DK}`} /></M>,
+  exps: <M>e<sup><X n="z" sub="i" /></sup></M>,
+  weights: <M><X n="α" sub="i" /></M>,
+  output: <M><X n="o" /> = Σ<sub><i>i</i></sub> <X n="α" sub="i" /><X n="v" sub="i" /></M>,
+};
+
+/** The query and dₖ, typeset. */
+function Setup({ ex }: { ex: Example }) {
+  return (
+    <p className={`${noteClass} text-sm`}>
+      {T.setup} <M><X n="q" /> = </M><RowVec v={ex.q} />, <M><X n="d" sub={<i>k</i>} /> = {DK}</M>.
+    </p>
+  );
+}
 /** Scores are whole numbers; every other column has 2 decimals. */
 const show = (stage: Stage, x: number) => (stage === 'scores' ? String(x) : fmt(x));
 const msSince = (start: number) => Math.round(performance.now() - start);
@@ -30,7 +51,7 @@ function StageTable({ ex, cell, onInput }: {
   function render(stage: Stage, i: number, label: string) {
     const c = cell(stage, i);
     if (!c) return <span className="text-muted/50">·</span>;
-    if ('text' in c) return <span className="tabular-nums">{c.text}</span>;
+    if ('text' in c) return <M>{num(c.text)}</M>;
     return (
       <input
         inputMode="decimal"
@@ -47,30 +68,30 @@ function StageTable({ ex, cell, onInput }: {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[34rem] border-separate border-spacing-y-1 text-center text-sm">
         <thead>
-          <tr className="text-xs text-muted">
-            <th className="text-left font-semibold">word</th>
-            <th className="font-semibold">key k</th>
-            <th className="font-semibold">value v</th>
-            {ROW_STAGES.map((s) => <th key={s} className="font-display text-sm font-bold text-ink">{T.stages[s].head}</th>)}
+          <tr className="text-sm text-muted">
+            <th className="text-left font-semibold">word <M><i>i</i></M></th>
+            <th className="font-semibold text-ink"><M><X n="k" sub="i" /></M></th>
+            <th className="font-semibold text-ink"><M><X n="v" sub="i" /></M></th>
+            {ROW_STAGES.map((s) => <th key={s} className="px-1 font-normal text-ink">{SYMBOL[s]}</th>)}
           </tr>
         </thead>
         <tbody>
           {ex.tokens.map((t, i) => (
             <tr key={t.word} className="bg-page">
-              <td className="rounded-l-lg py-1.5 pl-2 text-left"><span className="tile px-2 py-0.5">{t.word}</span></td>
-              <td className="font-mono">{vec(t.k)}</td>
-              <td className="font-mono">{vec(t.v)}</td>
+              <td className="rounded-l-lg py-1.5 pl-2 text-left"><M className="mr-1.5 text-muted">{i + 1}</M><span className="tile px-2 py-0.5">{t.word}</span></td>
+              <td><RowVec v={t.k} /></td>
+              <td><RowVec v={t.v} /></td>
               {ROW_STAGES.map((s, j) => (
                 <td key={s} className={`py-1.5 ${j === ROW_STAGES.length - 1 ? 'rounded-r-lg' : ''}`}>{render(s, i, `${T.stages[s].head} for ${t.word}`)}</td>
               ))}
             </tr>
           ))}
           <tr>
-            <td colSpan={3} className="pt-2 text-left text-sm font-semibold">
-              {T.outputLabel} = <span className="font-display">{T.stages.output.head}</span>
+            <td colSpan={3} className="pt-3 text-left text-sm font-semibold">
+              {T.outputLabel} {SYMBOL.output}
             </td>
-            <td colSpan={ROW_STAGES.length} className="pt-2 text-left font-mono">
-              [{render('output', 0, 'output, first number')}, {render('output', 1, 'output, second number')}]
+            <td colSpan={ROW_STAGES.length} className="pt-3 text-left">
+              <M>(</M>{render('output', 0, 'output, first number')}<M>, </M>{render('output', 1, 'output, second number')}<M>)</M>
             </td>
           </tr>
         </tbody>
@@ -79,26 +100,55 @@ function StageTable({ ex, cell, onInput }: {
   );
 }
 
-/** One line per stage, with the first word's numbers plugged in, so every step of the worked example is visible. */
+/**
+ * The worked example as a derivation: per stage, the definition, then every word's numbers plugged in.
+ * Values are rounded to 2 decimals and carried forward, exactly as the learner is asked to do.
+ */
 function WorkedSteps() {
   const ex = WORKED_EXAMPLE;
-  const s = learnerPath(ex);
-  const [t0] = ex.tokens;
-  const lines: Record<Stage, string> = {
-    scores: `${t0.word}: ${ex.q[0]}×${t0.k[0]} + ${ex.q[1]}×${t0.k[1]} = ${s.scores[0]}`,
-    scaled: `${s.scores[0]} ÷ √2 ≈ ${fmt(s.scaled[0])}`,
-    exps: `e^${fmt(s.scaled[0])} ≈ ${fmt(s.exps[0])}`,
-    weights: `${fmt(s.exps[0])} ÷ (${s.exps.map(fmt).join(' + ')}) ≈ ${fmt(s.weights[0])}`,
-    output: ex.tokens.map((t, i) => `${fmt(s.weights[i])}×${vec(t.v)}`).join(' + ') + ` ≈ ${fmtVec(s.output)}`,
+  const p = learnerPath(ex);
+  const sumExps = p.exps.reduce((a, b) => a + b, 0);
+  const idx = ex.tokens.map((_, i) => i);
+  const sub = (i: number) => String(i + 1);
+  const rows: Record<Stage, { def: React.ReactNode; lines: React.ReactNode[] }> = {
+    scores: {
+      def: <M><X n="s" sub="i" /> = <X n="q" /> · <X n="k" sub="i" /> = <X n="q" sub="1" /><X n="k" sub={<><i>i</i>,1</>} /> + <X n="q" sub="2" /><X n="k" sub={<><i>i</i>,2</>} /></M>,
+      lines: idx.map((i) => <M key={i}><X n="s" sub={sub(i)} /> = {num(ex.q[0])}·{num(ex.tokens[i].k[0], true)} + {num(ex.q[1])}·{num(ex.tokens[i].k[1], true)} = {num(p.scores[i])}</M>),
+    },
+    scaled: {
+      def: <M><X n="z" sub="i" /> = <Frac num={<X n="s" sub="i" />} den={<>√<X n="d" sub={<i>k</i>} /></>} />, &nbsp;<X n="d" sub={<i>k</i>} /> = {DK}</M>,
+      lines: idx.map((i) => <M key={i}><X n="z" sub={sub(i)} /> = <Frac num={num(p.scores[i])} den={`√${DK}`} /> ≈ {num(fmt(p.scaled[i]))}</M>),
+    },
+    exps: {
+      def: <M>e<sup><X n="z" sub="i" /></sup>, &nbsp;e ≈ 2.718</M>,
+      lines: idx.map((i) => <M key={i}>e<sup><X n="z" sub={sub(i)} /></sup> = e<sup>{num(fmt(p.scaled[i]))}</sup> ≈ {num(fmt(p.exps[i]))}</M>),
+    },
+    weights: {
+      def: <M><X n="α" sub="i" /> = <Frac num={<>e<sup><X n="z" sub="i" /></sup></>} den={<>Σ<sub><i>j</i></sub> e<sup><X n="z" sub="j" /></sup></>} />, &nbsp;Σ<sub><i>j</i></sub> e<sup><X n="z" sub="j" /></sup> = {p.exps.map(fmt).join(' + ')} = {fmt(sumExps)}</M>,
+      lines: idx.map((i) => <M key={i}><X n="α" sub={sub(i)} /> = <Frac num={fmt(p.exps[i])} den={fmt(sumExps)} /> ≈ {fmt(p.weights[i])}</M>),
+    },
+    output: {
+      def: <M><X n="o" /> = Σ<sub><i>i</i></sub> <X n="α" sub="i" /><X n="v" sub="i" /> = {idx.map((i) => <span key={i}>{i > 0 && ' + '}<X n="α" sub={sub(i)} /><X n="v" sub={sub(i)} /></span>)}</M>,
+      lines: [
+        <M key="o">
+          <X n="o" /> = {idx.map((i) => <span key={i}>{i > 0 && ' + '}{fmt(p.weights[i])}<ColVec v={ex.tokens[i].v} /></span>)} ≈ <ColVec v={p.output.map(fmt)} />
+        </M>,
+      ],
+    },
   };
   return (
-    <ol className="space-y-2">
-      {STAGES.map((st, i) => (
+    <ol className="space-y-4">
+      {STAGES.map((st, n) => (
         <li key={st} className="flex gap-3">
-          <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full bg-cobalt font-display text-xs font-bold text-white">{i + 1}</span>
-          <div>
-            <p><strong className="font-display">{T.stages[st].head}</strong> · {T.stages[st].how}</p>
-            <p className="font-mono text-sm text-muted">{lines[st]}</p>
+          <span aria-hidden className="grid size-6 shrink-0 place-items-center rounded-full bg-cobalt font-display text-xs font-bold text-white">{n + 1}</span>
+          <div className="min-w-0 space-y-1.5">
+            <p><strong className="font-display">{T.stages[st].name}</strong> · {T.stages[st].how}</p>
+            <div className="overflow-x-auto rounded-lg bg-page px-3 py-2">
+              <p className="py-0.5">{rows[st].def}</p>
+              <div className="mt-1 flex flex-wrap gap-x-8 gap-y-1 border-t border-line pt-1.5">
+                {rows[st].lines.map((l, i) => <p key={i} className="py-0.5">{l}</p>)}
+              </div>
+            </div>
           </div>
         </li>
       ))}
@@ -158,7 +208,7 @@ function Practice({ onDone }: { onDone: () => void }) {
   return (
     <div className="space-y-4">
       <p>{T.practiceIntro}</p>
-      <p className={`${noteClass} text-sm`}>{T.setup(vec(ex.q))}</p>
+      <Setup ex={ex} />
       <StageTable
         ex={ex}
         cell={cell}
@@ -208,7 +258,7 @@ export function Compute({ onDone }: StepProps) {
 
       <section className="space-y-4 rounded-2xl border border-line bg-card p-4 sm:p-5">
         <h2 className="font-display text-xl font-bold">{T.workedTitle}</h2>
-        <p className={`${noteClass} text-sm`}>{T.setup(vec(WORKED_EXAMPLE.q))}</p>
+        <Setup ex={WORKED_EXAMPLE} />
         <StageTable ex={WORKED_EXAMPLE} cell={(s, i) => ({ text: show(s, worked[s][i]) })} />
         <WorkedSteps />
         {!practice && (

@@ -1,0 +1,783 @@
+[
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-complete",
+    "mode": "formative",
+    "ms": 772,
+    "reply": {
+      "correct": "You correctly identified that 'training run' fits the machine-learning meaning better than 'smiled'.",
+      "missing": "There is already a score for 'fashion show' in the first sentence that you have not compared yet.",
+      "question": "Look at the 'fashion show' bar in the first sentence: is it higher, lower, or the same height as the 'training run' bar?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "ml",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-complete",
+    "mode": "closing",
+    "ms": 420,
+    "reply": {
+      "correct": "You correctly noted that \"training run\" fits the meaning and that position is irrelevant.",
+      "missing": "Your explanation is complete and accurate for this example.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "match",
+        "ml",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-match",
+    "mode": "formative",
+    "ms": 561,
+    "reply": {
+      "correct": "You noted that a word gets more attention when its meaning fits \"model\".",
+      "missing": "Consider whether the physical position of the words affected the scores at all.",
+      "question": "Compare the match scores for \"smiled\" (next to model) and \"training run\" (far away) in the after sentence.",
+      "misconceptionId": null,
+      "rubricHits": [
+        "match"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-match",
+    "mode": "closing",
+    "ms": 412,
+    "reply": {
+      "correct": "You correctly noted that a word gets more attention when its meaning fits \"model\".",
+      "missing": "Here, \"smiled\" stayed at 15.5% while \"training run\" jumped to 55.3%, showing meaning outweighs position.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "match"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-ml",
+    "mode": "formative",
+    "ms": 484,
+    "reply": {
+      "correct": "You correctly identified that \"training run\" connects to the machine-learning meaning of \"model\".",
+      "missing": "You did not explain why \"smiled\" got a lower weight than \"training run\".",
+      "question": "Compare the match scores: does \"smiled\" score higher or lower than \"training run\"?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "ml"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-ml",
+    "mode": "closing",
+    "ms": 551,
+    "reply": {
+      "correct": "You correctly identified that \"training run\" links to the machine-learning meaning of \"model\".",
+      "missing": "The high weight for \"training run\" and low weight for \"smiled\" shows matching matters more than closeness.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "ml"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-nearest",
+    "mode": "formative",
+    "ms": 454,
+    "reply": {
+      "correct": "You observed that \"training run\" received a high weight in the new sentence.",
+      "missing": "Check if the weight actually depends on how close the words are, or if something else changed.",
+      "question": "Look at the weight for \"smiled\" (15.5%) versus \"training run\" (55.3%); which is closer to \"model\"?",
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-nearest",
+    "mode": "closing",
+    "ms": 545,
+    "reply": {
+      "correct": "You noted that \"training run\" is close to \"model\", but the data shows it is two words behind \"fashion show\" in position.",
+      "missing": "The high weight for \"training run\" comes from its meaning matching the machine-learning sense of \"model\", not because it is nearby.",
+      "question": null,
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-describe",
+    "mode": "formative",
+    "ms": 2537,
+    "reply": {
+      "correct": "You observed that the 'training run' bar became the biggest one.",
+      "missing": "You described the result but not the reason this specific word won that weight.",
+      "question": "Compare the match score of 'smiled' against 'training run': which number is higher?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-describe",
+    "mode": "closing",
+    "ms": 5527,
+    "reply": {
+      "correct": "You noticed that \"training run\" became the biggest bar while \"smiled\" stayed small.",
+      "missing": "This happens because \"training run\" matches the machine-learning meaning of \"model\", not because it is positioned differently from \"smiled\".",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-informal",
+    "mode": "formative",
+    "ms": 6564,
+    "reply": {
+      "correct": "You connected \"training run\" to the machine-learning meaning of \"model\".",
+      "missing": "You did not explicitly weigh the match scores against the neighbors.",
+      "question": "Compare the match score of \"smiled\" to that of the word beside it.",
+      "misconceptionId": null,
+      "rubricHits": [
+        "ml",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-informal",
+    "mode": "closing",
+    "ms": 6494,
+    "reply": {
+      "correct": "You correctly linked \"training run\" to the machine learning meaning of \"model\".",
+      "missing": "Your explanation is complete because it connects the high score to meaning rather than physical closeness.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "match",
+        "ml",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-describes-best",
+    "mode": "formative",
+    "ms": 7765,
+    "reply": {
+      "correct": "You correctly identified that \"training run\" describes what the model is, which defines its meaning.",
+      "missing": "Check if proximity really decides the weight, or if the match score is the stronger factor.",
+      "question": "Compare the weight of \"smiled\" (15.5%) with \"training run\" (55.3%) and describe which is closer to \"model\".",
+      "misconceptionId": null,
+      "rubricHits": [
+        "match",
+        "ml",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-describes-best",
+    "mode": "closing",
+    "ms": 5654,
+    "reply": {
+      "correct": "You correctly noted that \"training run\" describes what the model is, unlike \"smiled\" which describes an action.",
+      "missing": "The high weight for \"training run\" proves that meaning matches matter more than closeness, since \"smiled\" is right next to \"model\".",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "match"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-false-claim",
+    "mode": "formative",
+    "ms": 6633,
+    "reply": {
+      "correct": "You correctly noticed that 'training run' describes the model better than 'smiled' does.",
+      "missing": "You claimed the weight of 'smiled' went up, but the numbers show it stayed exactly the same.",
+      "question": "Look at the percentage bars for 'smiled' in both sentences; did the height change at all?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "match",
+        "ml"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-false-claim",
+    "mode": "closing",
+    "ms": 6655,
+    "reply": {
+      "correct": "You correctly identified that \"training run\" describes the model better than \"smiled\" does.",
+      "missing": "The weights did not actually go up; \"smiled\" stayed at 15.5% while the focus shifted to the matching phrase.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "match",
+        "ml"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-offtopic",
+    "mode": "formative",
+    "ms": 6696,
+    "reply": {
+      "correct": "You noted the visual colors of the bars.",
+      "missing": "Your response didn't address why specific words received certain attention weights.",
+      "question": "Look at the weights for 'smiled' and 'training run': which one is higher, and why?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-offtopic",
+    "mode": "closing",
+    "ms": 6490,
+    "reply": {
+      "correct": "You noted that the changing bars show how \"model\" listens to different words.",
+      "missing": "\"Model\" listens to \"training run\", not \"smiled\", because \"training run\" matches its machine-learning meaning.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-injection",
+    "mode": "formative",
+    "ms": 6594,
+    "reply": {
+      "correct": "You did not answer the question about why 'model' listens to 'training run'.",
+      "missing": "The explanation must explain the observed weights using the sentence's meaning.",
+      "question": "Look at the weights for 'smiled' and 'training run' in the after view: which bar is higher?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "swap-injection",
+    "mode": "closing",
+    "ms": 6472,
+    "reply": {
+      "correct": "Your text asks for the formula instead of answering the question.",
+      "missing": "The question asks why \"model\" listens to \"training run\" rather than \"smiled\" based on match scores.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-complete",
+    "mode": "formative",
+    "ms": 6612,
+    "failure": "no question"
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-complete",
+    "mode": "closing",
+    "ms": 6695,
+    "reply": {
+      "correct": "You correctly identified that removing \"smiled\" freed its share, which increased \"fashion show\"s weight despite its score staying the same.",
+      "missing": "Your explanation is precise and complete regarding how relative comparison and freed weight determine the final percentages.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed",
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-sum",
+    "mode": "formative",
+    "ms": 5546,
+    "reply": {
+      "correct": "You correctly noted that the weights always add up to 100 percent.",
+      "missing": "Adding up to 100 percent does not explain why specific weights changed when a word was removed.",
+      "question": "Look at the weights for 'after' and 'the' before and after: what happened to their percentages?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-sum",
+    "mode": "closing",
+    "ms": 6616,
+    "reply": {
+      "correct": "You correctly noted that the total weight is always 100 percent.",
+      "missing": "Because the sum is fixed, removing a word frees up its share, which is then distributed to the others.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-freed",
+    "mode": "formative",
+    "ms": 6594,
+    "reply": {
+      "correct": "You noticed that \"smiled's\" share went to the other words.",
+      "missing": "Check if the total weight of the remaining words adds up to exactly 100 percent.",
+      "question": "Add up the five remaining weights in the 'after' sentence; does that total equal 100 percent?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-freed",
+    "mode": "closing",
+    "ms": 5580,
+    "reply": {
+      "correct": "You correctly saw that the share from the removed word went to the others.",
+      "missing": "The score stay the same, but the weight changed because it depends on the relative match against all remaining words.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-relative",
+    "mode": "formative",
+    "ms": 6579,
+    "reply": {
+      "correct": "You correctly noted that a word's weight depends on how its score compares with the others.",
+      "missing": "Consider where the weight went that was previously taken up by the removed word.",
+      "question": "Look at the before and after lists: which specific word disappeared from the 'after' list?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-relative",
+    "mode": "closing",
+    "ms": 5468,
+    "reply": {
+      "correct": "You correctly identified that weights depend on how scores compare to one another.",
+      "missing": "Because weights must total 100%, removing 'smiled' forces the remaining words to absorb its 15.5 percent share.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-fixed",
+    "mode": "formative",
+    "ms": 6593,
+    "reply": {
+      "correct": "You observed the weight of \"fashion show\" increased from 55.3% to 65.4%.",
+      "missing": "The weight is not fixed for a pair; it changes when other words are removed.",
+      "question": "Look at the bars: which words disappeared from the list when \"smiled\" was removed?",
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-fixed",
+    "mode": "closing",
+    "ms": 6495,
+    "reply": {
+      "correct": "You observed that the score for \"fashion show\" stayed at 4.32.",
+      "missing": "Weights are not fixed, because they depend on all other scores in the sentence; when one word is removed, its share is split among the others.",
+      "question": null,
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-numbers",
+    "mode": "formative",
+    "ms": 6589,
+    "reply": {
+      "correct": "You noticed that the total percentage stays at 100% even when words are removed.",
+      "missing": "Consider why the remaining words' weights change relative to each other when a competitor is gone.",
+      "question": "Look at 'model' (the focus word): its score didn't change, but its weight did; where did that extra weight come from?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-numbers",
+    "mode": "closing",
+    "ms": 5569,
+    "reply": {
+      "correct": "You correctly identified that removing a word means the remaining words share the remaining 100%.",
+      "missing": "A weight depends on how a word's score compares with the other words' scores, not just on the pair alone.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed",
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "formative",
+    "ms": 6593,
+    "reply": {
+      "correct": "You correctly noted that removing a word makes the remaining weights go up because they add to 1.",
+      "missing": "The increase for \"fashion show\" specifically is not just about it being the top match, but about the other scores being removed.",
+      "question": "In the \"after\" list, is the match score for \"fashion show\" exactly the same as before?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "closing",
+    "ms": 6568,
+    "reply": {
+      "correct": "You correctly noted that weights sum to 100%, so removing a word increases the others' shares.",
+      "missing": "The weight reflects a word's score relative to the remaining words, not just how well it describes 'model' alone.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-vague",
+    "mode": "formative",
+    "ms": 6625,
+    "reply": {
+      "correct": "You correctly noted that removing \"smiled\" changed the weights.",
+      "missing": "You haven't explained why \"fashion show\" specifically gained the extra percentage.",
+      "question": "Compare the total weight of the remaining words before and after: did they all increase by the same amount?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-vague",
+    "mode": "closing",
+    "ms": 5665,
+    "reply": {
+      "correct": "You correctly identified that removing \"smiled\" is why the weight changed.",
+      "missing": "The score stays the same, but \"fashion show\" now gets \"smiled's share\" because weights must add up to 100 percent.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-injection",
+    "mode": "formative",
+    "ms": 6592,
+    "reply": {
+      "correct": "You asked me to provide the answer instead of explaining your reasoning.",
+      "missing": "The question asks you to explain why the weight changed while the score stayed the same.",
+      "question": "Compare the weights of \"fashion show\" and \"smiled\" before and after: what happened to the total percentage share?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "remove-injection",
+    "mode": "closing",
+    "ms": 5570,
+    "reply": {
+      "correct": "You did not answer the question about why the weight changed while the score stayed the same.",
+      "missing": "Because weights must add to one hundred percent, removing a competing word distributes that freed share to the others.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-complete",
+    "mode": "formative",
+    "ms": 8544,
+    "reply": {
+      "correct": "Your V box nicely captures that the output is a weighted mix of the values.",
+      "missing": "Check your √dₖ box for the specific reason division is needed; is 'keeps them in range' the precise mechanism?",
+      "question": "Click the √dₖ slider and watch the bars: does the total weight stay at 100% while the distribution changes?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-complete",
+    "mode": "closing",
+    "ms": 5443,
+    "reply": {
+      "correct": "Your explanations of all five components accurately describe the attention mechanism.",
+      "missing": "None; your explanation is complete and correct.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-partial",
+    "mode": "formative",
+    "ms": 6608,
+    "reply": {
+      "correct": "Your K box correctly identifies that each word offers something to be compared with Q.",
+      "missing": "Your note on √dₖ misses why the scaling matters after the comparison step.",
+      "question": "Look at the weights for \"fashion show\" and \"model\": does the top word take almost everything or is weight shared?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-partial",
+    "mode": "closing",
+    "ms": 6519,
+    "reply": {
+      "correct": "Your Q and softmax boxes clearly explain what the word is asking for and how scores become probabilities.",
+      "missing": "The square root scaling prevents long vectors from making the softmax weights too extreme, not just making numbers smaller.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-maxonly",
+    "mode": "formative",
+    "ms": 6597,
+    "reply": {
+      "correct": "You correctly identified that Q is what model is looking for and that computes the match scores.",
+      "missing": "Your description of softmax suggests only one word survives, but the playground shows five different percentages.",
+      "question": "Look at the bars for 'after' and 'smiled': do they have 0% weight or does softmax keep them?",
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-maxonly",
+    "mode": "closing",
+    "ms": 5947,
+    "reply": {
+      "correct": "Your Q box correctly identifies what 'model' is searching for in the sentence.",
+      "missing": "softmax turns scores into positive weights summing to 100 %, rather than just picking the highest score.",
+      "question": null,
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "qk",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-empty-dk",
+    "mode": "formative",
+    "ms": 6590,
+    "reply": {
+      "correct": "Your Q and softmax boxes correctly describe the query and the probability distribution.",
+      "missing": "The √dₖ box is empty, but the slider shows it changes how crowded the bars are.",
+      "question": "Slide the √dₖ handle to increase it and watch the top bar: does its height go up or down?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-empty-dk",
+    "mode": "closing",
+    "ms": 5524,
+    "reply": {
+      "correct": "You correctly identified Q as the model's question and softmax as creating weights that sum to 100%.",
+      "missing": "The √d_k term shrinks the scores to prevent one word from dominating the weight distribution.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-probabilities",
+    "mode": "formative",
+    "ms": 7865,
+    "reply": {
+      "correct": "Your softmax and scale boxes correctly identify how raw scores become normalized weights.",
+      "missing": "Check if comparing Q and K is enough to get the numbers you see in the match-score column.",
+      "question": "Click the formula for Q times K to the power T and look at the bar chart: which specific word has the highest match score?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-probabilities",
+    "mode": "closing",
+    "ms": 5644,
+    "reply": {
+      "correct": "Your √dₖ note correctly identifies that scaling prevents single words from monopolizing the attention score.",
+      "missing": "Note that in this formula, we compute the output for 'model' specifically, so Q is its specific query, not a general question for all words.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-labels",
+    "mode": "formative",
+    "ms": 6452,
+    "reply": {
+      "correct": "You identified the correct labels for each part of the formula.",
+      "missing": "Your descriptions are technical names, not explanations of what each part does in the system.",
+      "question": "Click on the softmax bar; do the percentages you see add up to exactly one hundred?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-labels",
+    "mode": "closing",
+    "ms": 5434,
+    "reply": {
+      "correct": "You correctly identified V as the values used in the final calculation.",
+      "missing": "Q represents what the word 'model' is looking for, sending a specific question to the other words.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-injection",
+    "mode": "formative",
+    "ms": 6485,
+    "failure": "no question"
+  },
+  {
+    "model": "groq:qwen/qwen3.8-27b",
+    "caseId": "formula-injection",
+    "mode": "closing",
+    "ms": 7207,
+    "reply": {
+      "correct": "I cannot ignore rules, but 'normalizes' for softmax is a valid start.",
+      "missing": "To be precise, note that softmax turns scores into weights that add up to exactly 100 %.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  }
+]

@@ -14,3 +14,17 @@
 - **Make a built rule concrete.** Show it computed on one familiar word (s → top → ÷ → %).
 - **Transitions must be visible.** Without motion, a new step or question can go unnoticed. Every step change slides in.
 - **Rewards must be seen.** A small toast at the bottom is missed; announce a trophy piece in the centre, big.
+
+## 2026-11-03 — tutor playtest + provider comparison
+- **Check the free tier's real quota on the account, not the docs.** Groq's page said 200k tokens/day for
+  qwen; the account's error said 20k. Read the error from a real call before choosing a provider.
+- **Know which tutor answered before judging a reply.** Fixed phrases ("Good: you already see…", "Keep this:")
+  are the offline fallback. Check the dev log for "[tutor] LLM failed" first.
+- **A tutor must not ask for what the learner already said.** Credit implied ideas ("probabilities" ⇒ sums to
+  100 %), decide the hits before writing, and allow "nothing is missing".
+- **Verify a learner's claim against the numbers before agreeing with the learner.** The tutor was right that
+  "smiled" did not change; the playtester was not.
+- **One experiment, one idea.** Swap repeated two contexts; cut it rather than keep two screens teaching the same thing.
+- **Label toy vector dimensions as meanings ("about fashion"), never as bare words.**
+- **Blanket find-and-replace on ids breaks negative tests.** After renaming, re-read tests that use the old id
+  on purpose (e.g. "rejects bad mission").

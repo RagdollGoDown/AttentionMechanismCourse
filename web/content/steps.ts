@@ -3,16 +3,16 @@ import type { Example } from '@/lib/compute';
 import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
-/** Linear steps of the lesson. The lab is one step that holds six unlockable experiments. */
+/** Linear steps of the lesson. The lab is one step that holds five unlockable experiments. */
 export type StepId = 'welcome' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
-export type LabId = 'contrast' | 'qk' | 'swap' | 'remove' | 'rule' | 'softmax';
+export type LabId = 'contrast' | 'qk' | 'remove' | 'rule' | 'softmax';
 /** Anything the logger can stamp an event with. */
 export type MissionId = StepId | LabId;
 
 // The pre-test comes before the hook, so nothing in the lesson has taught its answers yet. Without ?condition=,
 // the condition is assigned at its end by the experimenter, from the score.
 export const STEP_ORDER: StepId[] = ['welcome', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
-export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'swap', 'remove', 'rule', 'softmax'];
+export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'remove', 'rule', 'softmax'];
 
 export const CHAPTERS: { title: string; steps: StepId[] }[] = [
   { title: 'Start', steps: ['welcome', 'pretest', 'hook', 'why'] },
@@ -25,7 +25,6 @@ export const CHAPTERS: { title: string; steps: StepId[] }[] = [
 export const LAB_TITLES: Record<LabId, string> = {
   contrast: 'Two contexts',
   qk: 'Query and key',
-  swap: 'Swap a word',
   remove: 'Remove a word',
   rule: 'Invent the rule',
   softmax: 'Meet softmax',
@@ -36,7 +35,6 @@ export const TROPHY_PIECES: { id: MissionId; title: string }[] = [
   { id: 'vectors', title: 'Words as vectors' },
   { id: 'contrast', title: 'Two contexts' },
   { id: 'qk', title: 'Query and key' },
-  { id: 'swap', title: 'Swap a word' },
   { id: 'remove', title: 'Remove a word' },
   { id: 'rule', title: 'Invent the rule' },
   { id: 'softmax', title: 'Meet softmax' },
@@ -132,7 +130,7 @@ export function dotPlotMin(): number {
 
 export const LAB_TEXT = {
   title: 'The sentence lab',
-  intro: 'One sentence, six experiments. Finish one to unlock the next.',
+  intro: 'One sentence, five experiments. Finish one to unlock the next.',
   locked: 'Finish the experiment before to unlock this one.',
   next: 'Next experiment',
   done: 'Lab complete. On to the formula',
@@ -142,9 +140,8 @@ export const LAB_TEXT = {
 
 export const CONTRAST_TEXT = {
   prompt: 'Here is "model" in two sentences. In each one, click the word you think "model" listens to most.',
-  bars: 'Each bar shows how much "model" listens to a word. The bars add up to 100 %.',
+  bars: 'Each bar is a weight: how much "model" listens to a word, in %. The weights add up to 100 %.',
   revealLabel: 'Show the weights',
-  reflectPrompt: 'What made the difference? (optional)',
 };
 
 export const QK_TEXT = {
@@ -165,10 +162,17 @@ export const QK_TEXT = {
 };
 
 export const RULE_TEXT = {
+  /** The card above the tests: the two numbers met so far (score from Query and key, weight = the bar), on our sentence. */
+  bridge: {
+    title: 'Two numbers per word',
+    score: 'match score',
+    weight: 'weight (the bar)',
+    rule: '? rule',
+    text: 'Something turns the scores into the weights. In Remove a word, the score stayed and the weight moved: the rule looks at all the scores together.',
+  },
   intro: [
-    'Each word has a match score s. Scores can be any number, even below zero.',
-    'A bar needs a weight: positive, and all the weights add up to 100 %.',
-    'Build a rule that turns scores into weights, in two picks:',
+    'Scores can be any number, even below zero. Weights must be positive and add up to 100 %.',
+    'Build the rule that turns scores into weights, in two picks:',
   ],
   howTo: [
     'Top: what to do with each score.',
@@ -208,6 +212,7 @@ export const SOFTMAX_TEXT = {
   next: 'Next step',
   done: 'That is softmax. If your rule was eˢ ÷ sum, you found it yourself!',
   checkPrompt: 'Your turn. Three words have match scores 2, 1 and 0. What weight does the first word get?',
+  checkHint: 'A weight is eˢ ÷ sum.',
   options: [33, 50, 67, 90],
   solution: '7.4 ÷ (7.4 + 2.7 + 1) = 7.4 ÷ 11.1 ≈ 67 %',
   mysteryTitle: 'One more thing',
@@ -264,7 +269,7 @@ export const COMPUTE_TEXT = {
   kicker: 'Formula',
   title: 'Compute it yourself',
   intro: 'Three words, two numbers per vector, so dₖ = 2. First read one example worked out, then do one yourself.',
-  setup: (q: string) => `The query of "model" is q = ${q}. Each word has a key k and a value v.`,
+  setup: 'Each word i has a key and a value. The query of "model" and the key size:',
   workedTitle: 'Worked example',
   practiceTitle: 'Your turn',
   practiceIntro: 'Now the whole table is yours. Fill in every cell, then check. Round to 2 decimals and use your rounded numbers in the next column.',
@@ -278,14 +283,14 @@ export const COMPUTE_TEXT = {
     run: '=',
     error: 'Cannot read that. Check the brackets.',
   },
-  outputLabel: 'output',
-  /** Column headers and one line on how to get each column. */
+  outputLabel: 'Output',
+  /** Per stage: a plain-text label (screen readers), a name and one line on how to get it. */
   stages: {
-    scores: { head: 'q · k', how: 'Dot product of q with each key.' },
-    scaled: { head: '÷ √2', how: 'Divide each score by √dₖ = √2 ≈ 1.41.' },
-    exps: { head: 'eˣ', how: 'Raise e to each scaled score.' },
-    weights: { head: 'weight', how: 'Divide each eˣ by the sum of the three.' },
-    output: { head: 'Σ weight × v', how: 'Add up the values, each multiplied by its weight.' },
+    scores: { head: 'score s', name: 'Scores', how: 'Dot product of the query with each key.' },
+    scaled: { head: 'scaled score z', name: 'Scale', how: 'Divide each score by √dₖ = √2 ≈ 1.41.' },
+    exps: { head: 'e to the z', name: 'Exponentiate', how: 'Raise e to each scaled score.' },
+    weights: { head: 'weight alpha', name: 'Normalise (softmax)', how: 'Divide each eᶻ by the sum of all three. The weights add up to 1.' },
+    output: { head: 'output o', name: 'Weighted sum', how: 'Add up the values, each multiplied by its weight.' },
   },
   right: 'Right!',
   wrong: (n: number) => `${n} ${n === 1 ? 'cell is' : 'cells are'} off: see the amber ones. Each cell is checked with your own numbers from the column before.`,

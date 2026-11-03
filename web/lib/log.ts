@@ -34,7 +34,7 @@ export type EventType =
   | 'compute_check'
   | 'calc_use'
   | 'compute_reveal'
-  | 'model_answer_shown'
+  | 'revision_skipped'
   | 'test_answer'
   | 'test_submit'
   | 'data_sent'

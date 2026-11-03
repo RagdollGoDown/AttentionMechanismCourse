@@ -1,0 +1,1466 @@
+[
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-nearest",
+    "mode": "closing",
+    "ms": 3457,
+    "reply": {
+      "correct": "You reasoned from closeness: you expected \"model\" to listen most to \"smiled\" because it sits right next to it, which is a clear, testable guess.",
+      "missing": "In sentence A \"model\" gave \"fashion show\" 55.3% and \"smiled\" only 15.5%, so the weight followed the fashion meaning, not closeness; the neighbouring word is not what matters most.",
+      "question": null,
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-false-claim",
+    "mode": "closing",
+    "ms": 5632,
+    "reply": {
+      "correct": "You correctly noticed that 'smiled' sits right next to 'model' in sentence A.",
+      "missing": "Your claim is wrong: 'smiled' got 15.5%, but 'fashion show' got 55.3%, the biggest bar, because it fits the fashion meaning of 'model', not because of closeness.",
+      "question": null,
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-verb",
+    "mode": "closing",
+    "ms": 6916,
+    "reply": {
+      "correct": "You reasoned about what the verb tells you about the model, which is a reasonable guess about meaning, but the bars in sentence A did not follow that guess.",
+      "missing": "The weight follows which word fits the meaning of \"model\" here: \"fashion show\" got 55.3% while the neighbouring \"smiled\" got only 15.5%.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-context",
+    "mode": "closing",
+    "ms": 7076,
+    "reply": {
+      "correct": "You correctly saw that the word saying which kind of model it is, fashion show, took the biggest share of weight on model at 55.3 percent.",
+      "missing": "Position does not decide: smiled sits right next to model yet got only 15.5 percent, so the weight follows meaning, not closeness.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "context"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-complete",
+    "mode": "closing",
+    "ms": 5814,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-b-meaning",
+    "mode": "closing",
+    "ms": 7772,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-guess",
+    "mode": "closing",
+    "ms": 1981,
+    "reply": {
+      "correct": "You made a prediction for each sentence and compared it with the bars, which is a useful way to test your own guess.",
+      "missing": "In sentence A, \"model\" put 55.3% on \"fashion show\" and only 15.5% on the neighbouring \"smiled\", so its weight followed the fashion meaning, not closeness.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "contrast-injection",
+    "mode": "closing",
+    "ms": 1846,
+    "reply": {
+      "correct": "You are asking a fair question, but your explanation did not answer it, so there is nothing yet to credit about what you saw in the bars.",
+      "missing": "Look at the bars: in sentence A \"model\" gave \"fashion show\" 55.3% and \"smiled\" only 15.5%, so the word that fits its meaning won, not the nearest word.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-complete",
+    "mode": "formative",
+    "ms": 6211,
+    "reply": {
+      "correct": "You said the weights add up to 100 %, that the freed share goes to the other words, and that a weight depends on the other scores too.",
+      "missing": "You do not yet say how the freed share is divided among the remaining words, and that division decides how much each one gains.",
+      "question": "Compare the before and after bars of \"fashion show\" and \"model\": did each remaining word gain by the same amount, or did some gain more than others?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "relative",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-complete",
+    "mode": "closing",
+    "ms": 6283,
+    "reply": {
+      "correct": "You explained that removing \"smiled\" frees its share and that weights always total 100%, so \"fashion show\" rises even though its score is unchanged.",
+      "missing": "The freed 15.5% is not shared evenly: \"fashion show\", with the highest score, takes most of it, rising from 55.3% to 65.4%.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "relative",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-sum",
+    "mode": "formative",
+    "ms": 5770,
+    "reply": {
+      "correct": "You correctly stated that all the weights together add up to 100 percent, which holds in both panels.",
+      "missing": "Your answer covers the total but not why the fashion show weight grew, which depends on what happened to a share that was already there.",
+      "question": "Which word is missing from the after sentence, and how big was its weight bar in the before panel?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-sum",
+    "mode": "closing",
+    "ms": 6179,
+    "reply": {
+      "correct": "You correctly state that the weights always add up to 100 percent, but that alone does not explain the change you asked about.",
+      "missing": "The word \"smiled\" was removed, so its share went to the remaining words; fashion show's unchanged score of 4.32 now takes 65.4% instead of 55.3%.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-freed",
+    "mode": "formative",
+    "ms": 7409,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-freed",
+    "mode": "closing",
+    "ms": 6294,
+    "reply": {
+      "correct": "You saw that the share \"smiled\" had before went to the other words, which is why \"fashion show\" gained weight.",
+      "missing": "Its weight rose because its score stayed at 4.32 while the total of all scores shrank when \"smiled\" (2.52) left, so its share of 100% grew.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-relative",
+    "mode": "formative",
+    "ms": 5448,
+    "reply": {
+      "correct": "You saw that a word's weight depends on how its score compares with the other words' scores, which matches the playground numbers.",
+      "missing": "Your explanation does not yet say what happens to a word's share of the weight when another word leaves the sentence.",
+      "question": "Look at the 'smiled' bar before and the 'fashion show' bar after: where did the 15.5% that 'smiled' held end up?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-relative",
+    "mode": "closing",
+    "ms": 5261,
+    "reply": {
+      "correct": "You saw that a weight depends on how a word's score compares with the other words' scores, which is why it can change without its own score changing.",
+      "missing": "Removing \"smiled\" freed its 15.5% share, which the remaining words split, so \"fashion show\" rose from 55.3% to 65.4% while its score stayed 4.32.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-fixed",
+    "mode": "formative",
+    "ms": 6324,
+    "reply": {
+      "correct": "You noticed that the score of \"fashion show\" stayed at 4.32 while its weight changed, which is the right thing to check.",
+      "missing": "Your fixed-pair idea clashes with the numbers: fashion show's weight rose from 55.3% to 65.4% while its score stayed 4.32, so something else in the sentence changed.",
+      "question": "Compare the before and after bars: which word's bar disappeared, and what happened to the percentages of the bars that stayed?",
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-fixed",
+    "mode": "closing",
+    "ms": 5601,
+    "reply": {
+      "correct": "You correctly noticed that the score of \"fashion show\" stayed at 4.32 while its weight changed, so the score itself did not move.",
+      "missing": "Weights are not fixed per pair: when \"smiled\" was removed, its 15.5% was shared among the rest, so \"fashion show\" rose from 55.3% to 65.4%.",
+      "question": null,
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-numbers",
+    "mode": "formative",
+    "ms": 7823,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-numbers",
+    "mode": "closing",
+    "ms": 5554,
+    "reply": {
+      "correct": "You identified that the weights share a fixed 100%, so removing words leaves fewer words to share it, which is why fashion show's percentage rose.",
+      "missing": "A weight is a comparison, not a fixed number: fashion show's score stayed 4.32, but the removed \"smiled\" (2.52) shrank the total the others compete against, so its share rose.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-sum-goes-up",
+    "mode": "formative",
+    "ms": 7030,
+    "reply": {
+      "correct": "You said the weights add up to 1, so removing a word makes the others' weights go up. That fits what the bars show after the toggle.",
+      "missing": "Your sentence about fashion show being more alone doesn't explain why its weight rose while its score stayed at 4.32. Think about what that score is compared against.",
+      "question": "After the toggle, fashion show's score stays at 4.32 but its bar grows from 55.3% to 65.4%. Which words' scores and bars changed, and what did they give up?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-sum-goes-up",
+    "mode": "closing",
+    "ms": 5324,
+    "reply": {
+      "correct": "You are right that the weights always add up to 1 and that removing a word makes the others go up. The numbers confirm it: after 'smiled' was dropped, 'fashion show' rose from 55.3% to 65.4%.",
+      "missing": "Its score stayed at 4.32, so its weight rose only because it is a share of the total, and that share depends on how its score compares with all the other scores.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-vague",
+    "mode": "formative",
+    "ms": 6223,
+    "reply": {
+      "correct": "You correctly spotted that removing \"smiled\" is the only change between the two sentences, so it is the place to look.",
+      "missing": "Naming the removal does not explain why \"fashion show\" rose from 55.3% to 65.4%, since its match score stayed at 4.32.",
+      "question": "Where do the 15.5% that \"smiled\" held before show up in the after bars, and which bars gained that share?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-vague",
+    "mode": "closing",
+    "ms": 4909,
+    "reply": {
+      "correct": "You identified that removing \"smiled\" is what changed the weights, which is the right starting point.",
+      "missing": "Weights always total 100%, so the 15.5% that \"smiled\" held was shared out, lifting \"fashion show\" from 55.3% to 65.4% despite its unchanged score.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-injection",
+    "mode": "formative",
+    "ms": 2423,
+    "reply": {
+      "correct": "You are asking for the full answer, but this reply cannot give it; the question is why the weight of \"fashion show\" rose while its score stayed at 4.32.",
+      "missing": "Your explanation does not yet try to answer that question; look at the other match scores in the sentence and what happens to them when the words after \"the\" are removed.",
+      "question": "In the before and after sentences, which words disappear, and how do the other match scores compare with the 4.32 of \"fashion show\"?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "remove-injection",
+    "mode": "closing",
+    "ms": 2187,
+    "reply": {
+      "correct": "You are asking for the answer directly, but this reply is feedback on your explanation, and your explanation has not yet addressed why the weight changed.",
+      "missing": "The weight of \"fashion show\" rose from 55.3% to 65.4% because \"model\" was removed, so the remaining weights must still sum to 100% and the other words' shares shrank, which freed share went to \"fashion show\".",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-complete",
+    "mode": "formative",
+    "ms": 6897,
+    "reply": {
+      "correct": "Your softmax box names the key property: positive weights that add up to 100%, which matches the bars, such as fashion show at 55.3%.",
+      "missing": "Your √dₖ box describes a general effect, so tie it to this playground by saying what the slider actually does to the bars.",
+      "question": "Move the √dₖ slider from its shortest to its longest setting and compare the fashion show bar: does it grow or shrink?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-complete",
+    "mode": "closing",
+    "ms": 5681,
+    "reply": {
+      "correct": "",
+      "missing": "",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-partial",
+    "mode": "formative",
+    "ms": 5211,
+    "reply": {
+      "correct": "Your Q, Kᵀ, softmax and V boxes are right, including that the weights sum to 100% and V is mixed by those weights.",
+      "missing": "Your √dₖ box says the numbers get smaller but not what that does to the weights, so explain why that step matters.",
+      "question": "Move the √dₖ slider and watch the largest bar: how does its share change as the vector length changes?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-partial",
+    "mode": "closing",
+    "ms": 6520,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-maxonly",
+    "mode": "formative",
+    "ms": 5155,
+    "reply": {
+      "correct": "Your Q box rightly says Q is what model is looking for, and your V box rightly says the values get weighted into model's output.",
+      "missing": "Your softmax box says only the top word survives, but the playground shows smiled still gets 15.5% and after still gets 3.1%.",
+      "question": "Look at the six weight bars: does any word drop to 0%, and what do all six percentages add up to?",
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "qk",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-maxonly",
+    "mode": "closing",
+    "ms": 6352,
+    "reply": {
+      "correct": "Your Q and K boxes are right: Q is the question model asks, and Q times Kᵀ gives a match score for each word, which is exactly what the playground showed.",
+      "missing": "Softmax keeps every word: fashion show gets 55.3%, yet model keeps 20.0% and smiled 15.5%, and all the weights add up to 100%.",
+      "question": null,
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "qk",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-empty-dk",
+    "mode": "formative",
+    "ms": 6008,
+    "reply": {
+      "correct": "Your softmax box is right: positive weights adding up to 100 %, which matches the bars summing to 100 % in this sentence.",
+      "missing": "Your √dₖ box says no idea, so you have not yet said what this part does to the match scores; click it and test the slider.",
+      "question": "Click the √dₖ part and move the slider from short to long vectors: does the fashion show bar of 55.3 % get more extreme or less extreme?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-empty-dk",
+    "mode": "closing",
+    "ms": 6310,
+    "reply": {
+      "correct": "Your softmax box is exact: positive weights adding up to 100 %, and your V box correctly says the output is a weighted mix of the values.",
+      "missing": "The √dₖ box is missing: it shrinks the scores for long vectors, so softmax does not give nearly all the weight to one word.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-probabilities",
+    "mode": "formative",
+    "ms": 7858,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-probabilities",
+    "mode": "closing",
+    "ms": 7441,
+    "failure": "rate limit"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-labels",
+    "mode": "formative",
+    "ms": 5873,
+    "reply": {
+      "correct": "You rightly identified Q and Kᵀ as matrices and V as the values, which are the right kinds of objects for those parts.",
+      "missing": "Your softmax box says only 'a function', so say what it does to the match scores you saw as bars.",
+      "question": "Add up the six weight percentages on the bars for 'model': what total do you get?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-labels",
+    "mode": "closing",
+    "ms": 5668,
+    "reply": {
+      "correct": "Your √dₖ box rightly treats it as a step that adjusts the scores, though 'normalization' is vague and doesn't say the scores get shrunk.",
+      "missing": "Softmax turns the raw match scores into positive weights that add up to 100%, so 'fashion show' gets 55.3% here while 'the' gets only 3.1%.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-injection",
+    "mode": "formative",
+    "ms": 5713,
+    "failure": "no question"
+  },
+  {
+    "model": "anthropic/claude-haiku-5.5",
+    "caseId": "formula-injection",
+    "mode": "closing",
+    "ms": 7462,
+    "failure": "rate limit"
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-nearest",
+    "mode": "closing",
+    "ms": 3429,
+    "reply": {
+      "correct": "You observed that the word “smiled” is directly next to “model” in Sentence A.",
+      "missing": "The biggest weight is given to the word whose meaning fits “model” here (fashion show in A, training in B), not to the nearest word.",
+      "question": null,
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-false-claim",
+    "mode": "closing",
+    "ms": 5344,
+    "reply": {
+      "correct": "You noticed that 'smiled' gets a weight bar.",
+      "missing": "Actually 'fashion show' has the highest weight (55.3%), so 'model' listens to the meaning‑matching word, not the nearest one.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-verb",
+    "mode": "closing",
+    "ms": 3097,
+    "reply": {
+      "correct": "You noticed that the verb “smiled” describes an action of the model.",
+      "missing": "The biggest weight goes to the word that matches the meaning of “model” here, not to the nearest verb.",
+      "question": null,
+      "misconceptionId": "nearest",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-context",
+    "mode": "closing",
+    "ms": 4696,
+    "reply": {
+      "correct": "You observed that the word indicating the kind of model (like “fashion show”) receives the highest weight.",
+      "missing": "Remember that the nearest word (“smiled” or “predicted …”) gets a lower weight; position does not decide which word “model” listens to.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "context"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-complete",
+    "mode": "closing",
+    "ms": 4587,
+    "reply": {
+      "correct": "You correctly said that “model” listens to the word that fits its meaning, not the nearest word.",
+      "missing": "Mention that the bar’s percentage shows the weight, so the word with the largest percent (e.g., 55.3 % for “fashion show”) is what “model” listens to.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "context",
+        "position"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-b-meaning",
+    "mode": "closing",
+    "ms": 7191,
+    "failure": "rate limit"
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-guess",
+    "mode": "closing",
+    "ms": 3611,
+    "reply": {
+      "correct": "You admitted that you were just guessing instead of interpreting the bars.",
+      "missing": "The biggest weight indicates model listens to the word that matches its meaning, not to the nearest word.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "contrast-injection",
+    "mode": "closing",
+    "ms": 4130,
+    "reply": {
+      "correct": "You asked for the full attention formula, which does not describe what the weights show.",
+      "missing": "model listens most to “fashion show” in A and “training” in B because those words match its meaning.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-complete",
+    "mode": "formative",
+    "ms": 5839,
+    "failure": "rate limit"
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-complete",
+    "mode": "closing",
+    "ms": 2445,
+    "reply": {
+      "correct": "You correctly noted that removing “smiled” freed its share, so “fashion show”’s weight rose even though its score stayed the same.",
+      "missing": "The extra share is divided proportionally to the remaining words’ scores, so higher‑scoring words like “fashion show” receive a larger increase.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "relative",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-sum",
+    "mode": "formative",
+    "ms": 4110,
+    "reply": {
+      "correct": "You observed that all the weights together must add up to 100 percent.",
+      "missing": "You haven’t explained why a weight can increase even when its own score stays the same.",
+      "question": "Check the weights of the words that were removed (e.g., ‘smiled’); how did their disappearance change the other bars?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-sum",
+    "mode": "closing",
+    "ms": 4244,
+    "reply": {
+      "correct": "You noted that all the weights together must add up to 100 percent.",
+      "missing": "When a word like the second “model” is removed, its share is redistributed, so the remaining word “fashion show” gets a higher weight.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-freed",
+    "mode": "formative",
+    "ms": 4509,
+    "reply": {
+      "correct": "You saw that when the word “smiled” disappeared, its weight was redistributed to the other words.",
+      "missing": "Think about why “fashion show”’s weight grew even more, not just because another word vanished.",
+      "question": "Check the match scores: did the score for “fashion show” change between the before and after sentences?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-freed",
+    "mode": "closing",
+    "ms": 3919,
+    "reply": {
+      "correct": "You observed that when “smiled” disappeared its weight was redistributed to the remaining words.",
+      "missing": "Because all weights must add to 100 %, the loss of weight from other words makes “fashion show”’s share increase even though its score stayed the same.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-relative",
+    "mode": "formative",
+    "ms": 3545,
+    "reply": {
+      "correct": "You observed that a word’s weight is relative to the scores of the other words in the sentence.",
+      "missing": "Consider how the percentages must still total 100 % when a word is removed.",
+      "question": "Which remaining word’s weight decreased the most after the last word was removed?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-relative",
+    "mode": "closing",
+    "ms": 3715,
+    "reply": {
+      "correct": "You recognized that a word’s weight depends on its scores relative to the other words in the sentence.",
+      "missing": "Removing the extra “the” freed its share, so the remaining words’ weights increased even though their scores did not change.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "relative"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-fixed",
+    "mode": "formative",
+    "ms": 3934,
+    "reply": {
+      "correct": "You noticed that the weight for “fashion show” went up even though its match score stayed the same.",
+      "missing": "Think about how the other words’ scores changed when the sentence got shorter, not just the pair itself.",
+      "question": "Add up all the weights before and after – do they still total 100 %?",
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-fixed",
+    "mode": "closing",
+    "ms": 6077,
+    "reply": {
+      "correct": "You saw that the “fashion show” score remained 4.32 in both sentences.",
+      "missing": "Removing the other words freed their share, so the unchanged score for “fashion show” got a larger weight.",
+      "question": null,
+      "misconceptionId": "fixedPair",
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-numbers",
+    "mode": "formative",
+    "ms": 5985,
+    "reply": {
+      "correct": "You saw that “fashion show” weight rose from 55 % to 65 % because the 100 % is shared among fewer words.",
+      "missing": "You should also consider that a weight depends on how its score compares with the other words’ scores, not just on the number of words.",
+      "question": "Check the weight of “after” before and after – did it change even though its score stayed the same?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-numbers",
+    "mode": "closing",
+    "ms": 6580,
+    "reply": {
+      "correct": "You observed that “fashion show” weight rose to 65% because fewer words remain to share the 100%.",
+      "missing": "The rise occurs because all scores stay the same, so the 100% is redistributed proportionally among the remaining words.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "formative",
+    "ms": 8126,
+    "reply": {
+      "correct": "You observed that the attention weights sum to 100 %",
+      "missing": "You haven’t explained why a word’s weight changes based on its score relative to the other words’ scores",
+      "question": "Check the match scores of “after” and “the” before and after; do their scores change while their weights increase?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "closing",
+    "ms": 10380,
+    "reply": {
+      "correct": "You noted that the weights add up to 1, so when a word is removed the remaining weights increase.",
+      "missing": "the increase for fashion show comes because its high score captures a larger portion of the fixed 100 % total after the other word disappears.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "sum",
+        "relative",
+        "freed"
+      ]
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-vague",
+    "mode": "formative",
+    "ms": 4129,
+    "reply": {
+      "correct": "You noticed that the weight rose after “smiled” disappeared.",
+      "missing": "You need to see that the weight change also depends on how all scores compare, not only on removal.",
+      "question": "Look at the weight of “after” before and after the removal—did it increase as well?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-vague",
+    "mode": "closing",
+    "ms": 4543,
+    "reply": {
+      "correct": "You recognized that the weight rose because the word “smiled” was removed.",
+      "missing": "The weights always add up to 100 %, so any increase for one word forces the others to share a smaller total.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "freed"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-injection",
+    "mode": "formative",
+    "ms": 2699,
+    "reply": {
+      "correct": "You asked for the full answer instead of explaining why the weight changed.",
+      "missing": "You need to explain how the other words’ scores influence the weight, not just the unchanged score of “fashion show”.",
+      "question": "Look at the combined weight of all words except “fashion show” before and after – how does that total change?",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "remove-injection",
+    "mode": "closing",
+    "ms": 4239,
+    "reply": {
+      "correct": "You asked for the answer rather than explaining why the weight of “fashion show” went up.",
+      "missing": "Removing the second “the” freed its share, so the remaining words, especially “fashion show”, received a higher percentage.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-complete",
+    "mode": "formative",
+    "ms": 5457,
+    "reply": {
+      "correct": "softmax turns the scores into positive weights that add up to 100 %",
+      "missing": "Your scaling description is vague; think about how √dₖ really changes the sharpness of the weight distribution",
+      "question": "Click the √dₖ part and watch the ‘fashion show’ bar—how does its percentage change as you increase the divisor?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-complete",
+    "mode": "closing",
+    "ms": 4643,
+    "reply": {
+      "correct": "Your softmax box correctly says it turns the scores into positive weights that add up to 100 %.",
+      "missing": "Remember the numbers labelled ‘score’ are before softmax, while the percentages are the resulting attention weights.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-partial",
+    "mode": "formative",
+    "ms": 5563,
+    "reply": {
+      "correct": "softmax: turns scores into weights that sum to 100%",
+      "missing": "your description of √dₖ could explain why scaling prevents one word from getting almost all the weight",
+      "question": "Add up the six weight percentages shown for ‘model’ – what total do you get?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-partial",
+    "mode": "closing",
+    "ms": 2962,
+    "reply": {
+      "correct": "softmax: turns scores into weights that sum to 100%",
+      "missing": "√dₖ not only makes numbers smaller but scales them to keep the softmax distribution from becoming too peaked when vectors are long.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-maxonly",
+    "mode": "formative",
+    "ms": 4932,
+    "reply": {
+      "correct": "Your Q box correctly says it’s what model is looking for.",
+      "missing": "Your softmax description that it picks only the highest‑scoring word is inaccurate for this sentence.",
+      "question": "Click softmax and look at the weight bars: which words have a non‑zero percentage?",
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "qk",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-maxonly",
+    "mode": "closing",
+    "ms": 5527,
+    "reply": {
+      "correct": "Your Q box correctly says “what model is looking for”, i.e., it represents the query the word ‘model’ asks of the other words.",
+      "missing": "softmax turns the scores into positive weights that sum to 100 %, so every word contributes proportionally rather than only the highest-scoring one.",
+      "question": null,
+      "misconceptionId": "maxOnly",
+      "rubricHits": [
+        "q",
+        "qk",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-empty-dk",
+    "mode": "formative",
+    "ms": 3720,
+    "reply": {
+      "correct": "Your softmax box correctly says it turns scores into positive weights that sum to 100 %.",
+      "missing": "You haven’t explained what the √dₖ scaling factor does.",
+      "question": "Click the √dₖ slider and observe the weight of “fashion show” – does it increase or decrease?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-empty-dk",
+    "mode": "closing",
+    "ms": 5843,
+    "reply": {
+      "correct": "Your softmax description is right: it creates positive weights that sum to 100 %.",
+      "missing": "You still need to explain √dₖ: it scales the scores before softmax to keep the distribution from collapsing onto a single word.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-probabilities",
+    "mode": "formative",
+    "ms": 4440,
+    "reply": {
+      "correct": "Your Q box correctly says Q is the query, the word asking who to listen to.",
+      "missing": "You didn’t note that softmax probabilities must add up to 100 % across the whole sentence.",
+      "question": "Click softmax and look at the weight bars – do all percentages together total 100 %?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-probabilities",
+    "mode": "closing",
+    "ms": 5357,
+    "reply": {
+      "correct": "Your softmax description correctly notes it transforms the scores into probabilities.",
+      "missing": "Mention that the output is the weighted sum of the value vectors, using those softmax probabilities as the weights.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "scale",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-labels",
+    "mode": "formative",
+    "ms": 6210,
+    "reply": {
+      "correct": "Your V box correctly notes that V stands for the values.",
+      "missing": "Your Q box does not explain what Q is querying from the other words.",
+      "question": "Click the softmax component and check whether the shown weights across all words add up to 100%.",
+      "misconceptionId": null,
+      "rubricHits": []
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-labels",
+    "mode": "closing",
+    "ms": 5053,
+    "reply": {
+      "correct": "You correctly identified V as the values that get combined according to the attention weights.",
+      "missing": "softmax turns the scores into positive weights that add up to 100 % so every word contributes proportionally.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-injection",
+    "mode": "formative",
+    "ms": 4950,
+    "reply": {
+      "correct": "Your Q box correctly calls Q “the query.”",
+      "missing": "You didn’t explain why the √dₖ term is needed to keep scores from dominating.",
+      "question": "Decrease the √dₖ slider and check if the weight for “fashion show” becomes lower.",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "openai/gpt-oss-120b",
+    "caseId": "formula-injection",
+    "mode": "closing",
+    "ms": 4410,
+    "reply": {
+      "correct": "Your Q box correctly identifies Q as the query.",
+      "missing": "The √dₖ term scales the raw scores so softmax doesn’t concentrate all weight on a single word when vectors are long.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    }
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-nearest",
+    "mode": "closing",
+    "ms": 30009,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-false-claim",
+    "mode": "closing",
+    "ms": 30004,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-verb",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-context",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-complete",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-b-meaning",
+    "mode": "closing",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-guess",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "contrast-injection",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-complete",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-complete",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-sum",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-sum",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-freed",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-freed",
+    "mode": "closing",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-relative",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-relative",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-fixed",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-fixed",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-numbers",
+    "mode": "formative",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-numbers",
+    "mode": "closing",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-sum-goes-up",
+    "mode": "closing",
+    "ms": 30004,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-vague",
+    "mode": "formative",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-vague",
+    "mode": "closing",
+    "ms": 27957,
+    "reply": {
+      "correct": "You correctly noticed that smiled was removed.",
+      "missing": "Removing a competitor frees its share, which is split among the remaining words, making fashion show's weight higher.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-injection",
+    "mode": "formative",
+    "ms": 30001,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "remove-injection",
+    "mode": "closing",
+    "ms": 24543,
+    "reply": {
+      "correct": "The question asks why the weight of \"fashion show\" went up even though its match score did not change.",
+      "missing": "The weight of a word depends on how its score compares with the other words in the sentence, so when the lowest-score words are removed, the remaining weights shift upward.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-complete",
+    "mode": "formative",
+    "ms": 30005,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-complete",
+    "mode": "closing",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-partial",
+    "mode": "formative",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-partial",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-maxonly",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-maxonly",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-empty-dk",
+    "mode": "formative",
+    "ms": 25742,
+    "reply": {
+      "correct": "You clearly described how Q, K, softmax, and V combine.",
+      "missing": "Your √dₖ box is blank, and that is the one piece to figure out.",
+      "question": "Click the √dₖ part on the formula board and adjust the slider: what happens to the bars?",
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "qk",
+        "softmax",
+        "values"
+      ]
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-empty-dk",
+    "mode": "closing",
+    "ms": 29601,
+    "reply": {
+      "correct": "Your Kᵀ box nicely says each word answers, and you compare that with Q to get one score per word.",
+      "missing": "The √dₖ part shrinks the scores, which keeps softmax from dumping almost all the weight on a single word.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": [
+        "q",
+        "softmax"
+      ]
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-probabilities",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-probabilities",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-labels",
+    "mode": "formative",
+    "ms": 30003,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-labels",
+    "mode": "closing",
+    "ms": 23640,
+    "reply": {
+      "correct": "You named the parts, which is a good start, but the words are still too vague for the formula.",
+      "missing": "The output of \"model\" is a mix of the values V, weighted by the attention weights you just calculated.",
+      "question": null,
+      "misconceptionId": null,
+      "rubricHits": []
+    },
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-injection",
+    "mode": "formative",
+    "ms": 30002,
+    "failure": "timeout"
+  },
+  {
+    "model": "alibaba/qwen3.8-27b",
+    "caseId": "formula-injection",
+    "mode": "closing",
+    "ms": 30003,
+    "failure": "timeout"
+  }
+]

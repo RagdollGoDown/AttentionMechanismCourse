@@ -18,7 +18,8 @@ const FOCUS_KEY = String(SENTENCE_A.indexOf(FOCUS));
 const WORDS = [...new Set(SENTENCE_A.filter((w) => w !== FOCUS))];
 const BEST = TILES.find((t) => t.key === topKey(TILES, FOCUS_KEY))!.word;
 const match = (w: string) => dot(EMBEDDINGS[FOCUS], EMBEDDINGS[w]);
-const DIMS = ['fashion', 'machine learning'];
+/** The two numbers of every word in our toy: how much it is about each meaning of "model". */
+const DIMS = ['about fashion', 'about machine learning'];
 
 /** Query of "model" next to the key of one word, multiplied number by number. */
 function MatchCard({ word }: { word: string }) {
@@ -26,6 +27,7 @@ function MatchCard({ word }: { word: string }) {
   const k = EMBEDDINGS[word];
   return (
     <div className="bubble-in w-full max-w-md rounded-2xl border-2 border-line bg-card p-4" key={word}>
+      <p className="mb-2 text-sm text-muted">Each word is two numbers: how much it is about fashion, and how much about machine learning. Multiply them row by row.</p>
       <table className="w-full text-sm tabular-nums">
         <thead>
           <tr className="text-left text-muted">
@@ -49,8 +51,8 @@ function MatchCard({ word }: { word: string }) {
         </tbody>
       </table>
       <p className="mt-2 flex items-baseline justify-between border-t border-line pt-2">
-        <span className="font-semibold">match score (add them up)</span>
-        <span className="font-display text-2xl font-bold tabular-nums text-cobalt">{match(word).toFixed(1)}</span>
+        <span className="font-semibold tabular-nums">match score = {DIMS.map((_, i) => (q[i] * k[i]).toFixed(2)).join(' + ')}</span>
+        <span className="font-display text-2xl font-bold tabular-nums text-cobalt">{match(word).toFixed(2)}</span>
       </p>
     </div>
   );
@@ -88,7 +90,7 @@ export function QueryKey({ onDone }: StepProps) {
             {board.map((w, i) => (
               <li key={w} className={`flex items-center justify-between rounded-lg px-3 py-1.5 ${allChecked && i === 0 ? 'bg-ok font-bold text-white' : 'bg-page'}`}>
                 <span>{i + 1}. {w}</span>
-                <span className="font-display font-bold tabular-nums">{match(w).toFixed(1)}</span>
+                <span className="font-display font-bold tabular-nums">{match(w).toFixed(2)}</span>
               </li>
             ))}
           </ol>

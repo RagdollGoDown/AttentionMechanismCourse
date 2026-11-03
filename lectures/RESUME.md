@@ -79,6 +79,24 @@ attention-mechanism lesson. Update it when a new chapter is added.
 - **Key message:** instructional design means *combining* learning mechanisms to serve the
   objectives, not picking one theory.
 
+## Ch. 5: AI in Education (Oct 5)
+
+- **AI is not a learning mechanism.** AI in education is not the same as AI tutoring: ask which
+  mechanism the AI supports (feedback, scaffolding, worked examples, self-explanation, teaching).
+- History: computer-assisted instruction (PLATO, static branching) → intelligent tutoring systems
+  (Andes: model tracing against expert rules + a **buggy library of misconceptions** that triggers a
+  hint or remediation; Cognitive Tutor: domain, student and pedagogical models, mastery learning)
+  → conversational tutors (AutoTutor) → learning analytics → GenAI (Khanmigo).
+- Lab examples: **REFINE** (interactive AI feedback on student work), **PharmaSim** (LLM agents
+  scaffolding diagnostic reasoning), **Relex/Gelex** (personalized worked examples + self-explanation),
+  **Explique** (AI teachable agent: learners learn by teaching).
+- **Scaffolding:** temporary support for a task learners cannot yet do alone, faded as they improve.
+  - *Structuring*: manage complexity, focus attention, organize the task.
+  - *Problematizing*: make learners articulate their thinking, notice gaps, reconsider their reasoning.
+- **Teaching** improves the teacher's own knowledge (retrieve, organize, explain).
+- Design question: what should the AI **generate, analyze, adapt or interact** with?
+  **Does it support the learner's productive effort, or replace it?**
+
 ## Takeaways for our project
 
 | Lecture mechanism | Where it appears in our lesson |
@@ -90,6 +108,7 @@ attention-mechanism lesson. Update it when a new chapter is added.
 | Worked example + fading | P5: 3-token computation, then step-by-step checked practice |
 | Self-explanation | P6 (and P2–P4): own-words explanations |
 | Feedback (formative) | **The AI affordance:** adaptive tutor feedback on explanations; control = fixed expert answer |
+| AI support (Ch. 5) | The tutor *analyzes* the explanation against a rubric and a buggy library of misconceptions (as in Andes), then *problematizes*: one gap, one question that sends the learner back to the playground. It never gives the answer, so it supports the learner's effort instead of replacing it. The last reply closes the gap in words, never with the formula before the formula step |
 | Cognitive load | Labels on the visualization (split attention), short sentences (intrinsic load) |
 | Prerequisites / pre-test | Pre-test for dot product, softmax, embeddings; balance groups |
 | Backward design | Post-test items per LG (LG1 explain, LG2 compute, LG3 predict) |

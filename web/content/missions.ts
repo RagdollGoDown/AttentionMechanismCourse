@@ -2,7 +2,7 @@ import type { Change } from '@/lib/tiles';
 import { SENTENCE_A } from '@/content/sentences';
 
 /** Tasks where the learner writes an explanation and gets feedback (AI tutor or expert answer). */
-export type TutorMissionId = 'swap' | 'remove' | 'formula';
+export type TutorMissionId = 'contrast' | 'remove' | 'formula';
 
 export interface RubricItem {
   id: string;
@@ -44,7 +44,7 @@ export type Prediction =
   | { kind: 'choice'; prompt: string; options: string[]; correct: string };
 
 export interface TutorMission extends ExplainTask {
-  id: 'swap' | 'remove';
+  id: 'remove';
   intro: string;
   actionLabel: string;
   before: string[];
@@ -54,60 +54,47 @@ export interface TutorMission extends ExplainTask {
   revealNote: string;
 }
 
-export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
-  swap: {
-    id: 'swap',
-    intro: 'Right now "model" listens most to "fashion show". Look at the bars, then swap "fashion show" for "training run".',
-    actionLabel: 'Swap it',
-    before: SENTENCE_A,
-    focusIndex: 4,
-    change: { type: 'swap', index: 2, to: 'training run' },
-    prediction: {
-      kind: 'tile',
-      prompt: 'The weights are hidden now. Which word does "model" listen to most? Click it in the sentence.',
-      correctIndex: 2,
+/**
+ * "Two contexts": the learner clicks the word "model" listens to most, in two sentences. Only a wrong pick
+ * leads here: the learner says what made them think so, then gets one reply (AI: closing tutor reply,
+ * control: this expert answer). Match scores are not taught yet: the tutor talks about weights and meaning.
+ */
+export const CONTRAST_TASK: ExplainTask = {
+  id: 'contrast',
+  explainPrompt: 'Your pick was not the word "model" listened to most. What made you think it was?',
+  rubric: [
+    {
+      id: 'context',
+      text: 'In each sentence, "model" listens most to the word that fits the meaning it has there: "fashion show" (fashion) in A, "training run" (machine learning) in B.',
+      keywords: /meaning|context|fit|match|relat|about|fashion|machine|\bml\b|learning|sense|topic/i,
+      hint: 'What decides which word "model" listens to?',
+      probe: 'Compare the top word in A and in B: which meaning of "model" does each one fit?',
     },
-    revealNote: '"model" now listens most to "training run". Yet "smiled" sits right next to it.',
-    explainPrompt: 'Why does "model" listen to "training run" and not to "smiled", the word right next to it?',
-    rubric: [
-      {
-        id: 'match',
-        text: 'A word gets a high score when it matches what "model" is about (its meaning).',
-        keywords: /match|similar|align|meaning|relat|relevan|fit|direction|vector|score/i,
-        hint: 'You describe what happened, but not what makes a word score high for "model".',
-        probe: 'Look at the match score under each word. Which words score highest, and what do they share with "model"?',
-      },
-      {
-        id: 'ml',
-        text: '"training run" fits the machine-learning meaning of "model", as strongly as "fashion show" fitted the fashion meaning.',
-        keywords: /machine|\bml\b|learning|\bai\b|neural|comput|data/i,
-        hint: 'Which of the two meanings of "model" does "training run" connect to?',
-        probe: 'Toggle before and after. Which meaning did "fashion show" support? Which one does "training run" support?',
-      },
-      {
-        id: 'position',
-        text: 'Position does not matter: "smiled" is closer but matches "model" less.',
-        // Must state that position does NOT count; a bare "close"/"next to" would credit the misconception.
-        keywords:
-          /\b(position|order|distance|closeness|proximity|nearest|closest|neighbou?rs?|adjacent)\b[^.]{0,25}\b(doesn'?t|does not|don'?t|do not|isn'?t|is not|not|never)\b[^.]{0,10}\b(matter|count|help|play|relevant|important|get|receive)|\b(even though|although|despite|while)\b[^.]{0,40}\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)|\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)\w*\b[^.]{0,40}\bbut\b[^.]{0,40}\b(less|lower|smaller|weaker|doesn'?t|does not)\b/i,
-        hint: 'You have not said why being right next to "model" does not help "smiled".',
-        probe: '"smiled" is the closest word to "model". Does its bar suggest that closeness counts?',
-      },
-    ],
-    misconceptions: [
-      {
-        id: 'nearest',
-        text: 'Attention goes to the nearest word.',
-        // Checked per sentence; sentences with a negation or "but/even though" are skipped (see mock.ts).
-        keywords:
-          /\b(close|closer|closest|nearest|next to|adjacent|near|neighbou?r\w*|order|position)\b[^.]{0,40}\b(gets?|getting|receives?|has|have|so|should)\b[^.]{0,20}\b(more|most|higher|highest|bigger|larger)\b|\b(is|are|it'?s|being)\s+(closer|closest|nearest|next to|adjacent)\b/i,
-        hint: 'Careful: you seem to link the weight to how close a word is to "model".',
-        probe: 'Think back to "Two contexts". Did "model" listen to its neighbour there?',
-      },
-    ],
-    expertAnswer:
-      '"model" is ambiguous. Its vector sits between the fashion meaning and the machine-learning meaning. Every other word gets a match score for how well it fits "model". "training run" fits the machine-learning meaning very well. So it gets the highest score and the largest weight, just like "fashion show" did for fashion. Position plays no role: "smiled" is right next to "model" but fits it less, so it gets less weight.',
-  },
+    {
+      id: 'position',
+      text: 'Position does not decide: the word right next to "model" ("smiled" in A, "predicted" in B) gets less weight than the word that fits its meaning.',
+      keywords:
+        /\b(position|order|distance|closeness|proximity|nearest|closest|neighbou?rs?|adjacent)\b[^.]{0,25}\b(doesn'?t|does not|don'?t|do not|isn'?t|is not|not|never)\b[^.]{0,10}\b(matter|count|help|play|relevant|important|get|receive)|\b(even though|although|despite|while)\b[^.]{0,40}\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)|\b(close|closer|closest|nearest|next to|adjacent|neighbou?r)\w*\b[^.]{0,40}\bbut\b[^.]{0,40}\b(less|lower|smaller|weaker|doesn'?t|does not)\b/i,
+      hint: 'You have not said why the word right next to "model" does not win.',
+      probe: 'Which word sits right next to "model" in each sentence? Is it the tallest bar?',
+    },
+  ],
+  misconceptions: [
+    {
+      id: 'nearest',
+      text: 'Attention goes to the nearest word.',
+      // Checked per sentence; sentences with a negation or "but/even though" are skipped (see mock.ts).
+      keywords:
+        /\b(close|closer|closest|nearest|next to|adjacent|near|neighbou?r\w*|order|position)\b[^.]{0,40}\b(gets?|getting|receives?|has|have|so|should)\b[^.]{0,20}\b(more|most|higher|highest|bigger|larger)\b|\b(is|are|it'?s|being)\s+(closer|closest|nearest|next to|adjacent)\b/i,
+      hint: 'Careful: you seem to link the weight to how close a word is to "model".',
+      probe: 'Which word sits right next to "model" in each sentence? Is it the tallest bar?',
+    },
+  ],
+  expertAnswer:
+    '"model" has two meanings. In each sentence, it listens most to the word that fits the meaning it has there: "fashion show" in A (fashion), "training run" in B (machine learning). Position does not matter: the word right next to "model" ("smiled" in A, "predicted" in B) gets less weight.',
+};
+
+export const TUTOR_MISSIONS: Record<'remove', TutorMission> = {
   remove: {
     id: 'remove',
     intro: 'Back to the original sentence. Note the weight on "fashion show", then remove "smiled".',
@@ -141,7 +128,7 @@ export const TUTOR_MISSIONS: Record<'swap' | 'remove', TutorMission> = {
       {
         id: 'freed',
         text: 'Removing a competitor frees its share, which is split among the remaining words.',
-        keywords: /free|redistribut|its share|spread|went to|goes to|split|left over|room/i,
+        keywords: /free|redistribut|its share|spread|went to|goes to|split|left over|room|absorb|take (over|up)|took (over|up)|share it/i,
         hint: 'Where did the weight of "smiled" go?',
         probe: '"smiled" had about 16 %. Toggle before and after: which bars got that share?',
       },
@@ -237,4 +224,4 @@ export const FORMULA_TASK: ExplainTask = {
 
 export { FORMULA_EXPERT };
 
-export const EXPLAIN_TASKS: Record<TutorMissionId, ExplainTask> = { ...TUTOR_MISSIONS, formula: FORMULA_TASK };
+export const EXPLAIN_TASKS: Record<TutorMissionId, ExplainTask> = { contrast: CONTRAST_TASK, ...TUTOR_MISSIONS, formula: FORMULA_TASK };
