@@ -34,7 +34,6 @@ RQ1 = learning outcomes; RQ2 = process (revision behavior), taken from logs.
 - `CS_411_Digital_Education___Checkpoint_C2.pdf`: our current design.
 - `lectures/`: course slides. **Read `lectures/RESUME.md` first** and justify design
   choices with those learning mechanisms. Update it when a new lecture PDF is added.
-- `logs/<member>.md`: per-person AI interaction logs (see below).
 - `web/`: the Next.js prototype (see `web/README.md`). `cd web && npm test` before committing.
   Teaching content lives in `web/content/`. Its claims are enforced by `web/tests/content-*.test.ts`.
 
@@ -45,33 +44,6 @@ RQ1 = learning outcomes; RQ2 = process (revision behavior), taken from logs.
   feedback received, revisions, time per phase.
 - Keep the UI low in extraneous load (labels on the visualization, short sentences).
 
-## AI interaction logging (required: we are part of a study)
+## AI interaction logs
 
-The course studies our use of GenAI. Each milestone requires 1–2 AI interaction logs per
-team member. **In every session:**
-
-1. Identify the team member (ask if unknown) and append a new session entry to **their own
-   log**: `logs/julien.md`, `logs/andre.md` or `logs/morgane.md` (create it if missing).
-   Never rewrite or delete past entries, and never write in another member's log.
-2. Record the date, the tool/model, and each user request
-   with a concise account of the AI's response and actions (files changed, decisions,
-   alternatives proposed, what the user accepted or rejected, and any corrections).
-3. At the end of the session, add a **Summary** (mark the reflection as an AI draft for the member to rewrite): what was done, key decisions, open
-   questions, and a short reflection on how the AI helped or hindered the work or learning.
-
-Use this format:
-
-```markdown
-## Session YYYY-MM-DD — <member> — <topic>
-**Tool:** Claude Code (<model>)
-
-### Interactions
-1. **User:** <request, quoted or paraphrased>
-   **AI:** <what it did / answered>
-
-### Summary
-- Done: …
-- Decisions: …
-- Open questions: …
-- Reflection: …
-```
+Do not write AI interaction logs or session summaries in the repo. The course collects them another way.
