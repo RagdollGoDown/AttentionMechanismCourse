@@ -1,0 +1,42 @@
+# Every push to main: run the tests, then deploy to Vercel production.
+# Vercel builds the app itself, using the project's settings (Root Directory = web).
+# Needs one repository secret: VERCEL_TOKEN (vercel.com/account/tokens).
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # "Run workflow" button in the Actions tab
+
+# One production deploy at a time, in push order.
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      # Not secrets: they only say which Vercel project to deploy to.
+      VERCEL_ORG_ID: team_H2i67banV6mtGedeyus9DK4C
+      VERCEL_PROJECT_ID: prj_DPx3ByxxsYO8gGPozKspw7CPfXDV
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Test
+        working-directory: web
+        run: |
+          npm ci
+          npm test
+
+      - name: Deploy
+        # From the repo root: the Vercel project's Root Directory is web.
+        run: npx --yes vercel@54.5.0 deploy --prod --yes --token "$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
