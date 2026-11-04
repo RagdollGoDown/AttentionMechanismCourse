@@ -9,6 +9,7 @@ import { SessionLog } from '@/components/SessionLog';
 import { Explain, Formula } from '@/components/steps/Formula';
 import { Hook } from '@/components/steps/Hook';
 import { End, Welcome, Why } from '@/components/steps/Intro';
+import { Consent } from '@/components/steps/Consent';
 import { Compute } from '@/components/steps/Compute';
 import { Lab } from '@/components/steps/Lab';
 import { Posttest } from '@/components/steps/Posttest';
@@ -21,6 +22,7 @@ import { canGoBack } from '@/lib/nav';
 
 const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   welcome: Welcome,
+  consent: Consent,
   pretest: Pretest,
   hook: Hook,
   why: Why,

@@ -4,18 +4,18 @@ import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
 /** Linear steps of the lesson. The lab is one step that holds five unlockable experiments. */
-export type StepId = 'welcome' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
+export type StepId = 'welcome' | 'consent' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
 export type LabId = 'contrast' | 'qk' | 'remove' | 'rule' | 'softmax';
 /** Anything the logger can stamp an event with. */
 export type MissionId = StepId | LabId;
 
 // The pre-test comes before the hook, so nothing in the lesson has taught its answers yet. Without ?condition=,
 // the condition is assigned at its end by the experimenter, from the score.
-export const STEP_ORDER: StepId[] = ['welcome', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
+export const STEP_ORDER: StepId[] = ['welcome', 'consent', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
 export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'remove', 'rule', 'softmax'];
 
 export const CHAPTERS: { title: string; steps: StepId[] }[] = [
-  { title: 'Start', steps: ['welcome', 'pretest', 'hook', 'why'] },
+  { title: 'Start', steps: ['welcome', 'consent', 'pretest', 'hook', 'why'] },
   { title: 'Warm-up', steps: ['vectors'] },
   { title: 'Lab', steps: ['lab'] },
   { title: 'Formula', steps: ['formula', 'compute', 'explain'] },
@@ -59,6 +59,27 @@ export const WELCOME = {
   ],
   cta: 'Start',
 };
+
+/** Shown before the pre-test. Keep it true to what the code stores (lib/collect) and sends (lib/tutor). */
+export const CONSENT = {
+  title: 'Before you start',
+  intro: 'This lesson is part of a study for the course CS-411 Digital Education at EPFL. To take part, we need your OK to keep:',
+  collected: [
+    'your test answers and what you write in the lesson,',
+    'your clicks and the time each part takes,',
+    'a participant code, no name and no email.',
+  ],
+  shared: [
+    'Your data is stored with Supabase, in Zurich.',
+    'In the AI version, your written explanations are also sent to an AI provider (Anthropic, or Groq as a backup) so it can write the feedback.',
+    'Only the course team sees it. Results are reported for the whole group.',
+  ],
+  voluntary: 'You can say no. Then you cannot take part in the study, and nothing is saved.',
+  agree: 'I agree',
+  decline: 'No thanks',
+  declinedTitle: 'Thank you anyway',
+  declinedBody: 'Without your OK we cannot use your data, so you cannot take part in the study. Nothing was saved. You can close this page.',
+} as const;
 
 export const HOOK = {
   question: 'What does "model" mean here?',

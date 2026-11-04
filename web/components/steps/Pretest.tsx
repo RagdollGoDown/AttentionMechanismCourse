@@ -98,6 +98,7 @@ function Experimenter({ submission, sent, onResend, onAssign }: {
     sent === null || sent === 'sending' ? 'Saving…'
     : savedOk ? `Saved (${sent[0].store})`
     : sent.some((r) => !r.ok) ? `NOT SAVED: ${sent.find((r) => !r.ok)?.error ?? 'error'}`
+    : sent[0].store === 'no consent' ? 'NOT SAVED: the participant did not consent'
     : `NOT SAVED: no store configured (${sent[0].store})`;
 
   return (
