@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { STEP_ORDER } from '@/content/steps';
-import { canGoBack } from '@/lib/nav';
+import { canGoBack, warnsBeforeLeaving } from '@/lib/nav';
 
 const at = (id: (typeof STEP_ORDER)[number]) => STEP_ORDER.indexOf(id);
 
@@ -34,5 +34,20 @@ describe('canGoBack', () => {
 
   it('has nowhere to go from the end screen', () => {
     expect(canGoBack(STEP_ORDER.length)).toBe(false);
+  });
+});
+
+describe('warnsBeforeLeaving', () => {
+  it('is off on the welcome and consent screens', () => {
+    expect(warnsBeforeLeaving(at('welcome'))).toBe(false);
+    expect(warnsBeforeLeaving(at('consent'))).toBe(false);
+  });
+
+  it('is on at every step from the pre-test through the post-test', () => {
+    for (const id of STEP_ORDER.slice(at('pretest'))) expect(warnsBeforeLeaving(at(id))).toBe(true);
+  });
+
+  it('is off on the end screen', () => {
+    expect(warnsBeforeLeaving(STEP_ORDER.length)).toBe(false);
   });
 });

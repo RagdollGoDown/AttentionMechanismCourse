@@ -287,6 +287,7 @@ export const TEST_TEXT = {
       'It shows what you already know, so we can see what you learn. It does not count for anything.',
       "Please don't look anything up. If you don't know, say so: that helps us too.",
       'It takes about 6 minutes.',
+      "Please don't refresh or close this page: your progress would be lost.",
     ],
     start: 'Start the quiz',
     submit: 'Submit',
