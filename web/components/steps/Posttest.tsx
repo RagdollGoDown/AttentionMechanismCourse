@@ -12,7 +12,7 @@ import { downloadLog } from '@/lib/download';
 
 const T = TEST_TEXT.post;
 
-/** Last step, identical in both conditions. Sends the test and the session log, then shows the end screen. */
+/** Identical in both conditions. Sends the test and the session log, then the reflection survey follows. */
 export function Posttest({ onDone }: StepProps) {
   const logger = useLogger();
   const [state, setState] = useState<'open' | 'saving' | 'failed'>('open');

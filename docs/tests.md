@@ -32,6 +32,14 @@ Knowledge items offer "I don't know" to cut guessing. The calculator from the le
 numeric items; its placeholder gives no hint about the method. The formula is **not** shown in either test,
 since knowing its steps is part of LG2.
 
+## Reflection survey (after the post-test)
+
+A last step, `reflection` (~4 min, `SURVEY` in `web/content/tests.ts`): the qualitative measure of the M4 plan.
+Four open questions, optional, identical in both conditions: a moment something clicked, a moment of being stuck
+and what came next, whether and why they revised their explanation (RQ2), and Byte (did he make them want to keep going, get in the way, or neither).
+Sent as a `survey` record (answers, duration), then the full session log. Behaviour toward Byte is also in the log
+(`garden_toggled`, `pet_petted`).
+
 ## Assigning the condition
 
 It runs before the hook, so nothing in the lesson has taught its answers yet, and it is one session with the lesson.
@@ -60,5 +68,5 @@ store in red when nothing is kept. If a send fails, the page offers the JSON dow
 
 - Rubric scoring of the open items: who scores, and blind to the condition (M3 placeholder).
 - The pre-test shows the role wording of Q/K/V before the lesson (mild priming, the same in both groups).
-- Lesson + tests now take ~50 min. The post-test can be cut by dropping post-qkv-explain if needed.
+- Lesson + tests + survey now take ~55 min. The post-test can be cut by dropping post-qkv-explain if needed.
 - `/api/collect` has no authentication: fine for a supervised study, but anyone with the URL can post records.

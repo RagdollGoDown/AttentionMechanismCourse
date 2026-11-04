@@ -42,6 +42,7 @@ export type EventType =
   | 'revision_skipped'
   | 'test_answer'
   | 'test_submit'
+  | 'survey_submit'
   | 'data_sent'
   | 'nav_back'
   | 'lab_redo'

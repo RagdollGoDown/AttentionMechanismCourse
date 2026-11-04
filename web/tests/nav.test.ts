@@ -43,8 +43,9 @@ describe('warnsBeforeLeaving', () => {
     expect(warnsBeforeLeaving(at('consent'))).toBe(false);
   });
 
-  it('is on at every step from the pre-test through the post-test', () => {
+  it('is on at every step from the pre-test through the reflection survey', () => {
     for (const id of STEP_ORDER.slice(at('pretest'))) expect(warnsBeforeLeaving(at(id))).toBe(true);
+    expect(warnsBeforeLeaving(at('reflection'))).toBe(true);
   });
 
   it('is off on the end screen', () => {

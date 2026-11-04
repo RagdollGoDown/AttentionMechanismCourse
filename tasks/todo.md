@@ -288,3 +288,14 @@ Chapters on a quest map. Intro and consolidation are linear. The lab is a hub.
 - [x] Verified the numbers by hand (Python, independent of the app). Fixed: the page showed eˣ of the *unrounded* scaled
       score (e^2.83 shown as 16.92, really 16.95) and "4 ÷ 1.41 ≈ 2.83" (really 2.84). Worked example and "Show me" now
       use `learnerPath` (round to 2 decimals, carry forward, ÷ √2), pinned by tests with the hand-computed values.
+
+## M4 (due Nov 5, 23:59; Q&A Nov 10), checked against `M4_digital_education.pdf`
+
+- [ ] Research plan, 2–3 pages: RQs (RQ1 outcomes, RQ2 process), participants + recruitment, conditions + procedure, measures + analysis per RQ
+- [x] Working implementation, both conditions, public link (prod checked Nov 4: 21/21 interactions)
+- [ ] 1–2 AI interaction logs per member in the submission (not in the repo: `logs/` was removed in #15)
+- [x] Quantitative measure: pre/post-test per LG, auto + rubric scoring
+- [ ] Analysis plan: ANCOVA on post-test with pre-test as covariate (or gains / normalized gains), floor/ceiling check, blind horizontal rubric grading
+- [x] Qualitative: open-ended questions after the post-test (reflection survey, same in both conditions)
+- [ ] Thematic-analysis plan for the survey answers (Braun & Clarke)
+- [ ] Participant information sheet (procedure, ~50 min, rights, withdrawal, contact, data); in-app consent exists
