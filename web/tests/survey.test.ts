@@ -13,7 +13,7 @@ describe('reflection survey', () => {
     expect(SURVEY.open.some((q) => q.text.includes('Byte'))).toBe(true);
   });
 
-  it('is accepted by /api/collect and sent with the session log, only with consent', async () => {
+  it('is accepted by /api/records and sent with the session log, only with consent', async () => {
     const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => {
       expect(RecordSchema.safeParse(JSON.parse(String(init?.body))).success).toBe(true);
       return new Response(JSON.stringify({ ok: true, stored: true, store: 'x' }));
