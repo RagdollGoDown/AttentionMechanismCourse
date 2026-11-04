@@ -36,7 +36,7 @@ since knowing its steps is part of LG2.
 
 A last step, `reflection` (~4 min, `SURVEY` in `web/content/tests.ts`): the qualitative measure of the M4 plan.
 Four open questions, optional, identical in both conditions: a moment something clicked, a moment of being stuck
-and what came next, whether and why they revised their explanation (RQ2), and Byte (did he change how they worked).
+and what came next, whether and why they revised their explanation (RQ2), and Byte (did he make them want to keep going, get in the way, or neither).
 Sent as a `survey` record (answers, duration), then the full session log. Behaviour toward Byte is also in the log
 (`garden_toggled`, `pet_petted`).
 

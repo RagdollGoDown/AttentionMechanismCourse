@@ -341,7 +341,7 @@ export const SURVEY = {
     { id: 'helped', text: 'Think of a moment when something clicked. What was it?' },
     { id: 'stuck', text: 'Was there a moment you got stuck? What did you do then?' },
     { id: 'revise', text: 'After writing an explanation, you could change it. Did you? What made you decide?' },
-    { id: 'byte', text: 'Anything else about Byte? For example, did he change how you worked through the lesson?' },
+    { id: 'byte', text: 'How did it feel to have Byte with you during the lesson? Did he make you want to keep going, get in the way, or neither?' },
   ],
   submit: 'Submit and finish',
 };
