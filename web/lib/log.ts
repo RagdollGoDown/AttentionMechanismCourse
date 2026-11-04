@@ -34,6 +34,7 @@ export type EventType =
   | 'pet_petted'
   | 'pet_item_moved'
   | 'garden_toggled'
+  | 'garden_intro_closed'
   | 'compute_check'
   | 'calc_use'
   | 'compute_reveal'

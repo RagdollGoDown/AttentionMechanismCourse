@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useGifts } from '@/components/GiftProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { secondaryButtonClass } from '@/components/ui';
-import { STEP_ORDER } from '@/content/steps';
+import { GIFTS, STEP_ORDER } from '@/content/steps';
 
 /**
  * Developer tools, shown only with `?debug`. Jumps between steps without giving Byte gifts,
- * and remounts the current step to retest it. Participants never get this flag.
+ * remounts the current step to retest it, and can hand Byte his next gift to test the garden. Participants never get this flag.
  */
 export function DebugBar({ index, onGoTo, onReset }: {
   index: number;
@@ -36,9 +37,20 @@ export function DebugBar({ index, onGoTo, onReset }: {
       </select>
       <button type="button" className={secondaryButtonClass} disabled={index >= last} onClick={() => onGoTo(index + 1)} aria-label="Next step">→</button>
       <button type="button" className={secondaryButtonClass} disabled={index >= last} onClick={onReset}>Reset step</button>
+      <NextGift />
       <TutorStatus />
       <StoreStatus />
     </div>
+  );
+}
+
+function NextGift() {
+  const { gifts, win } = useGifts();
+  const next = GIFTS.find((g) => !gifts.includes(g));
+  return (
+    <button type="button" className={secondaryButtonClass} disabled={!next} onClick={() => next && win(next.id)}>
+      {next ? `Gift: ${next.item}` : 'All gifts'}
+    </button>
   );
 }
 

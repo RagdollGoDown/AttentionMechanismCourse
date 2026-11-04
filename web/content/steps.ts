@@ -40,7 +40,7 @@ export type PetItem = 'bowl' | 'tent' | 'ball' | 'tree' | 'cushion' | 'flowers' 
 export const GIFTS: { id: MissionId; title: string; item: PetItem; name: string; fact: string }[] = [
   { id: 'vectors', title: 'Words as vectors', item: 'tent', name: 'a tent', fact: 'A word is a vector, and the dot product says how well two words match.' },
   { id: 'contrast', title: 'Two contexts', item: 'ball', name: 'a tennis ball', fact: 'Same word, different context, different bars.' },
-  { id: 'qk', title: 'Query and key', item: 'tree', name: 'an apple tree', fact: '"model" asks with its query, and every word answers with its key.' },
+  { id: 'qk', title: 'Query and key', item: 'tree', name: 'a tall apple tree to climb', fact: '"model" asks with its query, and every word answers with its key.' },
   { id: 'remove', title: 'Remove a word', item: 'cushion', name: 'a dog bed', fact: 'Weights always share 100 %. When a word leaves, the others take its share.' },
   { id: 'rule', title: 'Invent the rule', item: 'flowers', name: 'tulips', fact: 'A good rule keeps every weight positive and makes them add up to 100 %.' },
   { id: 'softmax', title: 'Meet softmax', item: 'frisbee', name: 'a frisbee', fact: 'softmax raises e to each score, then divides by the sum.' },
@@ -86,6 +86,23 @@ export const WHY = {
     'Meet Byte, the robot dog at the bottom of the page. Each module you finish brings him a gift.',
   ],
   cta: "Let's go",
+};
+
+/** Byte's closable hello, the first time the garden shows in a session (same in both conditions). */
+export const GARDEN_INTRO = {
+  title: 'Hi, I’m Byte!',
+  body: 'My garden is still a bit empty. Each step you finish brings me a gift, so together we can make it a nicer place.',
+  close: 'Got it',
+};
+
+/**
+ * What Byte says to cheer the learner on: when a step opens and when a gift arrives. Effort and progress
+ * only, never about being right, so it is the same whatever the learner answered and in both conditions.
+ */
+export const BYTE_LINES = {
+  hype: ['You’ve got this!', 'Nice work!', 'Keep going!', 'Great focus!', 'You’re on a roll!', 'Look at you go!', 'One step closer!', 'Brain power!'],
+  test: 'Last stretch. You can do it!',
+  end: 'We did it! Thank you!',
 };
 
 export const VECTORS_TEXT = {

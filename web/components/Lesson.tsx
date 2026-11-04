@@ -66,8 +66,8 @@ function MissionTracker({ id }: { id: StepId | null }) {
   return null;
 }
 
-/** Steps without the garden: the welcome screen and both tests. */
-const NO_GARDEN: StepId[] = ['welcome', 'pretest', 'posttest'];
+/** Steps without the garden: the welcome screen and the pre-test (it comes back for the post-test, to celebrate the end). */
+const NO_GARDEN: StepId[] = ['welcome', 'pretest'];
 
 function LessonInner({ initialCondition, debug }: { initialCondition: Condition | null; debug: boolean }) {
   const logger = useLogger();
@@ -148,8 +148,8 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
         })}
         {!id && <div className="slide-in"><End /></div>}
       </main>
-      {/* Byte's garden: not during the tests, so it cannot change how the tests are taken. */}
-      <Garden on={id === null || !NO_GARDEN.includes(id)} />
+      {/* Byte's garden: from the hook on, through the post-test (he waits to celebrate the end with the learner). */}
+      <Garden on={id === null || !NO_GARDEN.includes(id)} step={id ?? 'end'} />
       {debug && <DebugBar index={index} onGoTo={goTo} onReset={resetStep} />}
       <SessionLog open={logOpen} onClose={() => setLogOpen(false)} />
     </>

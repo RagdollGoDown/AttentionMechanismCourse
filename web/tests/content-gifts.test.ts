@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GIFTS, LAB_ORDER, STEP_ORDER } from '@/content/steps';
+import { BYTE_LINES, GIFTS, LAB_ORDER, STEP_ORDER } from '@/content/steps';
 
 describe("Byte's gifts", () => {
   it('one gift per finished module: every lesson step but the welcome and the tests, and every lab experiment', () => {
@@ -13,5 +13,9 @@ describe("Byte's gifts", () => {
   });
   it('every gift names what it is and what the module taught', () => {
     for (const g of GIFTS) { expect(g.name.length).toBeGreaterThan(2); expect(g.fact.length).toBeGreaterThan(10); }
+  });
+
+  it("Byte's cheers praise effort, never correctness (they are the same whatever the learner answered)", () => {
+    for (const line of [...BYTE_LINES.hype, BYTE_LINES.test, BYTE_LINES.end]) expect(line).not.toMatch(/right|correct|wrong|smart|perfect/i);
   });
 });
