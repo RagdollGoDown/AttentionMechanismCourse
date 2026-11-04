@@ -19,7 +19,7 @@ import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
 import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
-import { canGoBack } from '@/lib/nav';
+import { canGoBack, warnsBeforeLeaving } from '@/lib/nav';
 
 const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   welcome: Welcome,
@@ -82,6 +82,15 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
   // Bumped by the debug "Reset step" button: a new key remounts that step with fresh state.
   const [resets, setResets] = useState<Partial<Record<StepId, number>>>({});
   const id = index < STEP_ORDER.length ? STEP_ORDER[index] : null;
+
+  // The browser's own "Leave site?" dialog. Its text cannot be changed: the pre-test intro explains why.
+  const warnOnLeave = warnsBeforeLeaving(index);
+  useEffect(() => {
+    if (!warnOnLeave) return;
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [warnOnLeave]);
 
   function show(to: number) {
     setIndex(to);
