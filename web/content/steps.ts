@@ -4,14 +4,14 @@ import type { BottomId, TopId } from '@/lib/rules';
 import { SENTENCE_A, SENTENCE_B } from '@/content/sentences';
 
 /** Linear steps of the lesson. The lab is one step that holds five unlockable experiments. */
-export type StepId = 'welcome' | 'consent' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest';
+export type StepId = 'welcome' | 'consent' | 'pretest' | 'hook' | 'why' | 'vectors' | 'lab' | 'formula' | 'compute' | 'explain' | 'posttest' | 'reflection';
 export type LabId = 'contrast' | 'qk' | 'remove' | 'rule' | 'softmax';
 /** Anything the logger can stamp an event with. */
 export type MissionId = StepId | LabId;
 
 // The pre-test comes before the hook, so nothing in the lesson has taught its answers yet. Without ?condition=,
 // the condition is assigned at its end by the experimenter, from the score.
-export const STEP_ORDER: StepId[] = ['welcome', 'consent', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest'];
+export const STEP_ORDER: StepId[] = ['welcome', 'consent', 'pretest', 'hook', 'why', 'vectors', 'lab', 'formula', 'compute', 'explain', 'posttest', 'reflection'];
 export const LAB_ORDER: LabId[] = ['contrast', 'qk', 'remove', 'rule', 'softmax'];
 
 export const CHAPTERS: { title: string; steps: StepId[] }[] = [
@@ -19,7 +19,7 @@ export const CHAPTERS: { title: string; steps: StepId[] }[] = [
   { title: 'Warm-up', steps: ['vectors'] },
   { title: 'Lab', steps: ['lab'] },
   { title: 'Formula', steps: ['formula', 'compute', 'explain'] },
-  { title: 'Finish', steps: ['posttest'] },
+  { title: 'Finish', steps: ['posttest', 'reflection'] },
 ];
 
 export const LAB_TITLES: Record<LabId, string> = {

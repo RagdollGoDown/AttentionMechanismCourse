@@ -14,6 +14,7 @@ import { Consent } from '@/components/steps/Consent';
 import { Compute } from '@/components/steps/Compute';
 import { Lab } from '@/components/steps/Lab';
 import { Posttest } from '@/components/steps/Posttest';
+import { Reflection } from '@/components/steps/Reflection';
 import { Pretest } from '@/components/steps/Pretest';
 import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
@@ -33,6 +34,7 @@ const VIEWS: Record<StepId, ComponentType<StepProps>> = {
   compute: Compute,
   explain: Explain,
   posttest: Posttest,
+  reflection: Reflection,
 };
 
 export function Lesson({ initialCondition, debug = false, participantId = null }: {

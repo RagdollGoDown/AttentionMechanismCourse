@@ -39,15 +39,22 @@ export async function sendRecord(record: CollectRecord): Promise<SendResult> {
   }
 }
 
-/** Sends the test, then the session log (only with consent), and logs what happened (in the downloadable log, after the sent copy). */
-export async function sendTestAndSession(logger: Logger, submission: Submission): Promise<SendResult[]> {
+export function surveyRecord(logger: Logger, answers: Record<string, unknown>): CollectRecord {
+  return { kind: 'survey', ...header(logger), data: answers };
+}
+
+/** Sends a record, then the session log (only with consent), and logs what happened (in the downloadable log, after the sent copy). */
+async function sendWithSession(logger: Logger, record: CollectRecord, what: string): Promise<SendResult[]> {
   // Without an explicit yes, nothing leaves the browser. "ok" so the lesson goes on; the JSON download stays available.
   if (logger.getConsent() !== true) {
     const results: SendResult[] = [0, 1].map(() => ({ ok: true, stored: false, store: 'no consent' }));
-    logger.log('data_sent', { test: submission.test, results: 'skipped: no consent' });
+    logger.log('data_sent', { test: what, results: 'skipped: no consent' });
     return results;
   }
-  const results = [await sendRecord(testRecord(logger, submission)), await sendRecord(sessionRecord(logger))];
-  logger.log('data_sent', { test: submission.test, results: results.map(({ ok, stored, store, error }) => ({ ok, stored, store, error })) });
+  const results = [await sendRecord(record), await sendRecord(sessionRecord(logger))];
+  logger.log('data_sent', { test: what, results: results.map(({ ok, stored, store, error }) => ({ ok, stored, store, error })) });
   return results;
 }
+
+export const sendTestAndSession = (logger: Logger, submission: Submission) => sendWithSession(logger, testRecord(logger, submission), submission.test);
+export const sendSurveyAndSession = (logger: Logger, answers: Record<string, unknown>) => sendWithSession(logger, surveyRecord(logger, answers), 'survey');

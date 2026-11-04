@@ -21,7 +21,7 @@ Lesson flow (v2, Sep 30): welcome → pre-test (without `?condition=`, the exper
 from its score) → hook ("model" alone, then in context) → why attention → words as vectors + dot product → **sentence lab** hub on one sentence,
 five experiments that unlock one by one (two contexts: a wrong pick gets one feedback reply,
 query & key, predict a removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
-and V output → explain the formula (AI tutor vs expert answer) → post-test. Tests: `docs/tests.md`.
+and V output → explain the formula (AI tutor vs expert answer) → post-test → reflection survey (open questions). Tests: `docs/tests.md`.
 Reward: Byte, a robot dog in a garden band at the bottom, gets one gift per finished module (completion only,
 never correctness, identical across conditions; hidden during the welcome, consent and pre-test). He says hello once, cheers when a step opens or a gift arrives (effort only), and celebrates the end. Rationale: `tasks/todo.md`.
 Learning goals: LG1 explain Q/K/V, softmax, √d_k · LG2 compute a 3-token example ·
@@ -32,7 +32,7 @@ RQ1 = learning outcomes; RQ2 = process (revision behavior), taken from logs.
 
 ## Key files
 
-- `Course Project Description.pdf`: official milestones and deadlines (M3 Oct 8, M4 Nov 5,
+- `Course Project Description.pdf`: official milestones and deadlines (M3 Oct 8, M4 Nov 5 (see `M4_digital_education.pdf`),
   presentation Dec 15, report Jan 7).
 - `CS_411_Digital_Education___Checkpoint_C2.pdf`: our current design.
 - `lectures/`: course slides. **Read `lectures/RESUME.md` first** and justify design

@@ -305,7 +305,7 @@ export const TEST_TEXT = {
       "Use the calculator if you need it, but please don't look anything up.",
       'It takes about 12 minutes.',
     ],
-    submit: 'Submit and finish',
+    submit: 'Submit',
   },
   question: (n: number, total: number) => `Question ${n} of ${total}`,
   dontKnow: DONT_KNOW,
@@ -326,4 +326,22 @@ export const TEST_TEXT = {
   saveFailed: 'Your answers could not be sent. Please download the log and give the file to the experimenter.',
   download: 'Download the log',
   continue: 'Continue',
+};
+
+/**
+ * The reflection survey, after the post-test: the qualitative measure of the M4 plan (coded with thematic analysis).
+ * Open questions only, optional, identical in both conditions: what helped, where learners got stuck,
+ * how they decided to revise (RQ2), and how Byte felt (motivation or distraction).
+ */
+export const SURVEY = {
+  kicker: 'Finish',
+  title: 'A few questions about the lesson',
+  body: ['There are no right answers. Short answers are fine.', 'It takes about 4 minutes.'],
+  open: [
+    { id: 'helped', text: 'Think of a moment when something clicked. What was it?' },
+    { id: 'stuck', text: 'Was there a moment you got stuck? What did you do then?' },
+    { id: 'revise', text: 'After writing an explanation, you could change it. Did you? What made you decide?' },
+    { id: 'byte', text: 'Anything else about Byte? For example, did he change how you worked through the lesson?' },
+  ],
+  submit: 'Submit and finish',
 };

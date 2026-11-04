@@ -14,9 +14,9 @@ export function canGoBack(index: number): boolean {
 }
 
 /**
- * Should the browser ask before the page is left at `index`? From the pre-test until the post-test is done: progress
- * lives in memory, so a reload restarts the lesson. Still on while the post-test is saving or its save has failed:
- * leaving then would lose the answers. Off on the welcome, consent and end screens.
+ * Should the browser ask before the page is left at `index`? From the pre-test until the reflection survey is sent: progress
+ * lives in memory, so a reload restarts the lesson. Still on while the post-test or the survey is saving or its save has
+ * failed: leaving then would lose the answers. Off on the welcome, consent and end screens.
  */
 export function warnsBeforeLeaving(index: number): boolean {
   return index >= STEP_ORDER.indexOf('pretest') && index < STEP_ORDER.length;

@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-/** What the browser sends to POST /api/collect: one test submission, or a whole session log. */
+/** What the browser sends to POST /api/collect: one test submission, the reflection survey, or a whole session log. */
 export const RecordSchema = z.object({
-  kind: z.enum(['test', 'session']),
+  kind: z.enum(['test', 'survey', 'session']),
   sessionId: z.string().min(1).max(100),
   participantId: z.string().max(40).nullable(),
   /** null on the pre-test, which runs before the condition is assigned. */
   condition: z.enum(['ai', 'control']).nullable(),
   /** `?debug` session: kept, but excluded from the study. */
   debug: z.boolean(),
-  /** The test submission, or the session log as exported (header + events). */
+  /** The test submission, the survey answers, or the session log as exported (header + events). */
   data: z.record(z.string(), z.unknown()),
 });
 
