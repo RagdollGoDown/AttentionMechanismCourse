@@ -3,7 +3,7 @@
 import { useEffect, useState, type ComponentType } from 'react';
 import { useLogger } from '@/components/LoggerProvider';
 import { SavedAnswers } from '@/components/SavedAnswers';
-import { useTrophy } from '@/components/TrophyProvider';
+import { useGifts } from '@/components/GiftProvider';
 import { buttonClass, secondaryButtonClass } from '@/components/ui';
 import type { StepProps } from '@/components/steps/types';
 import { Contrast } from '@/components/lab/Contrast';
@@ -43,7 +43,7 @@ function Lock() {
  */
 export function Lab({ condition, onDone, debug = false, visible = true }: StepProps) {
   const logger = useLogger();
-  const { win } = useTrophy();
+  const { win } = useGifts();
   const [done, setDone] = useState<LabId[]>([]);
   const [active, setActive] = useState<LabId>('contrast');
   const [opened, setOpened] = useState<LabId[]>(['contrast']);

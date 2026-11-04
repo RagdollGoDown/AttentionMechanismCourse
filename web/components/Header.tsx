@@ -1,11 +1,19 @@
 'use client';
 
 import { ConditionToggle } from '@/components/ConditionToggle';
-import { Trophy } from '@/components/Trophy';
-import { useTrophy } from '@/components/TrophyProvider';
+import { useGifts } from '@/components/GiftProvider';
 import { secondaryButtonClass } from '@/components/ui';
 import { CHAPTERS, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
+
+/** A paw print: the gift counter's icon. */
+function Paw() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-5 text-tile" fill="currentColor" aria-hidden>
+      <ellipse cx="12" cy="16" rx="5" ry="4.2" /><circle cx="5.5" cy="10.5" r="2.2" /><circle cx="9.5" cy="6.5" r="2.2" /><circle cx="14.5" cy="6.5" r="2.2" /><circle cx="18.5" cy="10.5" r="2.2" />
+    </svg>
+  );
+}
 
 export function Header({ condition, onConditionChange, step, onOpenLog, debug = false }: {
   condition: Condition;
@@ -15,7 +23,7 @@ export function Header({ condition, onConditionChange, step, onOpenLog, debug = 
   /** The condition switch and log viewer are for the team only: participants must not change condition. */
   debug?: boolean;
 }) {
-  const { pieces, total, latest } = useTrophy();
+  const { gifts, total } = useGifts();
   const current = CHAPTERS.findIndex((c) => c.steps.includes(step));
   return (
     <header className="relative z-10 bg-ink text-white shadow-md sm:sticky sm:top-0">
@@ -40,25 +48,11 @@ export function Header({ condition, onConditionChange, step, onOpenLog, debug = 
         </ol>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="relative flex items-center gap-2">
-            <Trophy won={pieces.length} total={total} className="size-9" />
-            <span className="font-display text-sm font-bold tabular-nums">
-              {pieces.length}/{total}
-              <span className="sr-only"> trophy pieces</span>
-            </span>
-            {latest && (
-              <div
-                key={latest.id}
-                role="status"
-                className="piece-toast pointer-events-none fixed inset-x-0 top-[18vh] z-40 mx-auto flex w-[min(22rem,90vw)] flex-col items-center gap-2 rounded-3xl border-4 border-xp bg-card px-6 py-5 text-center text-ink shadow-2xl"
-              >
-                <Trophy won={pieces.length} total={total} className="size-24" tone="light" />
-                <p className="font-display text-2xl font-bold">Trophy piece won!</p>
-                <p className="text-lg font-semibold">{latest.title}</p>
-                <p className="rounded-full bg-xp/25 px-3 py-0.5 text-sm font-bold tabular-nums">{pieces.length} of {total} pieces</p>
-              </div>
-            )}
-          </div>
+          <p className="flex items-center gap-1.5 font-display text-sm font-bold tabular-nums" title="Gifts for Byte">
+            <Paw />
+            {gifts.length}/{total}
+            <span className="sr-only"> gifts for Byte</span>
+          </p>
 
           {debug && <details className="relative">
             <summary className="cursor-pointer list-none rounded-md px-2 py-1 text-xs text-white/70 hover:bg-white/10">Demo</summary>

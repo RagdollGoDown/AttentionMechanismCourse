@@ -100,9 +100,8 @@ export async function tryLlm(req: FeedbackRequest, llm: LlmFn, timeoutMs = 10_00
   if (req.mode === 'formative' && !fb.question?.trim()) throw new Error('formative reply without a question');
   // A closing reply ends the task: a question there could not be acted on, so it is dropped.
   const out = req.mode === 'closing' ? { ...fb, question: null } : fb;
-  if (!mission.formulaTaught && [out.correct, out.missing, out.question ?? ''].some((s) => FORMULA.test(s))) {
-    throw new Error('LLM reply mentions the formula');
-  }
+  const leak = mission.formulaTaught ? undefined : [out.correct, out.missing, out.question ?? ''].find((s) => FORMULA.test(s));
+  if (leak) throw new Error(`LLM reply mentions the formula ("${leak.match(FORMULA)![0]}" in: ${leak})`);
   return out;
 }
 

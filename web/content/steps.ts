@@ -30,17 +30,23 @@ export const LAB_TITLES: Record<LabId, string> = {
   softmax: 'Meet softmax',
 };
 
-/** One trophy piece per finished module. Completion only, so it is identical in both conditions. */
-export const TROPHY_PIECES: { id: MissionId; title: string }[] = [
-  { id: 'vectors', title: 'Words as vectors' },
-  { id: 'contrast', title: 'Two contexts' },
-  { id: 'qk', title: 'Query and key' },
-  { id: 'remove', title: 'Remove a word' },
-  { id: 'rule', title: 'Invent the rule' },
-  { id: 'softmax', title: 'Meet softmax' },
-  { id: 'formula', title: 'The formula' },
-  { id: 'compute', title: 'Compute it yourself' },
-  { id: 'explain', title: 'Your explanation' },
+/** What Byte (the robot dog in the garden band) can be given. The food bowl is there from the start. */
+export type PetItem = 'bowl' | 'tent' | 'ball' | 'tree' | 'cushion' | 'flowers' | 'frisbee' | 'lamp' | 'bench' | 'balloons';
+
+/**
+ * One gift for Byte per finished module, in lesson order. Completion only, never correctness, so it is
+ * identical in both conditions. `fact` is what the module taught: the gift note says it back (informational reward).
+ */
+export const GIFTS: { id: MissionId; title: string; item: PetItem; name: string; fact: string }[] = [
+  { id: 'vectors', title: 'Words as vectors', item: 'tent', name: 'a tent', fact: 'A word is a vector, and the dot product says how well two words match.' },
+  { id: 'contrast', title: 'Two contexts', item: 'ball', name: 'a tennis ball', fact: 'Same word, different context, different bars.' },
+  { id: 'qk', title: 'Query and key', item: 'tree', name: 'a tall apple tree to climb', fact: '"model" asks with its query, and every word answers with its key.' },
+  { id: 'remove', title: 'Remove a word', item: 'cushion', name: 'a dog bed', fact: 'Weights always share 100 %. When a word leaves, the others take its share.' },
+  { id: 'rule', title: 'Invent the rule', item: 'flowers', name: 'tulips', fact: 'A good rule keeps every weight positive and makes them add up to 100 %.' },
+  { id: 'softmax', title: 'Meet softmax', item: 'frisbee', name: 'a frisbee', fact: 'softmax raises e to each score, then divides by the sum.' },
+  { id: 'formula', title: 'The formula', item: 'lamp', name: 'a lamp post', fact: 'softmax(QKᵀ/√dₖ)·V: every part has a job.' },
+  { id: 'compute', title: 'Compute it yourself', item: 'bench', name: 'a garden bench', fact: 'You computed attention by hand, number by number.' },
+  { id: 'explain', title: 'Your explanation', item: 'balloons', name: 'party balloons', fact: 'You explained attention in your own words.' },
 ];
 
 /** What learners can do at the end (LG1–LG3), shown on the "Why" screen. */
@@ -98,9 +104,26 @@ export const WHY = {
     'Attention runs inside GPT, Claude, Gemini and most translation tools.',
     'For every word, it decides which other words to listen to.',
     'You will build it yourself, piece by piece.',
-    'Each module you finish wins a piece of the trophy.',
+    'Meet Byte, the robot dog at the bottom of the page. Each module you finish brings him a gift.',
   ],
   cta: "Let's go",
+};
+
+/** Byte's closable hello, the first time the garden shows in a session (same in both conditions). */
+export const GARDEN_INTRO = {
+  title: 'Hi, I’m Byte!',
+  body: 'My garden is still a bit empty. Each step you finish brings me a gift, so together we can make it a nicer place.',
+  close: 'Got it',
+};
+
+/**
+ * What Byte says to cheer the learner on: when a step opens and when a gift arrives. Effort and progress
+ * only, never about being right, so it is the same whatever the learner answered and in both conditions.
+ */
+export const BYTE_LINES = {
+  hype: ['You’ve got this!', 'Nice work!', 'Keep going!', 'Great focus!', 'You’re on a roll!', 'Look at you go!', 'One step closer!', 'Brain power!'],
+  test: 'Last stretch. You can do it!',
+  end: 'We did it! Thank you!',
 };
 
 export const VECTORS_TEXT = {
@@ -327,7 +350,8 @@ export const EXPLAIN_TEXT = {
 
 export const END_TEXT = {
   title: 'Congratulations! You finished the lecture.',
-  body: 'You built attention from scratch: queries and keys, softmax, scaling and values. The trophy is yours.',
+  body: 'You built attention from scratch: queries and keys, softmax, scaling and values. Byte\'s garden is complete.',
+  garden: (n: number, total: number) => `Byte\'s garden: ${n} of ${total} gifts`,
   goalsTitle: 'You can now:',
   download: 'Download session log',
   restart: 'Start again',

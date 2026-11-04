@@ -49,9 +49,10 @@ session_id text, participant_id text, condition text, debug boolean, received_at
 A new backend is one function in `lib/collect/store.ts`.
 
 ## Where things live
-- `content/steps.ts`: lesson flow, chapters, all learner-facing text, XP and badges
+- `content/steps.ts`: lesson flow, chapters, all learner-facing text, Byte's gifts (`GIFTS`)
 - `content/tests.ts`: pre-/post-test items, answer keys and rubrics; `lib/assessment.ts` scores them
 - `content/missions.ts`: the three explain tasks (contrast, remove, formula): rubrics, misconceptions, expert answers
 - `lib/`: attention math, rule bricks (step 9), tiles, logger, tutor; `lib/nav.ts` says which steps have a Back button
 - `components/steps/`: one view per linear step; `Lab.tsx` is the hub with six unlockable experiments in `components/lab/`
-- `components/GameProvider.tsx`: XP (pays for effort, not correctness, identical in both conditions) and badges
+- `components/GiftProvider.tsx`: one gift for Byte per finished module (completion only, identical in both conditions)
+- `components/garden/`: Byte's garden band (`Garden.tsx`) and its three.js world (`world.ts`), loaded lazily
