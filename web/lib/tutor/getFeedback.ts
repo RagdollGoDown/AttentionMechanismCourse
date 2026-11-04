@@ -77,6 +77,13 @@ export function sanitize(fb: Feedback, m: ExplainTask): Feedback {
   };
 }
 
+/**
+ * "key" in its everyday sense ("the key constraint") is not the attention key, but the guard below cannot
+ * tell them apart, and models write it often. Before the formula step it becomes "main".
+ */
+const EVERYDAY_KEY = /\bkey(?= (?:constraints?|ideas?|points?|differences?|insights?|steps?|parts?|factors?|things?|rules?|observations?|details?|reasons?|takeaways?|issues?)\b)/gi;
+export const plainKey = (s: string) => s.replace(EVERYDAY_KEY, (k) => (k[0] === 'K' ? 'Main' : 'main'));
+
 /** Formula vocabulary withheld until the formula step (the tutor never gives the formula away). */
 export const FORMULA = /softmax|exponent|\bexp\b|dot product|\bquer(y|ies)\b|\bkeys?\b|\bvalue vectors?\b|√|sqrt|square root|\bd_?k\b|dₖ/i;
 
@@ -99,7 +106,8 @@ export async function tryLlm(req: FeedbackRequest, llm: LlmFn, timeoutMs = 10_00
   const fb = sanitize(FeedbackSchema.parse(raw), mission);
   if (req.mode === 'formative' && !fb.question?.trim()) throw new Error('formative reply without a question');
   // A closing reply ends the task: a question there could not be acted on, so it is dropped.
-  const out = req.mode === 'closing' ? { ...fb, question: null } : fb;
+  let out = req.mode === 'closing' ? { ...fb, question: null } : fb;
+  if (!mission.formulaTaught) out = { ...out, correct: plainKey(out.correct), missing: plainKey(out.missing), question: out.question && plainKey(out.question) };
   const leak = mission.formulaTaught ? undefined : [out.correct, out.missing, out.question ?? ''].find((s) => FORMULA.test(s));
   if (leak) throw new Error(`LLM reply mentions the formula ("${leak.match(FORMULA)![0]}" in: ${leak})`);
   return out;
