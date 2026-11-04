@@ -3,6 +3,7 @@ import type { MissionId } from '@/content/steps';
 
 export type EventType =
   | 'session_start'
+  | 'consent_answer'
   | 'mission_start'
   | 'mission_end'
   | 'skip'
@@ -93,6 +94,9 @@ export interface Logger {
   setMission(id: MissionId | null): void;
   setCondition(condition: Condition): void;
   getCondition(): Condition | null;
+  /** null until the learner has answered the consent page. Only an explicit true lets data leave the browser. */
+  setConsent(agreed: boolean): void;
+  getConsent(): boolean | null;
   getEvents(): readonly LogEvent[];
   subscribe(listener: () => void): () => void;
   toJSON(): string;
@@ -118,6 +122,7 @@ export function createLogger(opts: {
   const listeners = new Set<() => void>();
   let condition = opts.condition;
   let missionId: MissionId | null = null;
+  let consent: boolean | null = null;
   let events: LogEvent[] = [];
 
   const logger: Logger = {
@@ -149,6 +154,11 @@ export function createLogger(opts: {
       logger.log('condition_change', { from, to: next });
     },
     getCondition: () => condition,
+    setConsent(agreed) {
+      consent = agreed;
+      logger.log('consent_answer', { agreed });
+    },
+    getConsent: () => consent,
     getEvents: () => events,
     subscribe(listener) {
       listeners.add(listener);
@@ -161,6 +171,7 @@ export function createLogger(opts: {
       participantId,
       condition,
       debug,
+      consent,
       startedAt,
       exportedAt: new Date(wallNow()).toISOString(),
       totalMs: events.at(-1)?.t ?? 0,
