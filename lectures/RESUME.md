@@ -35,6 +35,7 @@ attention-mechanism lesson. Update it when a new chapter is added.
     put labels on the visual itself, not in a separate legend).
   - *Germane*: effort spent building schemas → **encourage** it.
 - Overload means no processing, and so no learning. No effort also means no learning.
+- Three design rules: **reduce extraneous load, manage intrinsic load, create productive effort.**
 
 ## Ch. 3: Learning through Exploration (Sep 22)
 
@@ -67,7 +68,8 @@ attention-mechanism lesson. Update it when a new chapter is added.
   - **Feedback** (Hattie & Timperley, 2007): show the gap between the answer and the target
     and point to what to change. REFINE is a GenAI example.
 - Frame-based e-learning: decompose into small steps, keep the learner active, give
-  immediate feedback, let learners progress at their own pace.
+  immediate feedback, let learners progress at their own pace. Adaptive testing picks the next
+  item from the learner's answers.
 - **Prerequisites & mastery learning:** Skill1 is a prerequisite of Skill2 if
   p(S2 | ¬S1) ≪ p(S2 | S1). Remediate missing prerequisites. Tests: prerequisite, pre-,
   intermediate and post-test.
@@ -94,8 +96,76 @@ attention-mechanism lesson. Update it when a new chapter is added.
   - *Structuring*: manage complexity, focus attention, organize the task.
   - *Problematizing*: make learners articulate their thinking, notice gaps, reconsider their reasoning.
 - **Teaching** improves the teacher's own knowledge (retrieve, organize, explain).
+- **Learning analytics:** collect, analyze and report data about learners to understand and improve
+  learning (observe → model → intervene), e.g. student-facing dashboards.
 - Design question: what should the AI **generate, analyze, adapt or interact** with?
   **Does it support the learner's productive effort, or replace it?**
+
+## Ch. 6: The social in learning (Oct, R. Tormey)
+
+- **Cognitive functions of the social:**
+  - *Peers as proximal models:* peer tutoring works for both sides (Hattie: d = 0.55; tutored 0.63,
+    tutor 0.58). Experts suffer from the **curse of knowledge** (they see connections novices do not);
+    a peer explains from closer to the learner. Teaching is a *constructive* activity (ICAP).
+    Interactive teaching beats lecturing (Freeman et al., 2014).
+  - *Peers as extended cognition:* on a **complex** problem, groups learn more than individuals
+    (76 % vs 57 % on the same individual exam); on a **simple** problem, social negotiation only adds load
+    (66 % vs 69 %) (Kirschner, Paas, Kirschner & Janssen, 2011).
+  - *Group composition* matters: diverse groups discuss more and decide better (Sommers, 2006).
+- **Emotional functions:** Pekrun's academic emotions: topic (interest, boredom), achievement (hope,
+  anxiety, pride, shame), epistemic (curiosity, frustration, joy) and social emotions. Emotions are
+  "an engine and a social GPS". Three social-emotional dimensions of learning:
+  **safety** (try, fail, get feedback, try again), **warmth** (the other cares about my well-being),
+  **mutual respect** (attention to the more knowledgeable other, self-efficacy).
+- **Unequal costs:** unconscious bias, **stereotype threat** (Spencer, Steele & Quinn, 1999), biased
+  competence judgments in feedback (same CV rated lower as "Jennifer" than "John", Moss-Racusin et al., 2012),
+  unequal confidence in student teams (Aeby et al., 2019). Feedback shapes self-efficacy.
+
+## Ch. 7: Designing experiments (Oct 27)
+
+- Four questions: **does it work? which works better? why? for whom and when?**
+- **Measuring learning:** pre-test, post-test, delayed post-test.
+  Learning gain = post − pre; **normalized gain** = (post − pre) / (max − pre);
+  retention = (delayed − pre) / (post − pre). Caveats: learning must be measurable, and watch for
+  **floor** and **ceiling effects**.
+- **Design vocabulary:** independent variable (factor, levels), dependent variables, controlled variables,
+  between-subjects (1 factor, or 2×2) vs within-subjects (counterbalanced order: fewer participants,
+  but order and carry-over effects). Example: PharmaSim, instruction before vs after problem solving,
+  with one hypothesis per post-test.
+- **Comparable groups:** balance before assignment (distribute prior knowledge, etc. across conditions),
+  then check after that the groups do not differ; if they do, use a **covariate analysis**.
+- **Confounding variable:** a third factor that influences both the condition and the outcome.
+  **Interaction effect:** the intervention works differently for different learners (e.g. by prior knowledge).
+  **Mediator:** the variable through which the condition causes the outcome (explains *why*).
+- **Measuring processes:** active experimentation → interaction logs; **self-explanation → written
+  explanations, explanations in AI-tutor interactions; help-seeking → AI-tutor logs**; collaboration →
+  dialogue; attention → eye tracking; cognitive load → questionnaires, think-aloud.
+- **Construct validity:** an item should be hard to get right without the skill and hard to get wrong
+  with it. MCQ pitfalls: easy-to-eliminate distractors, "always/never" options are usually wrong, the
+  longest option is usually right, guessing the author's intent, chance. Many MCQs only test low
+  **Bloom** levels.
+- **Open questions** have a **grader effect** (and halo and contrast effects, drift to the central grade).
+  Mitigation: **horizontal grading** (one item across all copies), **anonymous** copies,
+  **random order**. Automatic essay grading is an option.
+- **Stress-test the design:** is the comparison condition appropriate? Could anything other than the
+  intervention explain a difference (confounds)? Does the assessment capture the intended outcomes?
+
+## Ch. 8: Qualitative research in education (Nov, R. Tormey)
+
+- Two research traditions: **objectivism + positivism** (reality exists independently, measure it,
+  test hypotheses, find laws: mostly quantitative) vs **constructionism + interpretivism** (meanings are
+  built by people in interaction; understand what an action means to the actor, *Verstehen*; the
+  researcher is the instrument, so checks must be made explicit).
+- Hammersley's **preferences** of qualitative research: words and images over numbers, naturally
+  occurring data, meanings over behaviour, inductive (hypothesis-generating) rather than hypothesis-testing.
+- Three data-collection designs: **ethnography** (participant observation in the field, field notes),
+  **in-depth interviews** (experiences, *thick descriptions*: experiential data, not opinions;
+  semi-structured schedules, Bearman 2019), **recorded interactions**.
+- **Reflexive thematic analysis** (Braun & Clarke, 2006/2019): (1) familiarize with the data,
+  (2) generate initial codes (semantic vs latent content), (3) search for themes, (4) review themes
+  (internal homogeneity, external heterogeneity), (5) define and name themes, (6) write up.
+  Levels: notes → codes → themes/concepts → theory, with analytical memos throughout.
+  The researcher's subjectivity is a resource, made explicit.
 
 ## Takeaways for our project
 
@@ -112,6 +182,11 @@ attention-mechanism lesson. Update it when a new chapter is added.
 | Cognitive load | Labels on the visualization (split attention), short sentences (intrinsic load) |
 | Prerequisites / pre-test | Pre-test for dot product, softmax, embeddings; balance groups |
 | Backward design | Post-test items per LG (LG1 explain, LG2 compute, LG3 predict) |
+| Rewards & shaping (Ch. 4), safety and warmth (Ch. 6) | Byte's garden: one gift per finished module, cheers on effort only, never on correctness; the tutor names what is right first. Same in both conditions |
+| Experimental design (Ch. 7) | IV: feedback (adaptive AI tutor vs fixed expert answer), between subjects. DV: post-test score and gain per LG. Controls: identical lesson, rewards, tests and timing; pre-test-balanced assignment. Covariate: pre-test. Possible interaction: prior exposure × condition. Mediator (RQ2): revisions and explanation quality |
+| Measuring processes (Ch. 7) | Logs: playground actions, predictions, explanations, tutor replies, revisions, time per phase |
+| Grader effect (Ch. 7) | **To plan:** open post-test items scored with a rubric, blind to the condition, item by item, in random order |
+| Qualitative analysis (Ch. 8) | Reflection survey after the post-test: four open questions (what clicked, where stuck, why revise, Byte), coded with reflexive thematic analysis |
 
 Design checks:
 - The AI must **support the learning mechanism** (self-explanation, then repair), not
@@ -120,3 +195,5 @@ Design checks:
 - Log process data (playground actions, predictions, explanations, feedback, revisions,
   time per phase) to answer RQ2.
 - Measure actual learning (post-test), not just perceived learning.
+- Check the pre-test for floor effects and the post-test for ceiling effects.
+- Report time on task per condition: the AI condition reads more text and waits for replies (possible confound).
