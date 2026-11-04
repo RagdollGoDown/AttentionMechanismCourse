@@ -3,7 +3,7 @@ import { CONTRAST_TASK, EXPLAIN_TASKS, TUTOR_MISSIONS } from '@/content/missions
 import { FeedbackRequestSchema, FeedbackSchema, type FeedbackRequest } from '@/lib/tutor/schema';
 import { mockFeedback } from '@/lib/tutor/mock';
 import { buildUserPrompt, systemPrompt } from '@/lib/tutor/prompt';
-import { FORMULA, getFeedback, parseModel, tutorModels, tutorsFromEnv, type LlmFn } from '@/lib/tutor/getFeedback';
+import { FORMULA, getFeedback, plainKey, parseModel, tutorModels, tutorsFromEnv, type LlmFn } from '@/lib/tutor/getFeedback';
 
 /** One test tutor. */
 const one = (llm: LlmFn) => [{ model: 'test', llm }];
@@ -346,5 +346,17 @@ describe('tutor chain (primary → backup → mock)', () => {
     const fail = async () => { throw new Error('down'); };
     const r = await getFeedback(req(), [{ model: 'a', llm: fail }, { model: 'b', llm: fail }]);
     expect(r).toMatchObject({ source: 'mock', model: null });
+  });
+});
+
+describe('everyday "key" before the formula step', () => {
+  it('becomes "main", so the formula guard does not reject a harmless reply', () => {
+    expect(plainKey('which is the key constraint here.')).toBe('which is the main constraint here.');
+    expect(plainKey('Key idea: weights share 100 %.')).toBe('Main idea: weights share 100 %.');
+    expect(FORMULA.test(plainKey('which is the key constraint here.'))).toBe(false);
+  });
+  it('leaves the attention sense alone, so the guard still catches it', () => {
+    expect(FORMULA.test(plainKey('every word answers with its key.'))).toBe(true);
+    expect(FORMULA.test(plainKey('the key of "fashion" matches the query.'))).toBe(true);
   });
 });

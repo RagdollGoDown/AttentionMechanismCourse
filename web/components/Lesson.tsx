@@ -68,8 +68,8 @@ function MissionTracker({ id }: { id: StepId | null }) {
   return null;
 }
 
-/** Steps without the garden: the welcome screen and the pre-test (it comes back for the post-test, to celebrate the end). */
-const NO_GARDEN: StepId[] = ['welcome', 'pretest'];
+/** Steps without the garden: the welcome, consent and pre-test screens (it comes back for the post-test, to celebrate the end). */
+const NO_GARDEN: StepId[] = ['welcome', 'consent', 'pretest'];
 
 function LessonInner({ initialCondition, debug }: { initialCondition: Condition | null; debug: boolean }) {
   const logger = useLogger();

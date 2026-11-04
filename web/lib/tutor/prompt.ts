@@ -35,7 +35,7 @@ const CLOSING = `This is your LAST reply: the learner moves on after it, so leav
 - "missing": the ONE most important remaining idea (or the correction), stated plainly. Only that idea. If nothing is missing, what could be more precise.
 - "question": null.`;
 
-const NO_FORMULA = `The formula is not taught yet: never write a formula or an equation. Never use these words: softmax, exponential, exp, dot product, query, key, value, square root, √, d_k.`;
+const NO_FORMULA = `The formula is not taught yet: never write a formula or an equation. Never use these words, not even in their everyday sense: softmax, exponential, exp, dot product, query, key (say "main" instead), value, square root, √, d_k.`;
 
 const FORMULA_SEEN = `The learner has seen the formula softmax(QKᵀ/√d_k)·V and filled one box per part (Q, Kᵀ, √d_k, softmax, V). Name the parts freely; judge each box for its own part only.
 On the board, clicking a part highlights it, a slider changes √d_k, and the map shows the output of "model".`;
