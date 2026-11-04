@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GET, POST } from '@/app/api/collect/route';
+import { GET, POST } from '@/app/api/records/route';
+import { RECORDS_URL } from '@/lib/collect/send';
 import { storeFromEnv, type StoredRecord } from '@/lib/collect/store';
 
 const record = { kind: 'test', sessionId: 's1', participantId: 'P07', condition: null, debug: false, data: { test: 'pre' } };
 const call = (body: unknown) =>
-  POST(new Request('http://localhost/api/collect', {
+  POST(new Request('http://localhost/api/records', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: typeof body === 'string' ? body : JSON.stringify(body),
@@ -21,7 +22,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('POST /api/collect', () => {
+describe('POST /api/records', () => {
   it('accepts a record without a store, and says it was not kept', async () => {
     const res = await call(record);
     expect(res.status).toBe(200);
@@ -68,7 +69,7 @@ describe('POST /api/collect', () => {
   });
 });
 
-describe('GET /api/collect (store status)', () => {
+describe('GET /api/records (store status)', () => {
   it('reports no store by default', async () => {
     expect(await (await GET()).json()).toEqual({ store: 'none', ready: false });
   });
@@ -100,5 +101,12 @@ describe('storeFromEnv', () => {
     const store = storeFromEnv({ COLLECT_STORE: 'mongo' });
     expect(store.ready).toBe(false);
     await expect(store.save(stored)).rejects.toThrow();
+  });
+});
+
+describe('records endpoint', () => {
+  it('has a path ad blockers leave alone (uBlock Origin blocked /api/collect)', () => {
+    expect(RECORDS_URL).toBe('/api/records');
+    expect(RECORDS_URL).not.toMatch(/collect|track|analytic|beacon|pixel|telemetry|stats|log/i);
   });
 });

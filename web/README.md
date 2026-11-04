@@ -33,7 +33,7 @@ prompt and checks for each model; the report lands in `eval/report-<date>.md`.
 
 ## Pre-/post-test and data collection
 Spec: `../docs/tests.md`. The pre-test is step 2 (before the hook); the post-test is the last step.
-Answers and session logs go to `POST /api/collect`, which hands them to the store set in `.env.local`:
+Answers and session logs go to `POST /api/records`, which hands them to the store set in `.env.local`:
 
     COLLECT_STORE=none                       # default: nothing is kept (debug bar shows it in red)
     COLLECT_STORE=webhook                    # any URL that accepts a JSON POST

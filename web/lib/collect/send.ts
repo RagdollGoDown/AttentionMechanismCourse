@@ -2,6 +2,9 @@ import type { Submission } from '@/lib/assessment';
 import type { CollectRecord } from '@/lib/collect/schema';
 import type { Logger } from '@/lib/log';
 
+/** Not /api/collect: ad blockers (uBlock Origin, EasyPrivacy) block that path as analytics, and nothing would be saved. */
+export const RECORDS_URL = '/api/records';
+
 export interface SendResult {
   /** The server accepted the record (and the store, if any, saved it). */
   ok: boolean;
@@ -27,7 +30,7 @@ export function sessionRecord(logger: Logger): CollectRecord {
 /** Never throws: a failed send must not stop the lesson. The JSON download stays the fallback. */
 export async function sendRecord(record: CollectRecord): Promise<SendResult> {
   try {
-    const res = await fetch('/api/collect', {
+    const res = await fetch(RECORDS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(record),

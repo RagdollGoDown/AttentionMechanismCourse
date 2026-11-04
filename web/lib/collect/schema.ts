@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** What the browser sends to POST /api/collect: one test submission, the reflection survey, or a whole session log. */
+/** What the browser sends to POST /api/records: one test submission, the reflection survey, or a whole session log. */
 export const RecordSchema = z.object({
   kind: z.enum(['test', 'survey', 'session']),
   sessionId: z.string().min(1).max(100),

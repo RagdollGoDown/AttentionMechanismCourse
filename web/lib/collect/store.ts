@@ -3,7 +3,7 @@ import type { CollectRecord } from '@/lib/collect/schema';
 export type StoredRecord = CollectRecord & { receivedAt: string };
 
 /**
- * Where records go after /api/collect accepts them. Picked by COLLECT_STORE, so changing the
+ * Where records go after /api/records accepts them. Picked by COLLECT_STORE, so changing the
  * backend touches this file and the env only. Keys stay on the server.
  */
 export interface Store {

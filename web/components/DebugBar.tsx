@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useGifts } from '@/components/GiftProvider';
 import { useLogger } from '@/components/LoggerProvider';
+import { RECORDS_URL } from '@/lib/collect/send';
 import { secondaryButtonClass } from '@/components/ui';
 import { GIFTS, STEP_ORDER } from '@/content/steps';
 
@@ -109,11 +110,11 @@ function TutorStatus() {
   );
 }
 
-/** Where test answers and session logs go (POST /api/collect). Red: they are only in the browser. */
+/** Where test answers and session logs go (POST /api/records). Red: they are only in the browser. */
 function StoreStatus() {
   const [status, setStatus] = useState<{ store: string; ready: boolean } | 'loading' | 'error'>('loading');
   useEffect(() => {
-    fetch('/api/collect', { cache: 'no-store' })
+    fetch(RECORDS_URL, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then(setStatus, () => setStatus('error'));
   }, []);
