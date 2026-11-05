@@ -27,6 +27,7 @@ export function GiftReveal({ gift, webgl, onDone }: {
   const button = useRef<HTMLButtonElement>(null);
   const started = useRef(0);
   const finished = useRef(false);
+  const offered = useRef(false);   // once per window, even when React runs the effect twice in development
 
   const finish = (via: 'button' | 'close') => {
     if (finished.current) return;
@@ -38,7 +39,7 @@ export function GiftReveal({ gift, webgl, onDone }: {
   useEffect(() => {
     started.current = performance.now();
     const before = document.activeElement as HTMLElement | null;
-    logger.log('gift_offered', { item: gift.item });
+    if (!offered.current) { offered.current = true; logger.log('gift_offered', { item: gift.item }); }
     button.current?.focus();
     let cancelled = false;
     if (webgl && canvas.current) {

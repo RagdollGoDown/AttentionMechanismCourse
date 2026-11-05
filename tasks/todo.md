@@ -1,3 +1,18 @@
+# Byte's gifts: reveal, mood, use moments (Nov 5, branch feat/byte-gifts)
+
+Goal: a gift makes the learner want the next one, without disturbing learning. Design:
+`docs/superpowers/specs/2026-11-05-byte-gifts-design.md`, plan: `docs/superpowers/plans/2026-11-05-byte-gifts.md`.
+Grounding: a closed box keeps curiosity open (Kao et al. 2024, no hint of what is inside); the mood bar is endowed
+progress toward 100 % (Nunes & Drèze 2006), only up, completion only (Deci et al. 1999); the moment happens in a window
+between modules, so reading and answering stay calm (Rey 2012, seductive details); a companion that uses what the
+learner earned turns the reward into a small story (Sailer & Homner 2020, game fiction; Chan's My-Pet).
+
+- [x] Gift window "Open the new gift for Byte": unwrap, name + badge + module fact; Escape opens without animation.
+- [x] Mood gauge (face, bar, word, badges): Bored → Okay → Happy → Joyful → Overjoyed (9/9).
+- [x] Gifts ~1.8× bigger and more detailed (tree unchanged: already canvas height).
+- [x] A use moment per gift (tent, ball, tree + apple, bed, tulips + butterfly, frisbee catch, lamp on, bench, balloons).
+- [x] No window when the garden is hidden or on a phone; reduced motion: no animation. Logged: `gift_offered`, `gift_opened`.
+
 # Rewards: Byte's garden (Nov 3, branch feat/rewards)
 
 Replaces the trophy. Grounding: Sailer & Homner 2020 (game fiction), Chan's My-Pet (companion → effort),
