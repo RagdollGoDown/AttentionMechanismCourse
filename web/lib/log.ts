@@ -46,6 +46,10 @@ export type EventType =
   | 'data_sent'
   | 'nav_back'
   | 'lab_redo'
+  // Study integrity: pasted text (field and length, never the text) and leaving or coming back to the tab.
+  | 'text_paste'
+  | 'tab_hidden'
+  | 'tab_visible'
   // Developer tools (?debug) only; filter these out of study data.
   | 'debug_goto'
   | 'debug_reset'

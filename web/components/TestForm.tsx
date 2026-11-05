@@ -82,6 +82,7 @@ function NumberFields({ item, a, change, onBlur }: { item: NumberItem; a: Answer
           <label key={f.label} className="flex items-center gap-2">
             <span className="text-sm font-semibold">{f.label}</span>
             <input
+              name={item.id}
               inputMode="decimal"
               autoComplete="off"
               placeholder={T.numberPlaceholder}
@@ -151,6 +152,7 @@ function ComputeFields({ item, a, change, onBlur }: { item: ComputeItem; a: Answ
 function Text({ item, a, change, onBlur }: { item: TextItem; a: Answer; change: Change; onBlur: () => void }) {
   return (
     <textarea
+      name={item.id}
       aria-label={item.prompt}
       rows={4}
       maxLength={800}
