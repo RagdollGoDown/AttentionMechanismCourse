@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { GiftProvider, useGifts } from '@/components/GiftProvider';
 import { Garden } from '@/components/garden/Garden';
 import { DebugBar } from '@/components/DebugBar';
@@ -20,6 +20,7 @@ import type { StepProps } from '@/components/steps/types';
 import { Vectors } from '@/components/steps/Vectors';
 import { STEP_ORDER, type StepId } from '@/content/steps';
 import type { Condition } from '@/lib/condition';
+import { pastedField } from '@/lib/integrity';
 import { canGoBack, warnsBeforeLeaving } from '@/lib/nav';
 
 const VIEWS: Record<StepId, ComponentType<StepProps>> = {
@@ -93,6 +94,23 @@ function LessonInner({ initialCondition, debug }: { initialCondition: Condition 
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
   }, [warnOnLeave]);
+
+  // Unsupervised sessions: log pastes into text fields (field and length, never the text) and leaving the tab.
+  const step = useRef<StepId | 'end'>('welcome');
+  useEffect(() => { step.current = id ?? 'end'; }, [id]);
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const field = pastedField(e.target);
+      if (field) logger.log('text_paste', { step: step.current, field, chars: e.clipboardData?.getData('text').length ?? 0 });
+    };
+    const onVisibility = () => logger.log(document.hidden ? 'tab_hidden' : 'tab_visible', { step: step.current });
+    document.addEventListener('paste', onPaste);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('paste', onPaste);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [logger]);
 
   function show(to: number) {
     setIndex(to);

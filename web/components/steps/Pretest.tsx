@@ -66,7 +66,9 @@ export function Pretest({ onDone, assigned = true, onAssign }: StepProps) {
       <h1 className="font-display text-4xl font-extrabold tracking-tight">{T.doneTitle}</h1>
       <p className="text-lg text-muted">{assigned ? T.doneBody : T.waitBody}</p>
       {assigned && <button type="button" className={`${buttonClass} px-8 py-3 text-base`} onClick={onDone}>{T.continue}</button>}
-      {submission && (
+      {/* Remote participants arrive with a condition in the link and do not need the panel; it stays for
+          ?debug, for assigning the condition, and when saving failed (resend / download). */}
+      {submission && (logger.debug || !assigned || saveFailed(sent)) && (
         <Experimenter
           submission={submission}
           sent={sent}
@@ -79,6 +81,10 @@ export function Pretest({ onDone, assigned = true, onAssign }: StepProps) {
       )}
     </div>
   );
+}
+
+function saveFailed(sent: SendResult[] | 'sending' | null) {
+  return Array.isArray(sent) && !sent.every((r) => r.stored);
 }
 
 /** Collapsed by default: the learner does not need their score; the experimenter needs it to assign the condition. */

@@ -58,7 +58,9 @@ within each stratum in arrival order, and check after ~10 participants that the 
 
 Each submit sends two records to `POST /api/records`: `test` (answers, per-item score, first/last touch time,
 scores per goal, pending rubric points) and `session` (the full event log, as in the download). Events:
-`test_answer`, `test_submit`, `calc_use`, `data_sent`. The pre-test sends the session log so far; the post-test sends the complete one (same `sessionId`).
+`test_answer`, `test_submit`, `calc_use`, `data_sent`. Over the whole lesson, `text_paste` (step, field, number of
+characters, never the text) and `tab_hidden` / `tab_visible` (step) show pastes and time spent away from the page, since
+sessions are not supervised. The pre-test sends the session log so far; the post-test sends the complete one (same `sessionId`).
 
 The server passes records to the store chosen by `COLLECT_STORE` (see `web/README.md`): `none` (default, nothing
 is kept), `webhook` (any URL that accepts JSON) or `supabase` (REST insert, no SDK). The debug bar shows the
@@ -68,5 +70,5 @@ store in red when nothing is kept. If a send fails, the page offers the JSON dow
 
 - Rubric scoring of the open items: who scores, and blind to the condition (M3 placeholder).
 - The pre-test shows the role wording of Q/K/V before the lesson (mild priming, the same in both groups).
-- Lesson + tests + survey now take ~55 min. The post-test can be cut by dropping post-qkv-explain if needed.
+- Lesson + tests + survey now take ~50 min (the welcome and consent pages say so). The post-test can be cut by dropping post-qkv-explain if needed.
 - `/api/records` has no authentication: fine for a supervised study, but anyone with the URL can post records.

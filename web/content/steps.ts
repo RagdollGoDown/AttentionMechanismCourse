@@ -61,7 +61,7 @@ export const WELCOME = {
   body: [
     'Take the word "model". A person on a runway? A program that writes text?',
     'Language models solve this with a trick called attention.',
-    'You will play with one sentence, place bets and watch attention work. It takes about 30 minutes.',
+    'You will play with one sentence, place bets and watch attention work. With two short tests and a few questions at the end, it takes about 50 minutes.',
   ],
   cta: 'Start',
 };
@@ -72,7 +72,7 @@ export const CONSENT = {
   intro: 'This lesson is part of a study for the course CS-411 Digital Education at EPFL. To take part, we need your OK to keep:',
   collected: [
     'your test answers and what you write in the lesson,',
-    'your clicks and the time each part takes,',
+    'your clicks, the time each part takes, and when you paste text or leave the tab,',
     'a participant code, no name and no email.',
   ],
   shared: [
@@ -80,7 +80,7 @@ export const CONSENT = {
     'In the AI version, your written explanations are also sent to an AI provider (Anthropic, or Groq as a backup) so it can write the feedback.',
     'Only the course team sees it. Results are reported for the whole group.',
   ],
-  voluntary: 'You can say no. Then you cannot take part in the study, and nothing is saved.',
+  voluntary: 'It takes about 50 minutes. You can say no: then you cannot take part in the study, and nothing is saved. You can also stop at any time: a run you do not finish is not used.',
   agree: 'I agree',
   decline: 'No thanks',
   declinedTitle: 'Thank you anyway',
