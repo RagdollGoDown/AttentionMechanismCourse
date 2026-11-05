@@ -255,5 +255,21 @@
 @keyframes garden-hello-pop { from { transform: translate(-50%, calc(-100% - 12px)) scale(0.85); opacity: 0; } }
 .garden-toggle { position: fixed; right: 12px; bottom: 10px; z-index: 31; min-height: 32px; border-radius: 999px; padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--color-ink); background: rgb(255 255 255 / 0.88); box-shadow: 0 2px 8px rgb(27 43 75 / 0.12); }
 .garden-toggle:hover { background: var(--color-card); }
+
+/* Byte's mood gauge (sticker style): bottom left, above the band; grows for a moment when a gift is unwrapped. */
+.garden-mood { position: fixed; left: 12px; bottom: 120px; z-index: 31; pointer-events: none; transform-origin: left bottom; }
+.garden-mood-pill { display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 5px; background: #fff; border: 3px solid #2b2233; border-radius: 999px; box-shadow: 0 4px 14px rgb(27 43 75 / 0.14); }
+.garden-mood-main { display: flex; flex-direction: column; gap: 3px; }
+.garden-mood-label { font-family: var(--font-display); font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #2b2233; }
+.garden-mood-bar { display: block; width: 110px; height: 10px; border: 2.5px solid #2b2233; border-radius: 999px; background: #eef3e6; overflow: hidden; }
+.garden-mood-bar i { display: block; height: 100%; background: #7fd84a; transition: width 1.2s cubic-bezier(0.3, 1.4, 0.5, 1) 0.4s; }
+.garden-mood-word { font-family: var(--font-display); font-size: 14px; color: #2b2233; min-width: 64px; }
+.garden-mood-badges { display: flex; flex-wrap: wrap; gap: 4px; max-width: 290px; margin: 6px 0 0; padding: 0; list-style: none; }
+.garden-mood-badges li { font-size: 11px; font-weight: 700; color: #2b2233; background: #fff; border: 2px solid #2b2233; border-radius: 999px; padding: 1px 8px; }
+.garden-mood-pop-a { animation: garden-mood-pop-a 2.4s ease-in-out; }
+.garden-mood-pop-b { animation: garden-mood-pop-b 2.4s ease-in-out; }
+@keyframes garden-mood-pop-a { 0%, 100% { transform: scale(1); } 20%, 75% { transform: scale(1.6); } }
+@keyframes garden-mood-pop-b { 0%, 100% { transform: scale(1); } 20%, 75% { transform: scale(1.6); } }
+@media (prefers-reduced-motion: reduce) { .garden-mood-pop-a, .garden-mood-pop-b { animation: none; } .garden-mood-bar i { transition: none; } }
 /* Phones: no room for a garden band; the lesson comes first. */
-@media (max-width: 640px) { .garden-band, .garden-canvas, .garden-fx, .garden-toggle { display: none; } }
+@media (max-width: 640px) { .garden-band, .garden-canvas, .garden-fx, .garden-toggle, .garden-mood { display: none; } }

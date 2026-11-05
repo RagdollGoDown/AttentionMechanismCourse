@@ -5,6 +5,7 @@ import { useGifts } from '@/components/GiftProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { BYTE_LINES, GARDEN_INTRO, GIFTS, type StepId } from '@/content/steps';
 import type { World } from '@/components/garden/world';
+import { MoodGauge } from '@/components/garden/MoodGauge';
 
 /** Height of the garden band; the lesson keeps this much room at its end so nothing stays under it. */
 const BAND = 112;
@@ -15,7 +16,7 @@ const BAND = 112;
  * (tests, or the learner's own "Hide garden"). Without WebGL the lesson simply has no garden.
  */
 export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
-  const { gifts, revealed, pending, reveal } = useGifts();
+  const { gifts, revealed, pending, reveal, total } = useGifts();
   const logger = useLogger();
   const [hidden, setHidden] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -93,6 +94,7 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
       </div>
       <canvas ref={canvas} className="garden-canvas" hidden={!show} aria-hidden />
       <div ref={fx} className="garden-fx" hidden={!show} aria-live="polite" />
+      {show && <MoodGauge count={revealed.length} total={total} badges={revealed.map((g) => g.badge)} pulse={revealed.length} />}
       {on && !failed && (
         <button type="button" className="garden-toggle" onClick={toggle} aria-pressed={hidden}>
           {hidden ? 'Show Byte’s garden' : 'Hide garden'}
