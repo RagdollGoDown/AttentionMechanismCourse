@@ -238,10 +238,6 @@
 .garden-say[data-off] { opacity: 0; }
 .garden-heart { position: absolute; font-size: 20px; color: var(--color-miss); animation: garden-float 1.4s ease-out forwards; }
 @keyframes garden-float { from { transform: translate(-50%, 0) scale(0.6); opacity: 1; } to { transform: translate(calc(-50% + var(--dx)), -80px) scale(1.15); opacity: 0; } }
-.garden-note { position: absolute; bottom: 170px; transform: translateX(-50%); width: min(260px, 80vw); background: var(--color-card); border: 2px solid var(--color-cobalt); border-radius: 16px; padding: 10px 13px; box-shadow: 0 10px 30px rgb(27 43 75 / 0.18); animation: garden-pop 0.45s cubic-bezier(0.2, 1.5, 0.4, 1); }
-.garden-note strong { display: block; font-family: var(--font-display); font-size: 15px; margin-bottom: 2px; color: var(--color-ink); }
-.garden-note p { margin: 0; font-size: 13px; color: var(--color-muted); }
-@keyframes garden-pop { from { transform: translateX(-50%) scale(0.85); opacity: 0; } }
 .garden-confetti { position: absolute; top: -12px; width: 8px; height: 12px; border-radius: 2px; animation: garden-fall 3.2s cubic-bezier(0.3, 0.6, 0.5, 1) forwards; }
 @keyframes garden-fall { to { transform: translate(var(--dx), 105vh) rotate(720deg); opacity: 0.8; } }
 /* Byte's hello: a speech bubble above his head, closable; the only garden element that takes clicks. */
@@ -255,6 +251,23 @@
 @keyframes garden-hello-pop { from { transform: translate(-50%, calc(-100% - 12px)) scale(0.85); opacity: 0; } }
 .garden-toggle { position: fixed; right: 12px; bottom: 10px; z-index: 31; min-height: 32px; border-radius: 999px; padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--color-ink); background: rgb(255 255 255 / 0.88); box-shadow: 0 2px 8px rgb(27 43 75 / 0.12); }
 .garden-toggle:hover { background: var(--color-card); }
+
+/* The gift window between modules. */
+.gift-reveal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgb(27 43 75 / 0.38); animation: gift-fade 0.25s ease-out; }
+.gift-reveal-card { position: relative; width: min(380px, 100%); background: var(--color-card); border-radius: 22px; padding: 22px 22px 18px; text-align: center; box-shadow: 0 20px 60px rgb(27 43 75 / 0.3); animation: gift-pop 0.4s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.gift-reveal-card h2 { margin: 0 0 4px; font-family: var(--font-display); font-size: 21px; font-weight: 800; color: var(--color-ink); }
+.gift-reveal-x { position: absolute; top: 8px; right: 10px; width: 32px; height: 32px; border-radius: 999px; font-size: 22px; line-height: 1; color: var(--color-muted); }
+.gift-reveal-x:hover { background: rgb(27 43 75 / 0.06); }
+.gift-reveal-canvas { display: block; width: 100%; height: 230px; }
+.gift-reveal-box { font-size: 88px; line-height: 230px; }
+.gift-reveal-text { margin: 2px 0 12px; }
+.gift-reveal-badge { display: inline-block; margin: 0 0 6px; padding: 3px 12px; font-weight: 800; color: #2b2233; background: #fff6c9; border: 2.5px solid #2b2233; border-radius: 999px; }
+.gift-reveal-fact { margin: 0; font-size: 14px; color: var(--color-muted); }
+.gift-reveal-button { min-height: 44px; padding: 0 22px; border-radius: 999px; font-weight: 700; color: #fff; background: var(--color-cobalt); }
+.gift-reveal-button:disabled { opacity: 0.5; }
+@keyframes gift-fade { from { opacity: 0; } }
+@keyframes gift-pop { from { transform: scale(0.85); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .gift-reveal, .gift-reveal-card { animation: none; } }
 
 /* Byte's mood gauge (sticker style): bottom left, above the band; grows for a moment when a gift is unwrapped. */
 .garden-mood { position: fixed; left: 12px; bottom: 120px; z-index: 31; pointer-events: none; transform-origin: left bottom; }

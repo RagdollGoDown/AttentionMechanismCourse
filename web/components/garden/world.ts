@@ -207,17 +207,6 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
       back.appendChild(h); setTimeout(() => h.remove(), 1500);
     }, i * 130);
   }
-  function note(g: GiftView) {
-    fx.querySelectorAll('.garden-note').forEach((old) => old.remove());
-    const thing = things.get(g.item); if (!thing) return;
-    const [x] = toScreen(thing);
-    const n = document.createElement('div'); n.className = 'garden-note'; n.setAttribute('role', 'status');
-    n.style.left = `${Math.min(innerWidth - 145, Math.max(145, x))}px`;
-    const strong = document.createElement('strong'); strong.textContent = `New for Byte: ${g.name}`;
-    const p = document.createElement('p'); p.textContent = `You finished ${g.title}. ${g.fact}`;
-    n.append(strong, p); fx.appendChild(n); setTimeout(() => n.remove(), 6500);
-  }
-
   function place(item: PetItem, drop: boolean) {
     const [x, z] = spot(item); const g = build(item); g.position.set(x, 0, z); g.userData.item = item; stage.add(g); things.set(item, g);
     if (drop && !REDUCE) { g.position.y = 300; tween(0.95, (k) => { g.position.y = 300 * (1 - bounce(k)); }); }
@@ -402,7 +391,7 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
       setWrapped(next);
       const last = fresh.at(-1);
       if (last && announce) { giftDue = performance.now() + 1500; setTimeout(() => {
-        note(last); dog.queue = [{ pose: 'happy', dur: 1.6, face: () => 0, text: hypeLine() }, ...plan(last.item)]; dog.cur = null; dog.mood = 1;
+        dog.queue = [{ pose: 'happy', dur: 1.6, face: () => 0, text: hypeLine() }, ...plan(last.item)]; dog.cur = null; dog.mood = 1;
       }, REDUCE ? 0 : 1000); }
     },
     cheer(text) {

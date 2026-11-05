@@ -6,6 +6,7 @@ import { useLogger } from '@/components/LoggerProvider';
 import { BYTE_LINES, GARDEN_INTRO, GIFTS, type StepId } from '@/content/steps';
 import type { World } from '@/components/garden/world';
 import { MoodGauge } from '@/components/garden/MoodGauge';
+import { GiftReveal } from '@/components/garden/GiftReveal';
 
 /** Height of the garden band; the lesson keeps this much room at its end so nothing stays under it. */
 const BAND = 112;
@@ -33,8 +34,10 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
     world.current?.setGifts(revealed, nextItem(gifts));
   }, [revealed, gifts]);
 
-  // ponytail: temporary until the gift window lands (Task 5): unwrap at once.
-  useEffect(() => { if (pending) reveal('hidden', 0); }, [pending, reveal]);
+  // The gift window needs the garden on screen: not hidden by the learner, and not on a phone (no band there).
+  const [phone] = useState(() => typeof window !== 'undefined' && matchMedia('(max-width: 640px)').matches);
+  const windowOk = on && !hidden && !phone;
+  useEffect(() => { if (pending && on && !windowOk) reveal('hidden', 0); }, [pending, on, windowOk, reveal]);
 
   useEffect(() => {
     if (!show) { world.current?.setRunning(false); return; }
@@ -94,6 +97,7 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
       </div>
       <canvas ref={canvas} className="garden-canvas" hidden={!show} aria-hidden />
       <div ref={fx} className="garden-fx" hidden={!show} aria-live="polite" />
+      {pending && windowOk && <GiftReveal key={pending.item} gift={pending} webgl={!failed} onDone={reveal} />}
       {show && <MoodGauge count={revealed.length} total={total} badges={revealed.map((g) => g.badge)} pulse={revealed.length} />}
       {on && !failed && (
         <button type="button" className="garden-toggle" onClick={toggle} aria-pressed={hidden}>
