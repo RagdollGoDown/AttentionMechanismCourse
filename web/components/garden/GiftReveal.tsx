@@ -27,7 +27,9 @@ export function GiftReveal({ gift, webgl, onDone }: {
   const button = useRef<HTMLButtonElement>(null);
   const started = useRef(0);
   const finished = useRef(false);
-  const offered = useRef(false);   // once per window, even when React runs the effect twice in development
+  const offered = useRef(false);
+  const card = useRef<HTMLDivElement>(null);
+  const byKeyboard = useRef(false);   // opened with the keyboard: no auto-close, the learner reads at their own pace   // once per window, even when React runs the effect twice in development
 
   const finish = (via: 'button' | 'close') => {
     if (finished.current) return;
@@ -49,23 +51,42 @@ export function GiftReveal({ gift, webgl, onDone }: {
         try { reveal.current = createReveal(canvas.current, gift.item, reduce); } catch { setHas3d(false); }
       }, () => setHas3d(false));
     }
-    return () => { cancelled = true; reveal.current?.dispose(); reveal.current = null; before?.focus?.(); };
+    return () => {
+      cancelled = true; reveal.current?.dispose(); reveal.current = null;
+      // Back where the learner was; if that button is gone (the step changed), to the new step's heading.
+      if (before && before.isConnected && before.offsetParent !== null) before.focus();
+      else {
+        const heading = [...document.querySelectorAll<HTMLElement>('main h1, main h2')].find((h) => h.offsetParent !== null);
+        if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+      }
+    };
   }, [gift.item, webgl, logger]);
 
   useEffect(() => {
     if (stage !== 'open') return;
     button.current?.focus();
+    if (byKeyboard.current) return;
     const t = setTimeout(() => finish('button'), AUTO_CLOSE_MS);
     return () => clearTimeout(t);
   });
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') dismiss(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { dismiss(); return; }
+      if (e.key !== 'Tab' || !card.current) return;
+      // Keep focus inside the window (aria-modal): Tab cycles between its buttons.
+      const items = [...card.current.querySelectorAll<HTMLElement>('button:not([disabled])')];
+      if (!items.length) return;
+      const i = items.indexOf(document.activeElement as HTMLElement);
+      const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : (i === -1 || i === items.length - 1 ? 0 : i + 1);
+      e.preventDefault(); items[next].focus();
+    };
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
   });
 
-  async function open() {
+  async function open(keyboard: boolean) {
+    byKeyboard.current = keyboard;
     setStage('opening');
     await reveal.current?.unwrap();
     setStage('open');
@@ -73,7 +94,7 @@ export function GiftReveal({ gift, webgl, onDone }: {
 
   return (
     <div className="gift-reveal" onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}>
-      <div className="gift-reveal-card" role="dialog" aria-modal="true" aria-labelledby="gift-reveal-title">
+      <div ref={card} className="gift-reveal-card" role="dialog" aria-modal="true" aria-labelledby="gift-reveal-title">
         <button type="button" className="gift-reveal-x" aria-label="Close" onClick={dismiss}>×</button>
         <h2 id="gift-reveal-title">{GIFT_REVEAL.title}</h2>
         {has3d
@@ -87,7 +108,7 @@ export function GiftReveal({ gift, webgl, onDone }: {
         )}
         <button
           ref={button} type="button" className="gift-reveal-button" disabled={stage === 'opening'}
-          onClick={stage === 'closed' ? () => void open() : () => finish('button')}
+          onClick={stage === 'closed' ? (e) => void open(e.detail === 0) : () => finish('button')}
         >
           {stage === 'open' ? GIFT_REVEAL.done : GIFT_REVEAL.open}
         </button>

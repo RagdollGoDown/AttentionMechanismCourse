@@ -84,6 +84,7 @@ export function createReveal(canvas: HTMLCanvasElement, item: PetItem, reduce: b
     dispose() {
       cancelAnimationFrame(raf);
       scene.traverse((o) => { const m = o as THREE.Mesh; m.geometry?.dispose(); const mat = m.material; if (Array.isArray(mat)) mat.forEach((x) => x.dispose()); else mat?.dispose(); });
+      renderer.forceContextLoss();   // free the WebGL context now: browsers drop the oldest (the garden's) past ~16
       renderer.dispose();
     },
   };

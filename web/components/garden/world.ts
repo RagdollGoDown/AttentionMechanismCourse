@@ -355,6 +355,8 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
   }
   const jump = () => tween(0.9, (k) => { D.rig.position.y = Math.abs(Math.sin(k * Math.PI * 2)) * 0.5; }, () => { D.rig.position.y = 0; });
   function pet() {
+    // During a gift's moment, petting only gets hearts: cutting the moment would leave props mid-air.
+    if (performance.now() < giftDue) { say('♥', 1.7); hearts(); hooks.onPet(); return; }
     dog.queue = []; dog.cur = { pose: 'happy', dur: 1.7, t: 0 }; dog.pose = 'happy'; dog.want = 0; dog.mood = 1;
     say('♥', 1.7); hearts(); hooks.onPet(); jump();
   }
