@@ -7,6 +7,7 @@
  */
 import * as THREE from 'three';
 import type { PetItem } from '@/content/steps';
+import { createModels, GIFT_SCALE } from '@/components/garden/models';
 
 export interface GiftView { item: PetItem; name: string; title: string; fact: string }
 export interface World {
@@ -24,14 +25,13 @@ export interface World {
 
 const S = 32;                  // px per model unit (Byte)
 const GS = 38;                 // px per model unit (his things: a bit bigger, so each gift is easy to see)
-const BRANCH = 4.15 * GS;      // height of the tree branch Byte sits on
 const GROUND = 46;             // px from the canvas bottom to Byte's feet
 const SPEED = 80;              // px per second
 
 /* Where each thing stands: share of the window width, depth (negative = further back). Tall things at the ends. */
 const SPOTS: Record<PetItem, [number, number]> = {
-  bowl: [0.79, 18], tent: [0.06, -38], ball: [0.56, 30], tree: [1, -40], cushion: [0.87, -28],
-  flowers: [0.2, 18], frisbee: [0.42, 32], lamp: [0.29, -46], bench: [0.67, -40], balloons: [0.135, -46],
+  tent: [0.1, -38], balloons: [0.24, -46], flowers: [0.34, 18], lamp: [0.44, -46], frisbee: [0.5, 32],
+  ball: [0.58, 30], bench: [0.67, -40], bowl: [0.76, 18], cushion: [0.87, -28], tree: [1, -40],
 };
 
 type Step =
@@ -64,15 +64,16 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
   sun.shadow.radius = 5; sun.target = stage; scene.add(sun);
   const rimLight = new THREE.DirectionalLight('#c9d6ff', 0.8); rimLight.position.set(600, 300, -500); scene.add(rimLight);
 
-  /* ---------- Materials and shape helpers ---------- */
-  const std = (c: string, o: THREE.MeshStandardMaterialParameters = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.6, ...o });
-  const shell = (c: string, o: THREE.MeshPhysicalMaterialParameters = {}) => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.3, clearcoat: 0.7, clearcoatRoughness: 0.18, ...o });
-  const glow = (c: string, k = 1.4) => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: k, roughness: 0.3 });
-  const WHITE = shell('#f8f6f1'), PANEL = shell('#e9e5dc', { roughness: 0.4 }), ORANGE = shell('#e07a28', { roughness: 0.42, clearcoat: 0.35 });
-  const ORANGE_DK = std('#b9581a', { roughness: 0.7 }), BLACK = shell('#23262d', { roughness: 0.35, clearcoat: 0.5 }), JOINT = std('#2c3038', { roughness: 0.5, metalness: 0.2 });
-  const WOOD = std('#a7774f', { roughness: 0.8 }), WOOD_DK = std('#8a5f3c', { roughness: 0.85 });
-  const mesh = (g: THREE.BufferGeometry, m: THREE.Material, x = 0, y = 0, z = 0) => { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.castShadow = true; return o; };
-  const ball = (r: number, m: THREE.Material, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => { const o = mesh(new THREE.SphereGeometry(r, 32, 24), m, x, y, z); o.scale.set(sx, sy, sz); return o; };
+  /* ---------- Materials, shape helpers and gift models (models.ts, shared with the gift window) ---------- */
+  const models = createModels();
+  const { std, mesh, ball } = models.kit;
+  const { WHITE, PANEL, ORANGE, ORANGE_DK, BLACK, JOINT, WOOD_DK } = models.kit.M;
+  const glow = models.kit.glow;
+  // ponytail: sized once for the window width at load; a resize keeps the sizes (re-place on resize if it matters).
+  const FIT = Math.min(1, Math.max(0.65, innerWidth / 1280));
+  const unit = (id: PetItem | 'gift') => GS * GIFT_SCALE[id] * FIT;   // px per model unit of this thing
+  const BRANCH = 4.15 * unit('tree');                                // height of the tree branch Byte sits on
+  const build = (id: PetItem | 'gift') => models.build(id, unit(id));
 
   /* ---------- Byte (faces +z, the viewer) ---------- */
   const D = (() => {
@@ -137,93 +138,6 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     return { root, rig, head, eyes, brows, ears, legs, tail, tongue };
   })();
   stage.add(D.root);
-
-  /* ---------- Gifts ---------- */
-  const BUILD: Record<PetItem | 'gift', () => THREE.Group> = {
-    bowl() { const g = new THREE.Group();
-      const food = new THREE.Group(); food.position.x = -0.55; g.add(food);
-      food.add(mesh(new THREE.CylinderGeometry(0.6, 0.46, 0.32, 36), shell('#3d5afe'), 0, 0.16, 0));
-      const lip = mesh(new THREE.TorusGeometry(0.58, 0.06, 10, 36), shell('#2c47de'), 0, 0.32, 0); lip.rotation.x = Math.PI / 2; food.add(lip);
-      for (let i = 0; i < 16; i++) food.add(ball(0.09, std('#c98b4b', { roughness: 0.9 }), (Math.random() - .5) * .75, 0.33 + Math.random() * .06, (Math.random() - .5) * .7, 1, .7, 1));
-      const water = new THREE.Group(); water.position.x = 0.75; g.add(water);
-      water.add(mesh(new THREE.CylinderGeometry(0.5, 0.4, 0.28, 36), shell('#f3dda8'), 0, 0.14, 0));
-      water.add(mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.02, 36), std('#7fc4ff', { roughness: 0.05, metalness: 0.1 }), 0, 0.25, 0));
-      return g; },
-    tent() { const g = new THREE.Group(); const A = std('#ffb020', { side: THREE.DoubleSide, roughness: 0.75 }), B = std('#f4f1e8', { side: THREE.DoubleSide, roughness: 0.75 });
-      const slant = Math.hypot(1.75, 2.7), ang = Math.atan2(2.7, 1.75), stripes = 5, w = 2.9 / stripes;
-      [-1, 1].forEach((s) => { for (let i = 0; i < stripes; i++) { const p = mesh(new THREE.BoxGeometry(slant, 0.05, w), i % 2 ? B : A, s * 0.875, 1.35, -1.45 + w / 2 + i * w); p.rotation.z = s < 0 ? ang : -ang; g.add(p); } });
-      const tri = new THREE.Shape(); tri.moveTo(-1.75, 0); tri.lineTo(1.75, 0); tri.lineTo(0, 2.7); tri.lineTo(-1.75, 0);
-      g.add(mesh(new THREE.ShapeGeometry(tri), std('#d98f0f', { side: THREE.DoubleSide }), 0, 0, -1.45));
-      const flap = new THREE.Shape(); flap.moveTo(0, 0); flap.quadraticCurveTo(0.6, 0.15, 1.0, 0); flap.lineTo(0, 1.55); flap.lineTo(0, 0);
-      [-1, 1].forEach((s) => { const f = mesh(new THREE.ShapeGeometry(flap), A, s * 1.75, 0, 1.46); f.scale.x = -s; g.add(f);
-        g.add(mesh(new THREE.TorusGeometry(0.1, 0.03, 6, 12), std('#e5484d'), s * 0.95, 0.95, 1.5)); });
-      g.add(mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.7, 8), WOOD_DK, 0, 2.95, 1.45));
-      g.add(mesh(new THREE.ConeGeometry(0.16, 0.34, 3), std('#e5484d'), 0.15, 3.15, 1.45).rotateZ(-Math.PI / 2));
-      g.add(mesh(new THREE.BoxGeometry(3.2, 0.03, 2.9), std('#6d8fd8', { roughness: 0.9 }), 0, 0.02, 0));
-      const lantern = new THREE.Group(); lantern.position.set(0.6, 0, -0.9); g.add(lantern);
-      lantern.add(mesh(new THREE.CylinderGeometry(0.15, 0.17, 0.08, 12), JOINT, 0, 0.04, 0)); lantern.add(ball(0.14, glow('#ffd98a', 1.8), 0, 0.22, 0, 1, 1.3, 1));
-      [-1, 1].forEach((s) => { const r = mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.6, 4), WOOD_DK, s * 2.05, 0.9, 1.0); r.rotation.z = s * 0.75; g.add(r); });
-      return g; },
-    ball() { const g = new THREE.Group(); const b = new THREE.Group(); b.position.y = 0.42; g.add(b);
-      b.add(ball(0.42, std('#d6ec4a', { roughness: 0.95 })));
-      [0.5, -0.5].forEach((tilt, i) => { const sm = mesh(new THREE.TorusGeometry(0.33, 0.025, 6, 32), std('#ffffff', { roughness: 0.9 }), 0, 0, i ? -0.18 : 0.18); sm.rotation.set(0, Math.PI / 2, tilt); b.add(sm); });
-      g.userData.spin = b; return g; },
-    frisbee() { const g = new THREE.Group(); const b = new THREE.Group(); b.position.y = 0.08; g.add(b);
-      b.add(mesh(new THREE.CylinderGeometry(0.62, 0.52, 0.1, 36), shell('#1fa37a')));
-      const rimF = mesh(new THREE.TorusGeometry(0.58, 0.05, 8, 36), shell('#f3dda8'), 0, 0.05, 0); rimF.rotation.x = Math.PI / 2; b.add(rimF);
-      g.userData.spin = b; g.userData.slides = true; return g; },
-    tree() { const g = new THREE.Group();   // tall, at the window's edge; Byte climbs to the left branch
-      g.add(mesh(new THREE.CylinderGeometry(0.28, 0.46, 8.2, 16), WOOD, 0, 4.1, 0));
-      [[0.45, 0.4], [-0.45, 0.3], [0.1, -0.5]].forEach(([x, z]) => { const r = mesh(new THREE.CylinderGeometry(0.07, 0.2, 0.7, 8), WOOD, x, 0.18, z); r.rotation.set(z * 1.2, 0, -x * 1.6); g.add(r); });
-      const low = mesh(new THREE.CylinderGeometry(0.11, 0.17, 1.9, 10), WOOD, -0.95, 4.0, 0.1); low.rotation.z = Math.PI / 2 - 0.08; g.add(low);
-      g.add(mesh(new THREE.IcosahedronGeometry(0.42, 1), std('#5fbf74', { flatShading: true, roughness: 0.75 }), -1.95, 4.25, 0.1));
-      const high = mesh(new THREE.CylinderGeometry(0.08, 0.13, 1.2, 8), WOOD, 0.6, 6.3, 0); high.rotation.z = -1.0; g.add(high);
-      const greens = ['#5fbf74', '#4fae66', '#6ccb7f'];
-      [[0, 8.9, 0, 1.45], [1.0, 8.4, 0.3, 1.0], [-1.0, 8.5, -0.1, 1.05], [0.25, 9.8, -0.2, 0.9], [-0.4, 8.0, 0.75, 0.85], [0.7, 9.3, 0.6, 0.8], [1.15, 6.9, 0.1, 0.6]].forEach(([x, y, z, r], i) =>
-        g.add(mesh(new THREE.IcosahedronGeometry(r, 1), std(greens[i % 3], { roughness: 0.75, flatShading: true }), x, y, z)));
-      [[0.7, 8.0, 1.0], [-0.6, 8.6, 1.0], [0.2, 9.4, 0.95], [1.3, 8.7, 0.6], [-1.3, 8.1, 0.5], [0.1, 7.7, 1.2]].forEach(([x, y, z]) => g.add(ball(0.14, shell('#e5484d'), x, y, z)));
-      return g; },
-    cushion() { const g = new THREE.Group();
-      const rimC = mesh(new THREE.TorusGeometry(1.15, 0.32, 18, 48), std('#3d5afe', { roughness: 0.9 }), 0, 0.32, 0); rimC.rotation.x = Math.PI / 2; g.add(rimC);
-      g.add(mesh(new THREE.CylinderGeometry(1.15, 1.2, 0.3, 48), std('#e4e9ff', { roughness: 0.95 }), 0, 0.18, 0));
-      [[0, 0], [0.5, 0.3], [-0.5, 0.3], [0.5, -0.35], [-0.5, -0.35]].forEach(([x, z]) => g.add(ball(0.05, std('#9fb0ff'), x, 0.34, z, 1, 0.5, 1)));
-      const blanket = mesh(new THREE.BoxGeometry(0.9, 0.06, 0.7), std('#ffb020', { roughness: 0.95 }), 0.55, 0.42, 0.5); blanket.rotation.set(0.15, 0.5, 0.1); g.add(blanket);
-      return g; },
-    flowers() { const g = new THREE.Group();
-      for (let i = 0; i < 4; i++) [0.5, -0.5].forEach((z) => g.add(mesh(new THREE.BoxGeometry(2.0, 0.16, 0.05), i % 2 ? WOOD : WOOD_DK, 0, 0.1 + i * 0.16, z)));
-      [-1, 1].forEach((s) => g.add(mesh(new THREE.BoxGeometry(0.05, 0.64, 1.0), WOOD_DK, s, 0.34, 0)));
-      g.add(mesh(new THREE.BoxGeometry(1.95, 0.05, 0.95), std('#6b4a32', { roughness: 1 }), 0, 0.6, 0));
-      const cols = ['#e5484d', '#ffb020', '#8250df', '#ff8fb1', '#ffffff', '#e5484d', '#ff8fb1'];
-      const cup = new THREE.LatheGeometry([new THREE.Vector2(0, 0), new THREE.Vector2(0.1, 0.02), new THREE.Vector2(0.15, 0.12), new THREE.Vector2(0.13, 0.26), new THREE.Vector2(0.15, 0.3)], 14);
-      cols.forEach((c, i) => { const x = -0.8 + i * 0.27, z = i % 2 ? 0.18 : -0.15, h = 0.7 + ((i * 37) % 5) * 0.08;
-        g.add(mesh(new THREE.CylinderGeometry(0.022, 0.022, h, 6), std('#3f9a71'), x, 0.6 + h / 2, z));
-        const leaf = ball(0.12, std('#4fae66'), x + 0.07, 0.75, z, 0.35, 1.2, 0.6); leaf.rotation.z = -0.5; g.add(leaf);
-        g.add(mesh(cup, std(c, { side: THREE.DoubleSide, roughness: 0.5 }), x, 0.6 + h, z)); });
-      return g; },
-    lamp() { const g = new THREE.Group();
-      g.add(mesh(new THREE.CylinderGeometry(0.28, 0.34, 0.2, 16), JOINT, 0, 0.1, 0));
-      g.add(mesh(new THREE.CylinderGeometry(0.07, 0.09, 2.6, 12), std('#1b2b4b', { metalness: 0.3, roughness: 0.4 }), 0, 1.4, 0));
-      g.add(mesh(new THREE.ConeGeometry(0.42, 0.35, 6), std('#1b2b4b', { metalness: 0.3, roughness: 0.4 }), 0, 2.95, 0));
-      g.add(ball(0.22, glow('#ffd98a', 2), 0, 2.72, 0, 1, 1.2, 1));
-      return g; },
-    bench() { const g = new THREE.Group();
-      for (let i = 0; i < 3; i++) g.add(mesh(new THREE.BoxGeometry(2.0, 0.08, 0.2), WOOD, 0, 0.6, -0.25 + i * 0.25));
-      for (let i = 0; i < 2; i++) { const b = mesh(new THREE.BoxGeometry(2.0, 0.18, 0.06), WOOD, 0, 0.9 + i * 0.25, -0.42); b.rotation.x = -0.15; g.add(b); }
-      [-0.85, 0.85].forEach((x) => { g.add(mesh(new THREE.BoxGeometry(0.08, 0.6, 0.6), std('#1b2b4b', { metalness: 0.3 }), x, 0.3, 0)); g.add(mesh(new THREE.BoxGeometry(0.08, 0.7, 0.08), std('#1b2b4b', { metalness: 0.3 }), x, 1.0, -0.42)); });
-      return g; },
-    balloons() { const g = new THREE.Group(); const cols = ['#e5484d', '#3d5afe', '#ffb020', '#1fa37a', '#8250df'];
-      g.add(mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.22, 12), WOOD_DK, 0, 0.11, 0));
-      cols.forEach((c, i) => { const a = i / cols.length * Math.PI * 2, x = Math.cos(a) * 0.45, z = Math.sin(a) * 0.3, y = 2.4 + (i % 2) * 0.4;
-        const b = ball(0.34, shell(c, { roughness: 0.25 }), x, y, z, 1, 1.15, 1); b.userData.float = i; g.add(b);
-        g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.22, 0), new THREE.Vector3(x, y - 0.38, z)]), new THREE.LineBasicMaterial({ color: '#5b6b88' }))); });
-      return g; },
-    gift() { const g = new THREE.Group(); const blue = shell('#3d5afe'), rib = shell('#f3dda8');
-      g.add(mesh(new THREE.BoxGeometry(0.9, 0.72, 0.9), blue, 0, 0.36, 0)); g.add(mesh(new THREE.BoxGeometry(1.0, 0.16, 1.0), blue, 0, 0.78, 0));
-      g.add(mesh(new THREE.BoxGeometry(0.93, 0.9, 0.16), rib, 0, 0.45, 0)); g.add(mesh(new THREE.BoxGeometry(0.16, 0.9, 0.93), rib, 0, 0.45, 0));
-      [0.7, -0.7].forEach((r) => { const b = mesh(new THREE.TorusGeometry(0.17, 0.06, 10, 20), rib, 0, 1.0, 0); b.scale.set(1, 1.3, 1); b.rotation.set(Math.PI / 2 - 0.4, r, 0); g.add(b); });
-      return g; },
-  };
-  const build = (id: PetItem | 'gift') => { const g = BUILD[id](); g.scale.setScalar(GS); g.traverse((o) => { if ((o as THREE.Mesh).isMesh) { o.castShadow = true; o.receiveShadow = true; } }); return g; };
 
   /* ---------- Scenery: a fence, pines, bushes, grass and a stone path, for depth. Calm, all in the band. ---------- */
   const scenery = new THREE.Group(); stage.add(scenery);
@@ -309,7 +223,7 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     if (drop && !REDUCE) { g.position.y = 300; tween(0.95, (k) => { g.position.y = 300 * (1 - bounce(k)); }); }
   }
   function setWrapped(item: PetItem | null) {
-    if (wrapped && wrappedItem !== item) { const box = wrapped; tween(0.35, (k) => { box.scale.setScalar(GS * Math.max(0.01, 1 - k)); box.rotation.y = k * 4; }, () => stage.remove(box)); wrapped = null; }
+    if (wrapped && wrappedItem !== item) { const box = wrapped; tween(0.35, (k) => { box.scale.setScalar(unit('gift') * Math.max(0.01, 1 - k)); box.rotation.y = k * 4; }, () => stage.remove(box)); wrapped = null; }
     wrappedItem = item;
     if (item && !wrapped) { const [x, z] = spot(item); wrapped = build('gift'); wrapped.position.set(x, 0, z); stage.add(wrapped); }
   }
@@ -322,7 +236,7 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
       case 'bowl': return [{ walk: () => [g().x - 18 + side() * 44, g().z + 8] }, { pose: 'eat', dur: 3.2, face: () => -side() * 1.3, text: 'nom nom' }];
       case 'tent': return [{ walk: () => [g().x, g().z + 75] }, { walk: () => [g().x, g().z - 4] }, { pose: 'sleep', dur: 5, face: () => 0, text: 'z z z' }, { walk: () => [g().x, g().z + 75] }];
       case 'ball': case 'frisbee': return [{ walk: () => [g().x + side() * 44, g().z] }, { kick: item }, { pose: 'stand', dur: 0.8 }, { walk: () => [g().x + side() * 44, g().z] }, { pose: 'happy', dur: 1.3, face: () => 0, text: 'got it!' }];
-      case 'tree': { const bx = () => g().x - 0.8 * GS;
+      case 'tree': { const bx = () => g().x - 0.8 * unit('tree');
         return [{ walk: () => [bx(), g().z + 5] }, { climb: () => BRANCH }, { pose: 'sit', dur: 6, face: () => 0, text: 'What a view!' }, { climb: () => 0 }, { walk: () => [bx() - 70, g().z + 55] }]; }
       case 'cushion': return [{ walk: () => [g().x, g().z] }, { pose: 'sleep', dur: 5, face: () => 0, text: 'z z z' }];
       case 'flowers': return [{ walk: () => [g().x + side() * 56, g().z + 8] }, { pose: 'sniff', dur: 2.6, face: () => -side() * 1.3, text: '✿' }];
@@ -461,7 +375,7 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     for (const g of things.values()) {
       const vx = g.userData.vx as number | undefined;
       if (vx) { g.position.x += vx * dt; const spin = g.userData.spin as THREE.Object3D;
-        if (g.userData.slides) spin.rotation.y += vx * dt * 0.05; else spin.rotation.z -= vx * dt / (0.42 * GS);
+        if (g.userData.slides) spin.rotation.y += vx * dt * 0.05; else spin.rotation.z -= vx * dt / (0.42 * unit(g.userData.item as PetItem));
         g.userData.vx = vx * Math.pow(0.25, dt);
         if (Math.abs(g.position.x) > W / 2 - 40) { g.userData.vx = -g.userData.vx; g.position.x = Math.sign(g.position.x) * (W / 2 - 40); }
         if (Math.abs(g.userData.vx) < 4) g.userData.vx = 0; }
