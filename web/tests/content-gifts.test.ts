@@ -20,7 +20,7 @@ describe("Byte's gifts", () => {
     expect(GIFTS.map((g) => [g.item, g.badge.emoji, g.badge.label, g.badge.word])).toEqual([
       ['tent', '🏕', 'Tent', 'Cosy'], ['ball', '🎾', 'Tennis ball', 'Playful'], ['tree', '🍎', 'Apple tree', 'Adventurous'],
       ['cushion', '🛏', 'Dog bed', 'Rested'], ['flowers', '🦋', 'Tulips', 'Curious'], ['frisbee', '🥏', 'Frisbee', 'Energetic'],
-      ['lamp', '💡', 'Lamp post', 'Safe'], ['bench', '🪑', 'Bench', 'Relaxed'], ['balloons', '🎈', 'Balloons', 'Overjoyed'],
+      ['pool', '💦', 'Paddling pool', 'Refreshed'], ['bone', '🦴', 'Big bone', 'Proud'], ['balloons', '🎈', 'Balloons', 'Overjoyed'],
     ]);
     expect(badgeLabel(GIFTS[1])).toBe('🎾 Tennis ball · Playful +1');
   });

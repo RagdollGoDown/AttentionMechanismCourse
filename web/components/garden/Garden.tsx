@@ -98,7 +98,7 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
       <canvas ref={canvas} className="garden-canvas" hidden={!show} aria-hidden />
       <div ref={fx} className="garden-fx" hidden={!show} aria-live="polite" />
       {pending && windowOk && <GiftReveal key={pending.item} gift={pending} webgl={!failed} onDone={reveal} />}
-      {show && <MoodGauge count={revealed.length} total={total} badges={revealed.map((g) => g.badge)} pulse={revealed.length} />}
+      {show && <MoodGauge count={revealed.length} total={total} pulse={revealed.length} />}
       {on && !failed && (
         <button type="button" className="garden-toggle" onClick={toggle} aria-pressed={hidden}>
           {hidden ? 'Show Byte’s garden' : 'Hide garden'}

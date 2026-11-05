@@ -8,9 +8,10 @@ between modules, so reading and answering stay calm (Rey 2012, seductive details
 learner earned turns the reward into a small story (Sailer & Homner 2020, game fiction; Chan's My-Pet).
 
 - [x] Gift window "Open the new gift for Byte": unwrap, name + badge + module fact; Escape opens without animation.
-- [x] Mood gauge (face, bar, word, badges): Bored → Okay → Happy → Joyful → Overjoyed (9/9).
+- [x] Mood gauge (face, vertical bar, word): Bored → Okay → Happy → Joyful → Overjoyed (9/9); badges only in the gift window.
 - [x] Gifts ~1.8× bigger and more detailed (tree unchanged: already canvas height).
-- [x] A use moment per gift (tent, ball, tree + apple, bed, tulips + butterfly, frisbee catch, lamp on, bench, balloons).
+- [x] A use moment per gift (tent, ball, tree + apple, bed, tulips + butterfly, frisbee catch, paddling pool splash, big bone, balloons).
+- [x] After the first test: lamp and bench replaced by dog things (pool, bone); tent and bed moved fully in front of the fence.
 - [x] No window when the garden is hidden or on a phone; reduced motion: no animation. Logged: `gift_offered`, `gift_opened`.
 
 # Rewards: Byte's garden (Nov 3, branch feat/rewards)

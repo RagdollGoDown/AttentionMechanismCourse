@@ -13,15 +13,10 @@ const FACES: Record<MoodLevel, { fill: string; mouth: string }> = {
 };
 
 /**
- * Byte's mood: a face, a bar and one badge per gift. It only goes up (completion only, identical in both
- * conditions). `pulse` changes when a gift is unwrapped: the gauge grows, fills, and shrinks back.
+ * Byte's mood: a face on top of a vertical bar, and the mood word. It only goes up (completion only,
+ * identical in both conditions). `pulse` changes when a gift is unwrapped: the gauge grows, fills, and shrinks back.
  */
-export function MoodGauge({ count, total, badges, pulse }: {
-  count: number;
-  total: number;
-  badges: { emoji: string; word: string }[];
-  pulse: number;
-}) {
+export function MoodGauge({ count, total, pulse }: { count: number; total: number; pulse: number }) {
   const { level, pct } = moodOf(count, total);
   const face = FACES[level];
   // Grow only for gifts unwrapped while the gauge is on screen; switching between two identical
@@ -31,24 +26,15 @@ export function MoodGauge({ count, total, badges, pulse }: {
 
   return (
     <div className={`garden-mood ${pop}`}>
-      <div className="garden-mood-pill">
-        <svg viewBox="0 0 40 40" width="34" height="34" aria-hidden>
-          <circle cx="20" cy="20" r="17" fill={face.fill} stroke="#2b2233" strokeWidth="3" />
-          <circle cx="14.5" cy="16" r="2.4" fill="#2b2233" />
-          <circle cx="25.5" cy="16" r="2.4" fill="#2b2233" />
-          <path d={face.mouth} fill={level === 'Overjoyed' ? '#2b2233' : 'none'} stroke="#2b2233" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <div className="garden-mood-main">
-          <span className="garden-mood-label">Byte&rsquo;s mood</span>
-          <span className="garden-mood-bar"><i style={{ width: `${pct}%` }} /></span>
-        </div>
-        <strong className="garden-mood-word">{level}</strong>
-      </div>
-      {badges.length > 0 && (
-        <ul className="garden-mood-badges" aria-hidden>
-          {badges.map((b) => <li key={b.word}>{b.emoji} {b.word} +1</li>)}
-        </ul>
-      )}
+      <span className="garden-mood-label">Mood</span>
+      <svg viewBox="0 0 40 40" width="34" height="34" aria-hidden>
+        <circle cx="20" cy="20" r="17" fill={face.fill} stroke="#2b2233" strokeWidth="3" />
+        <circle cx="14.5" cy="16" r="2.4" fill="#2b2233" />
+        <circle cx="25.5" cy="16" r="2.4" fill="#2b2233" />
+        <path d={face.mouth} fill={level === 'Overjoyed' ? '#2b2233' : 'none'} stroke="#2b2233" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <span className="garden-mood-bar" aria-hidden><i style={{ height: `${pct}%` }} /></span>
+      <strong className="garden-mood-word">{level}</strong>
       <span className="sr-only" aria-live="polite">{`Byte's mood: ${level}, ${pct} %`}</span>
     </div>
   );

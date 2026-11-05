@@ -77,13 +77,16 @@ When a module with a gift is finished:
 | 9 | Overjoyed | open smile, teal |
 
 - Percentage = gifts / 9 (so 100 % exactly with the last gift).
-- Badges: one per gift received, word from the table below, shown under the gauge.
+- Badges: shown in the gift window only (not under the gauge).
 - Placement: always visible but small in a corner of the garden band; for a moment after a gift it grows, fills,
   then shrinks back. Hidden with the garden.
 - Look: the sticker style approved in the mockup (white pill, dark outline, face, green bar, mood word, badge
   chips). It is page HTML/SVG on top of the canvas, not part of the 3D scene, so it stays crisp and readable.
 
 ## Use moments and badges (approved)
+
+Update after the first test (Nov 5): the lamp post and the bench were replaced by dog things (paddling pool,
+big bone); the gauge became a vertical bar and lost the badge chips (the badge stays in the gift window).
 
 | Gift (`PetItem`) | Byte's moment when it arrives | Badge |
 |---|---|---|
@@ -93,8 +96,8 @@ When a module with a gift is finished:
 | cushion (dog bed) | Turns three times, curls up, short nap with "z z z" | 🛏 Rested |
 | flowers (tulips) | Sniffs them; a butterfly flies out and he follows it | 🦋 Curious |
 | frisbee | The frisbee flies; he jumps and catches it in the air | 🥏 Energetic |
-| lamp | The lamp switches on with a warm glow; he sits under it | 💡 Safe |
-| bench | Hops onto it and sits like a person, looking around | 🪑 Relaxed |
+| pool (paddling pool) | Hops in, splashes, hops out and shakes himself dry | 💦 Refreshed |
+| bone (big bone) | Carries it around proudly, then lies down and chews it | 🦴 Proud |
 | balloons | Holds the strings and bounces, half floating | 🎈 Overjoyed |
 
 After its first moment, each gift joins `idleChoice()`: now and then Byte goes back to it on his own.

@@ -8,7 +8,7 @@ import type { PetItem } from '@/content/steps';
 /** Size of each gift relative to the world's base unit: bigger than the background so earned things stand out. */
 export const GIFT_SCALE: Record<PetItem | 'gift', number> = {
   // The tree stays at 1: it already reaches the top of the canvas.
-  bowl: 1, tent: 1.8, ball: 1.8, tree: 1, cushion: 1.8, flowers: 1.8, frisbee: 1.8, lamp: 1.8, bench: 1.8, balloons: 1.5, gift: 1.6,
+  bowl: 1, tent: 1.8, ball: 1.8, tree: 1, cushion: 1.8, flowers: 1.8, frisbee: 1.8, pool: 1.8, bone: 1.8, balloons: 1.5, gift: 1.6,
 };
 
 /** Materials and shape helpers (Byte's model in world.ts uses them too). */
@@ -116,26 +116,22 @@ export function createModels(kit: Kit = createKit()) {
       can.add(mesh(new THREE.CylinderGeometry(0.03, 0.045, 0.5, 8), tin, 0.3, 0.36, 0).rotateZ(-0.9));
       const hand = mesh(new THREE.TorusGeometry(0.14, 0.03, 8, 16, Math.PI), tin, -0.05, 0.42, 0); can.add(hand);
       return g; },
-    lamp() { const g = new THREE.Group();
-      g.add(mesh(new THREE.CylinderGeometry(0.28, 0.34, 0.2, 16), JOINT, 0, 0.1, 0));
-      g.add(mesh(new THREE.CylinderGeometry(0.07, 0.09, 2.6, 12), std('#1b2b4b', { metalness: 0.3, roughness: 0.4 }), 0, 1.4, 0));
-      g.add(mesh(new THREE.ConeGeometry(0.42, 0.35, 6), std('#1b2b4b', { metalness: 0.3, roughness: 0.4 }), 0, 2.95, 0));
-      const bulb = ball(0.22, glow('#ffd98a', 2), 0, 2.72, 0, 1, 1.2, 1); g.add(bulb);
-      (bulb.material as THREE.MeshStandardMaterial).emissiveIntensity = 0; (bulb.material as THREE.MeshStandardMaterial).color.set('#d9d2bd');
-      g.userData.bulb = bulb;   // off until Byte's first visit (world.ts, use moment)
-      g.add(mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.5, 6, 1, true), std('#ffffff', { transparent: true, opacity: 0.25, roughness: 0.05, side: THREE.DoubleSide }), 0, 2.72, 0));
-      [0, 1, 2, 3, 4, 5].forEach((i) => { const a = (i / 6) * Math.PI * 2; g.add(mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.5, 4), std('#1b2b4b', { metalness: 0.3 }), Math.cos(a) * 0.3, 2.72, Math.sin(a) * 0.3)); });
-      g.add(ball(0.06, std('#1b2b4b', { metalness: 0.3 }), 0, 3.15, 0));
+    pool() { const g = new THREE.Group();   // a round paddling pool with a rubber duck
+      const rim = mesh(new THREE.TorusGeometry(0.95, 0.2, 14, 40), shell('#3d8bfd', { roughness: 0.35 }), 0, 0.22, 0); rim.rotation.x = Math.PI / 2; g.add(rim);
+      for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2; g.add(ball(0.07, std('#ffffff', { roughness: 0.5 }), Math.cos(a) * 0.95, 0.42, Math.sin(a) * 0.95, 1, 0.5, 1)); }
+      g.add(mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.06, 40), std('#e9f3ff', { roughness: 0.6 }), 0, 0.03, 0));
+      g.add(mesh(new THREE.CylinderGeometry(0.92, 0.92, 0.04, 40), std('#7fd0ff', { roughness: 0.05, transparent: true, opacity: 0.85 }), 0, 0.3, 0));
+      const duck = new THREE.Group(); duck.position.set(0.35, 0.34, 0.2); duck.userData.float = 1; g.add(duck);
+      duck.add(ball(0.14, shell('#ffd34d'), 0, 0.05, 0, 1.2, 0.8, 1));
+      duck.add(ball(0.09, shell('#ffd34d'), 0.1, 0.18, 0));
+      duck.add(mesh(new THREE.ConeGeometry(0.04, 0.09, 8), std('#ff8a1c'), 0.2, 0.17, 0).rotateZ(-Math.PI / 2));
+      duck.add(ball(0.015, std('#23262d'), 0.15, 0.21, 0.06));
       return g; },
-    bench() { const g = new THREE.Group();
-      for (let i = 0; i < 3; i++) g.add(mesh(new THREE.BoxGeometry(2.0, 0.08, 0.2), WOOD, 0, 0.6, -0.25 + i * 0.25));
-      for (let i = 0; i < 2; i++) { const b = mesh(new THREE.BoxGeometry(2.0, 0.18, 0.06), WOOD, 0, 0.9 + i * 0.25, -0.42); b.rotation.x = -0.15; g.add(b); }
-      [-0.85, 0.85].forEach((x) => { g.add(mesh(new THREE.BoxGeometry(0.08, 0.6, 0.6), std('#1b2b4b', { metalness: 0.3 }), x, 0.3, 0)); g.add(mesh(new THREE.BoxGeometry(0.08, 0.7, 0.08), std('#1b2b4b', { metalness: 0.3 }), x, 1.0, -0.42)); });
-      [-0.95, 0.95].forEach((x) => g.add(mesh(new THREE.BoxGeometry(0.1, 0.06, 0.62), WOOD_DK, x, 0.88, -0.05)));
-      const bolt = std('#c9ced6', { metalness: 0.6, roughness: 0.3 });
-      for (let i = 0; i < 3; i++) [-0.85, 0.85].forEach((x) => g.add(ball(0.025, bolt, x, 0.65, -0.25 + i * 0.25)));
-      const pillow = mesh(new THREE.BoxGeometry(0.6, 0.12, 0.45), std('#8250df', { roughness: 0.95 }), -0.45, 0.7, 0); pillow.rotation.y = 0.15; g.add(pillow);
-      g.add(ball(0.035, std('#ffd34d'), -0.45, 0.77, 0));
+    bone() { const g = new THREE.Group();   // a giant chew bone, lying on the ground
+      const b = std('#f6ead2', { roughness: 0.55 });
+      g.add(mesh(new THREE.CylinderGeometry(0.15, 0.15, 1.3, 18), b, 0, 0.24, 0).rotateZ(Math.PI / 2));
+      [-0.68, 0.68].forEach((x) => [-0.14, 0.14].forEach((z) => g.add(ball(0.24, b, x, 0.24, z))));
+      g.add(mesh(new THREE.TorusGeometry(0.16, 0.025, 6, 18), std('#e5484d'), 0.25, 0.24, 0).rotateY(Math.PI / 2));
       return g; },
     balloons() { const g = new THREE.Group(); const cols = ['#e5484d', '#3d5afe', '#ffb020', '#1fa37a', '#8250df'];
       g.add(mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.22, 12), WOOD_DK, 0, 0.11, 0));

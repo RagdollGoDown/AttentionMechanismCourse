@@ -31,7 +31,7 @@ export const LAB_TITLES: Record<LabId, string> = {
 };
 
 /** What Byte (the robot dog in the garden band) can be given. The food bowl is there from the start. */
-export type PetItem = 'bowl' | 'tent' | 'ball' | 'tree' | 'cushion' | 'flowers' | 'frisbee' | 'lamp' | 'bench' | 'balloons';
+export type PetItem = 'bowl' | 'tent' | 'ball' | 'tree' | 'cushion' | 'flowers' | 'frisbee' | 'pool' | 'bone' | 'balloons';
 
 /**
  * One gift for Byte per finished module, in lesson order. Completion only, never correctness, so it is
@@ -45,8 +45,8 @@ export const GIFTS: { id: MissionId; title: string; item: PetItem; name: string;
   { id: 'remove', title: 'Remove a word', item: 'cushion', name: 'a dog bed', fact: 'Weights always share 100 %. When a word leaves, the others take its share.', badge: { emoji: '🛏', label: 'Dog bed', word: 'Rested' } },
   { id: 'rule', title: 'Invent the rule', item: 'flowers', name: 'tulips', fact: 'A good rule keeps every weight positive and makes them add up to 100 %.', badge: { emoji: '🦋', label: 'Tulips', word: 'Curious' } },
   { id: 'softmax', title: 'Meet softmax', item: 'frisbee', name: 'a frisbee', fact: 'softmax raises e to each score, then divides by the sum.', badge: { emoji: '🥏', label: 'Frisbee', word: 'Energetic' } },
-  { id: 'formula', title: 'The formula', item: 'lamp', name: 'a lamp post', fact: 'softmax(QKᵀ/√dₖ)·V: every part has a job.', badge: { emoji: '💡', label: 'Lamp post', word: 'Safe' } },
-  { id: 'compute', title: 'Compute it yourself', item: 'bench', name: 'a garden bench', fact: 'You computed attention by hand, number by number.', badge: { emoji: '🪑', label: 'Bench', word: 'Relaxed' } },
+  { id: 'formula', title: 'The formula', item: 'pool', name: 'a paddling pool', fact: 'softmax(QKᵀ/√dₖ)·V: every part has a job.', badge: { emoji: '💦', label: 'Paddling pool', word: 'Refreshed' } },
+  { id: 'compute', title: 'Compute it yourself', item: 'bone', name: 'a big bone', fact: 'You computed attention by hand, number by number.', badge: { emoji: '🦴', label: 'Big bone', word: 'Proud' } },
   { id: 'explain', title: 'Your explanation', item: 'balloons', name: 'party balloons', fact: 'You explained attention in your own words.', badge: { emoji: '🎈', label: 'Balloons', word: 'Overjoyed' } },
 ];
 
