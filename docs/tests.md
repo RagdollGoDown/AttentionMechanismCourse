@@ -38,7 +38,8 @@ A last step, `reflection` (~4 min, `SURVEY` in `web/content/tests.ts`): the qual
 Four open questions, optional, identical in both conditions: a moment something clicked, a moment of being stuck
 and what came next, whether and why they revised their explanation (RQ2), and Byte (did he make them want to keep going, get in the way, or neither).
 Sent as a `survey` record (answers, duration), then the full session log. Behaviour toward Byte is also in the log
-(`garden_toggled`, `pet_petted`).
+(`garden_toggled`, `pet_petted`), and so is the gift window: `gift_offered` (window shown) and `gift_opened`
+(`via`: button, close or hidden; `ms` in the window), so time on gifts can be taken out of time per step.
 
 ## Assigning the condition
 

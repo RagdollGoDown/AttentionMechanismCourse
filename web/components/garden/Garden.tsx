@@ -5,6 +5,8 @@ import { useGifts } from '@/components/GiftProvider';
 import { useLogger } from '@/components/LoggerProvider';
 import { BYTE_LINES, GARDEN_INTRO, GIFTS, type StepId } from '@/content/steps';
 import type { World } from '@/components/garden/world';
+import { MoodGauge } from '@/components/garden/MoodGauge';
+import { GiftReveal } from '@/components/garden/GiftReveal';
 
 /** Height of the garden band; the lesson keeps this much room at its end so nothing stays under it. */
 const BAND = 112;
@@ -15,20 +17,27 @@ const BAND = 112;
  * (tests, or the learner's own "Hide garden"). Without WebGL the lesson simply has no garden.
  */
 export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
-  const { gifts } = useGifts();
+  const { gifts, revealed, pending, reveal, total } = useGifts();
   const logger = useLogger();
   const [hidden, setHidden] = useState(false);
   const [failed, setFailed] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
   const fx = useRef<HTMLDivElement>(null);
   const world = useRef<World | null>(null);
-  const latest = useRef(gifts);
+  const latest = useRef(revealed);
+  const upcoming = useRef(gifts);
   const show = on && !hidden && !failed;
 
   useEffect(() => {
-    latest.current = gifts;
-    world.current?.setGifts(gifts, nextItem(gifts));
-  }, [gifts]);
+    latest.current = revealed;
+    upcoming.current = gifts;
+    world.current?.setGifts(revealed, nextItem(gifts));
+  }, [revealed, gifts]);
+
+  // The gift window needs the garden on screen: not hidden by the learner, and not on a phone (no band there).
+  const [phone] = useState(() => typeof window !== 'undefined' && matchMedia('(max-width: 640px)').matches);
+  const windowOk = on && !hidden && !phone;
+  useEffect(() => { if (pending && on && !windowOk) reveal('hidden', 0); }, [pending, on, windowOk, reveal]);
 
   useEffect(() => {
     if (!show) { world.current?.setRunning(false); return; }
@@ -45,7 +54,7 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
         setFailed(true);
         return;
       }
-      world.current.setGifts(latest.current, nextItem(latest.current));
+      world.current.setGifts(latest.current, nextItem(upcoming.current));
       world.current.setRunning(true);
       if (!latest.current.length && !introSeen()) {
         world.current.intro(GARDEN_INTRO, () => { remember(); logger.log('garden_intro_closed'); });
@@ -88,6 +97,8 @@ export function Garden({ on, step }: { on: boolean; step: StepId | 'end' }) {
       </div>
       <canvas ref={canvas} className="garden-canvas" hidden={!show} aria-hidden />
       <div ref={fx} className="garden-fx" hidden={!show} aria-live="polite" />
+      {pending && windowOk && <GiftReveal key={pending.item} gift={pending} webgl={!failed} onDone={reveal} />}
+      {show && <MoodGauge count={revealed.length} total={total} pulse={revealed.length} />}
       {on && !failed && (
         <button type="button" className="garden-toggle" onClick={toggle} aria-pressed={hidden}>
           {hidden ? 'Show Byte’s garden' : 'Hide garden'}

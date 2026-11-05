@@ -23,7 +23,7 @@ five experiments that unlock one by one (two contexts: a wrong pick gets one fee
 query & key, predict a removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
 and V output → explain the formula (AI tutor vs expert answer) → post-test → reflection survey (open questions). Tests: `docs/tests.md`.
 Reward: Byte, a robot dog in a garden band at the bottom, gets one gift per finished module (completion only,
-never correctness, identical across conditions; hidden during the welcome, consent and pre-test). He says hello once, cheers when a step opens or a gift arrives (effort only), and celebrates the end. Rationale: `tasks/todo.md`.
+never correctness, identical across conditions; hidden during the welcome, consent and pre-test). He says hello once, cheers when a step opens or a gift arrives (effort only), and celebrates the end. A finished module opens a window "Open the new gift for Byte": the box unwraps, the gift (bigger than the background) drops into the garden, Byte's vertical mood gauge rises one step (Bored → Overjoyed at 9/9, never down), the window names the gift's mood badge, and Byte does that gift's use moment. No window when the garden is hidden or on a phone. Rationale: `tasks/todo.md`; design: `docs/superpowers/specs/2026-11-05-byte-gifts-design.md`.
 Learning goals: LG1 explain Q/K/V, softmax, √d_k · LG2 compute a 3-token example ·
 LG3 predict weight shifts for an ambiguous word.
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BYTE_LINES, GIFTS, LAB_ORDER, STEP_ORDER } from '@/content/steps';
+import { badgeLabel } from '@/lib/mood';
 
 describe("Byte's gifts", () => {
   it('one gift per finished module: every lesson step but the welcome, consent, tests and survey, and every lab experiment', () => {
@@ -13,6 +14,15 @@ describe("Byte's gifts", () => {
   });
   it('every gift names what it is and what the module taught', () => {
     for (const g of GIFTS) { expect(g.name.length).toBeGreaterThan(2); expect(g.fact.length).toBeGreaterThan(10); }
+  });
+
+  it('every gift has its mood badge (emoji, short name, word), as designed', () => {
+    expect(GIFTS.map((g) => [g.item, g.badge.emoji, g.badge.label, g.badge.word])).toEqual([
+      ['tent', '🏕', 'Tent', 'Cosy'], ['ball', '🎾', 'Tennis ball', 'Playful'], ['tree', '🍎', 'Apple tree', 'Adventurous'],
+      ['cushion', '🛏', 'Dog bed', 'Rested'], ['flowers', '🦋', 'Tulips', 'Curious'], ['frisbee', '🥏', 'Frisbee', 'Energetic'],
+      ['pool', '💦', 'Paddling pool', 'Refreshed'], ['bone', '🦴', 'Big bone', 'Proud'], ['balloons', '🎈', 'Balloons', 'Overjoyed'],
+    ]);
+    expect(badgeLabel(GIFTS[1])).toBe('🎾 Tennis ball · Playful +1');
   });
 
   it("Byte's cheers praise effort, never correctness (they are the same whatever the learner answered)", () => {
