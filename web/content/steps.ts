@@ -37,16 +37,17 @@ export type PetItem = 'bowl' | 'tent' | 'ball' | 'tree' | 'cushion' | 'flowers' 
  * One gift for Byte per finished module, in lesson order. Completion only, never correctness, so it is
  * identical in both conditions. `fact` is what the module taught: the gift note says it back (informational reward).
  */
-export const GIFTS: { id: MissionId; title: string; item: PetItem; name: string; fact: string }[] = [
-  { id: 'vectors', title: 'Words as vectors', item: 'tent', name: 'a tent', fact: 'A word is a vector, and the dot product says how well two words match.' },
-  { id: 'contrast', title: 'Two contexts', item: 'ball', name: 'a tennis ball', fact: 'Same word, different context, different bars.' },
-  { id: 'qk', title: 'Query and key', item: 'tree', name: 'a tall apple tree to climb', fact: '"model" asks with its query, and every word answers with its key.' },
-  { id: 'remove', title: 'Remove a word', item: 'cushion', name: 'a dog bed', fact: 'Weights always share 100 %. When a word leaves, the others take its share.' },
-  { id: 'rule', title: 'Invent the rule', item: 'flowers', name: 'tulips', fact: 'A good rule keeps every weight positive and makes them add up to 100 %.' },
-  { id: 'softmax', title: 'Meet softmax', item: 'frisbee', name: 'a frisbee', fact: 'softmax raises e to each score, then divides by the sum.' },
-  { id: 'formula', title: 'The formula', item: 'lamp', name: 'a lamp post', fact: 'softmax(QKᵀ/√dₖ)·V: every part has a job.' },
-  { id: 'compute', title: 'Compute it yourself', item: 'bench', name: 'a garden bench', fact: 'You computed attention by hand, number by number.' },
-  { id: 'explain', title: 'Your explanation', item: 'balloons', name: 'party balloons', fact: 'You explained attention in your own words.' },
+/** `badge`: what the gift adds to Byte's mood (shown in the gift window and under the mood gauge). */
+export const GIFTS: { id: MissionId; title: string; item: PetItem; name: string; fact: string; badge: { emoji: string; label: string; word: string } }[] = [
+  { id: 'vectors', title: 'Words as vectors', item: 'tent', name: 'a tent', fact: 'A word is a vector, and the dot product says how well two words match.', badge: { emoji: '🏕', label: 'Tent', word: 'Cosy' } },
+  { id: 'contrast', title: 'Two contexts', item: 'ball', name: 'a tennis ball', fact: 'Same word, different context, different bars.', badge: { emoji: '🎾', label: 'Tennis ball', word: 'Playful' } },
+  { id: 'qk', title: 'Query and key', item: 'tree', name: 'a tall apple tree to climb', fact: '"model" asks with its query, and every word answers with its key.', badge: { emoji: '🍎', label: 'Apple tree', word: 'Adventurous' } },
+  { id: 'remove', title: 'Remove a word', item: 'cushion', name: 'a dog bed', fact: 'Weights always share 100 %. When a word leaves, the others take its share.', badge: { emoji: '🛏', label: 'Dog bed', word: 'Rested' } },
+  { id: 'rule', title: 'Invent the rule', item: 'flowers', name: 'tulips', fact: 'A good rule keeps every weight positive and makes them add up to 100 %.', badge: { emoji: '🦋', label: 'Tulips', word: 'Curious' } },
+  { id: 'softmax', title: 'Meet softmax', item: 'frisbee', name: 'a frisbee', fact: 'softmax raises e to each score, then divides by the sum.', badge: { emoji: '🥏', label: 'Frisbee', word: 'Energetic' } },
+  { id: 'formula', title: 'The formula', item: 'lamp', name: 'a lamp post', fact: 'softmax(QKᵀ/√dₖ)·V: every part has a job.', badge: { emoji: '💡', label: 'Lamp post', word: 'Safe' } },
+  { id: 'compute', title: 'Compute it yourself', item: 'bench', name: 'a garden bench', fact: 'You computed attention by hand, number by number.', badge: { emoji: '🪑', label: 'Bench', word: 'Relaxed' } },
+  { id: 'explain', title: 'Your explanation', item: 'balloons', name: 'party balloons', fact: 'You explained attention in your own words.', badge: { emoji: '🎈', label: 'Balloons', word: 'Overjoyed' } },
 ];
 
 /** What learners can do at the end (LG1–LG3), shown on the "Why" screen. */
@@ -55,6 +56,9 @@ export const GOALS = [
   'Work out the weights for three words.',
   'Say what Q, K, V, softmax and √dₖ do.',
 ];
+
+/** The window that opens when a module is finished (identical in both conditions). */
+export const GIFT_REVEAL = { title: 'Open the new gift for Byte', open: 'Open', done: 'Back to the lesson' };
 
 export const WELCOME = {
   title: 'How does a word know what it means?',
