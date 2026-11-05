@@ -32,6 +32,8 @@ export type EventType =
   | 'formula_part'
   | 'dk_change'
   | 'gift_received'
+  | 'gift_offered'
+  | 'gift_opened'
   | 'pet_petted'
   | 'pet_item_moved'
   | 'garden_toggled'
