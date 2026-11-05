@@ -38,7 +38,9 @@ type Step =
   | { walk: () => [number, number]; tx?: number; tz?: number; t?: number }
   | { kick: PetItem }
   | { pose: Pose; dur: number; face?: () => number; text?: string; t?: number }
-  | { climb: () => number; ty?: number };
+  | { climb: () => number; ty?: number }
+  | { act: () => void }                                 // an instant action
+  | { prop: (dt: number) => boolean };                  // animates something each frame until it returns true
 type Pose = 'stand' | 'walk' | 'eat' | 'sleep' | 'sit' | 'sniff' | 'happy' | 'climb';
 
 export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: { onPet: () => void; onMove: (item: PetItem) => void }, hype: readonly string[]): World {
@@ -210,6 +212,7 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
   function place(item: PetItem, drop: boolean) {
     const [x, z] = spot(item); const g = build(item); g.position.set(x, 0, z); g.userData.item = item; stage.add(g); things.set(item, g);
     if (drop && !REDUCE) { g.position.y = 300; tween(0.95, (k) => { g.position.y = 300 * (1 - bounce(k)); }); }
+    if (item === 'lamp' && !drop) lampOn(true);
   }
   function setWrapped(item: PetItem | null) {
     if (wrapped && wrappedItem !== item) { const box = wrapped; tween(0.35, (k) => { box.scale.setScalar(unit('gift') * Math.max(0.01, 1 - k)); box.rotation.y = k * 4; }, () => stage.remove(box)); wrapped = null; }
@@ -223,17 +226,113 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     const g = () => things.get(item)!.position; const side = () => (dog.x < g().x ? -1 : 1);
     switch (item) {
       case 'bowl': return [{ walk: () => [g().x - 18 + side() * 44, g().z + 8] }, { pose: 'eat', dur: 3.2, face: () => -side() * 1.3, text: 'nom nom' }];
-      case 'tent': return [{ walk: () => [g().x, g().z + 75] }, { walk: () => [g().x, g().z - 4] }, { pose: 'sleep', dur: 5, face: () => 0, text: 'z z z' }, { walk: () => [g().x, g().z + 75] }];
-      case 'ball': case 'frisbee': return [{ walk: () => [g().x + side() * 44, g().z] }, { kick: item }, { pose: 'stand', dur: 0.8 }, { walk: () => [g().x + side() * 44, g().z] }, { pose: 'happy', dur: 1.3, face: () => 0, text: 'got it!' }];
+      case 'tent': return [{ walk: () => [g().x, g().z + 2.6 * unit('tent')] }, { walk: () => [g().x, g().z - 4] }, { pose: 'sleep', dur: 5, face: () => 0, text: 'z z z' }, { walk: () => [g().x, g().z + 2.6 * unit('tent')] }];
+      case 'ball': case 'frisbee': return [{ walk: () => [g().x + side() * 1.1 * unit(item), g().z] }, { kick: item }, { pose: 'stand', dur: 0.8 }, { walk: () => [g().x + side() * 1.1 * unit(item), g().z] }, { pose: 'happy', dur: 1.3, face: () => 0, text: 'got it!' }];
       case 'tree': { const bx = () => g().x - 0.8 * unit('tree');
         return [{ walk: () => [bx(), g().z + 5] }, { climb: () => BRANCH }, { pose: 'sit', dur: 6, face: () => 0, text: 'What a view!' }, { climb: () => 0 }, { walk: () => [bx() - 70, g().z + 55] }]; }
       case 'cushion': return [{ walk: () => [g().x, g().z] }, { pose: 'sleep', dur: 5, face: () => 0, text: 'z z z' }];
-      case 'flowers': return [{ walk: () => [g().x + side() * 56, g().z + 8] }, { pose: 'sniff', dur: 2.6, face: () => -side() * 1.3, text: '✿' }];
-      case 'lamp': return [{ walk: () => [g().x + 34, g().z + 40] }, { pose: 'sit', dur: 4, face: () => 0, text: '…' }];
-      case 'bench': return [{ walk: () => [g().x + side() * 80, g().z + 45] }, { pose: 'sit', dur: 4, face: () => 0, text: '♪' }];
-      case 'balloons': return [{ walk: () => [g().x + 40, g().z + 50] }, { pose: 'happy', dur: 2, face: () => 0, text: 'party!' }];
+      case 'flowers': return [{ walk: () => [g().x + side() * 1.25 * unit('flowers'), g().z + 8] }, { pose: 'sniff', dur: 2.6, face: () => -side() * 1.3, text: '✿' }];
+      case 'lamp': return [{ walk: () => [g().x + 0.9 * unit('lamp'), g().z + 40] }, { pose: 'sit', dur: 4, face: () => 0, text: '…' }];
+      case 'bench': return [{ walk: () => [g().x + side() * 1.2 * unit('bench'), g().z + 45] }, { pose: 'sit', dur: 4, face: () => 0, text: '♪' }];
+      case 'balloons': return [{ walk: () => [g().x + 1.1 * unit('balloons'), g().z + 50] }, { pose: 'happy', dur: 2, face: () => 0, text: 'party!' }];
     }
   }
+
+  /* ---------- Use moments: what Byte does the first time he gets each gift (≤ 8 s each) ---------- */
+  const thing = (item: PetItem) => things.get(item)!;
+  const at = (item: PetItem) => thing(item).position;
+  const sideOf = (item: PetItem) => (dog.x < at(item).x ? -1 : 1);
+  /** A step that runs fn(k, dt) for `dur` seconds, k going 0 → 1. */
+  const timed = (dur: number, fn: (k: number, dt: number) => void): Step => { let s = 0; return { prop: (dt) => { s += dt; const k = Math.min(1, s / dur); fn(k, dt); return k >= 1; } }; };
+  /** Byte hops in an arc to a height and depth (onto the bench and back). */
+  const hop = (toY: () => number, toZ: () => number): Step => { let from: [number, number] | null = null;
+    return timed(0.55, (k) => { from ??= [dog.y, dog.z]; dog.y = from[0] + (toY() - from[0]) * k + Math.sin(k * Math.PI) * 28; dog.z = from[1] + (toZ() - from[1]) * k; }); };
+  /** Moves Byte toward x at running speed, inside a prop step. */
+  const runTo = (x: number, dt: number) => { const d = x - dog.x; if (Math.abs(d) > 4) { dog.x += Math.sign(d) * Math.min(Math.abs(d), SPEED * 1.6 * dt); dog.pose = 'walk'; dog.want = Math.sign(d) * 1.25; } else dog.pose = 'stand'; };
+
+  function lampOn(instant: boolean) {
+    const bulb = things.get('lamp')?.userData.bulb as THREE.Mesh | undefined; if (!bulb) return;
+    const m = bulb.material as THREE.MeshStandardMaterial, off = m.color.clone(), on = new THREE.Color('#ffd98a');
+    const set = (k: number) => { m.color.copy(off).lerp(on, k); m.emissive.copy(on); m.emissiveIntensity = 2 * k; };
+    if (instant) set(1); else tween(1, set);
+  }
+  function butterfly() {
+    const g = new THREE.Group(); const wing = new THREE.MeshStandardMaterial({ color: '#ff9f1c', side: THREE.DoubleSide, roughness: 0.6 });
+    [-1, 1].forEach((s) => { const pivot = new THREE.Group(); const w = new THREE.Mesh(new THREE.CircleGeometry(7, 12), wing); w.position.x = s * 7; pivot.add(w); g.add(pivot); });
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 10, 6), new THREE.MeshStandardMaterial({ color: '#2b2233' })));
+    return g;
+  }
+
+  function moment(item: PetItem): Step[] {
+    const u = unit(item), g = () => at(item);
+    switch (item) {
+      case 'bowl': return plan('bowl');
+      case 'tent': {   // crawls inside, pokes his head out of the open flaps, comes back out
+        const flaps = (thing('tent').userData.flaps ?? []) as THREE.Object3D[];
+        const door = (open: boolean) => timed(0.6, (k) => flaps.forEach((f, i) => { f.rotation.y = (i ? -1 : 1) * 1.2 * (open ? k : 1 - k); }));
+        return [{ walk: () => [g().x, g().z + 2.6 * u] }, door(true), { walk: () => [g().x, g().z + 0.3 * u] },
+          { pose: 'sit', dur: 2.4, face: () => 0, text: 'so cosy!' }, { walk: () => [g().x, g().z + 2.6 * u] }, door(false)];
+      }
+      case 'ball': {   // chases it, boops it with his nose, gets it
+        const beside = (): [number, number] => [g().x + sideOf('ball') * 1.1 * u, g().z];
+        return [{ walk: beside }, { kick: 'ball' }, { pose: 'stand', dur: 0.7 }, { walk: beside },
+          { pose: 'sniff', dur: 0.7, face: () => -sideOf('ball') * 1.3, text: 'boop!' }, { kick: 'ball' }, { pose: 'stand', dur: 0.7 },
+          { walk: beside }, { pose: 'happy', dur: 1.2, face: () => 0, text: 'got it!' }];
+      }
+      case 'tree': {   // climbs, an apple drops, he climbs down and eats it
+        const tree = thing('tree'), apple = tree.userData.apple as THREE.Object3D | undefined, bx = () => g().x - 0.8 * u;
+        const steps: Step[] = [{ walk: () => [bx(), g().z + 5] }, { climb: () => BRANCH }, { pose: 'sit', dur: 1.6, face: () => 0, text: 'What a view!' }];
+        if (!apple || apple.parent !== tree) return [...steps, { climb: () => 0 }];
+        let y0 = 0;
+        return [...steps,
+          { act: () => { stage.attach(apple); y0 = apple.position.y; } },
+          timed(0.9, (k) => { apple.position.y = y0 + (0.14 * u - y0) * bounce(k); }),
+          { climb: () => 0 }, { walk: () => [apple.position.x + 0.9 * u, apple.position.z + 8] },
+          { pose: 'eat', dur: 2, face: () => -1.3, text: 'crunch!' }, { act: () => { apple.visible = false; } }];
+      }
+      case 'cushion': {   // turns around twice, curls up, short nap
+        const c = () => g(), r = 0.45 * u;
+        const turn: Step[] = [0, 1, 2, 3].map((i) => ({ walk: () => [c().x + Math.cos(i * Math.PI / 2) * r, c().z + Math.sin(i * Math.PI / 2) * r] as [number, number] }));
+        return [...turn, ...turn.map((s) => ({ ...s })), { walk: () => [c().x, c().z] }, { pose: 'sleep', dur: 3, face: () => 0, text: 'z z z' }];
+      }
+      case 'flowers': {   // sniffs them; a butterfly flies out and he follows it
+        const bf = butterfly(); let x0 = 0, dir = 1;
+        return [{ walk: () => [g().x + sideOf('flowers') * 1.25 * u, g().z + 8] }, { pose: 'sniff', dur: 1.6, face: () => -sideOf('flowers') * 1.3, text: '✿' },
+          { act: () => { x0 = g().x; dir = x0 < 0 ? 1 : -1; bf.position.set(x0, 1.4 * u, g().z + 20); stage.add(bf); say('a butterfly!', 2); } },
+          timed(3.2, (k, dt) => {
+            bf.position.x = x0 + dir * k * 260 + Math.sin(k * 12) * 18; bf.position.y = 1.4 * u + Math.sin(k * 9) * 22;
+            bf.children.slice(0, 2).forEach((w, i) => { w.rotation.y = (i ? -1 : 1) * Math.abs(Math.sin(k * 60)) * 1.1; });
+            runTo(bf.position.x - dir * 50, dt);
+          }),
+          { act: () => tween(1, (k) => { bf.position.y += 5; bf.scale.setScalar(Math.max(0.05, 1 - k)); }, () => stage.remove(bf)) },
+          { pose: 'happy', dur: 1.2, face: () => 0, text: 'bye!' }];
+      }
+      case 'frisbee': {   // the frisbee flies; he runs, jumps and catches it
+        const fr = thing('frisbee'); let x0 = 0, dir = 1;
+        const mouth = () => fr.position.set(dog.x, (D.rig.position.y + 2.35) * S, dog.z + 1.3 * S);
+        return [{ walk: () => [g().x + sideOf('frisbee') * 1.2 * u, g().z] },
+          { act: () => { x0 = fr.position.x; dir = x0 > 0 ? -1 : 1; } },
+          timed(1.5, (k, dt) => { fr.position.x = x0 + dir * 240 * k; fr.position.y = Math.sin(k * Math.PI * 0.85) * 150; (fr.userData.spin as THREE.Object3D).rotation.y += dt * 14; runTo(x0 + dir * 240, dt); }),
+          { act: () => { jump(); dog.want = 0; } }, { pose: 'happy', dur: 0.01 },
+          timed(1.1, () => { mouth(); if (dog.pose !== 'happy') { dog.pose = 'happy'; say('caught it!', 1.3); } }),
+          timed(0.4, (k) => { fr.position.y *= 1 - k; })];
+      }
+      case 'lamp':   // the lamp switches on; he sits under it
+        return [{ walk: () => [g().x + 0.9 * u, g().z + 40] }, { act: () => lampOn(false) }, { pose: 'sit', dur: 3.2, face: () => 0, text: 'so warm' }];
+      case 'bench': {   // hops onto it and sits like a person
+        const front = () => g().z + 1.1 * u;
+        return [{ walk: () => [g().x, front()] }, hop(() => 0.64 * u, () => g().z), { pose: 'sit', dur: 3, face: () => 0, text: '♪ ♪' }, hop(() => 0, front)];
+      }
+      case 'balloons': {   // holds the strings and bounces, half floating, then lets them go home
+        const bl = thing('balloons'); let home: THREE.Vector3 | null = null;
+        return [{ walk: () => [g().x + 1.1 * u, g().z + 30] },
+          { act: () => { home = bl.position.clone(); dog.pose = 'happy'; say('wheee!', 3); } },
+          timed(3, (k) => { dog.y = Math.abs(Math.sin(k * Math.PI * 4)) * 26; bl.position.set(dog.x - 8, dog.y + 2.3 * S, dog.z + 6); }),
+          timed(0.8, (k) => { if (home) bl.position.lerp(home, k); dog.y *= 1 - k; })];
+      }
+    }
+  }
+
   function idleChoice() {
     if (REDUCE || hello) return;
     const items = [...things.keys()];
@@ -249,6 +348,8 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     if (!c) { dog.wait = 2.5 + Math.random() * 3.5; dog.pose = 'stand'; dog.want = 0; return; }
     if ('walk' in c) { [c.tx, c.tz] = c.walk(); dog.pose = 'walk'; }
     else if ('climb' in c) { c.ty = c.climb(); dog.pose = 'climb'; const tree = things.get('tree'); dog.want = tree && tree.position.x < dog.x ? -1.25 : 1.25; }
+    else if ('act' in c) { c.act(); dog.cur = null; }
+    else if ('prop' in c) { /* runs in frame() */ }
     else if ('kick' in c) { const b = things.get(c.kick); if (b) b.userData.vx = (dog.x < b.position.x ? 1 : -1) * 260; dog.mood = 1; dog.cur = null; }
     else { c.t = 0; dog.pose = c.pose; if (c.face) dog.want = c.face(); if (c.text) say(c.text, c.dur); }
   }
@@ -328,13 +429,15 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
     else if ('walk' in c) {
       const dx = c.tx! - dog.x, dz = c.tz! - dog.z, d = Math.hypot(dx, dz);
       if (d < 4 || REDUCE) { dog.x = c.tx!; dog.z = c.tz!; startNext(); }
-      else { const step = Math.min(d, SPEED * (1 + dog.mood * 0.6) * dt); dog.x += dx / d * step; dog.z += dz / d * step;
+      else { const step = Math.min(d, SPEED * (1 + dog.mood * 0.6) * (performance.now() < giftDue ? 2.4 : 1) * dt); dog.x += dx / d * step;   // runs during a gift's moment
+        dog.z += dz / d * step;
         dog.want = Math.abs(dx) > Math.abs(dz) * 0.8 ? Math.sign(dx) * 1.25 : dz < 0 ? Math.PI : 0; }
     } else if ('climb' in c) {
       const d = c.ty! - dog.y;
       if (Math.abs(d) < 3 || REDUCE) { dog.y = c.ty!; startNext(); }
       else { dog.y += Math.sign(d) * Math.min(Math.abs(d), SPEED * 0.7 * dt); dog.phase += dt * 9; }
     } else if ('pose' in c) { c.t = (c.t ?? 0) + dt; if (c.t >= c.dur) startNext(); }
+    else if ('prop' in c) { if (c.prop(dt)) startNext(); }
 
     dog.face += wrap(dog.want - dog.face) * Math.min(1, dt * 7);
     D.root.position.set(dog.x, dog.y, dog.z); D.root.rotation.y = dog.face;
@@ -390,9 +493,17 @@ export function createWorld(canvas: HTMLCanvasElement, fx: HTMLElement, hooks: {
       shown = gifts.length;
       setWrapped(next);
       const last = fresh.at(-1);
-      if (last && announce) { giftDue = performance.now() + 1500; setTimeout(() => {
-        dog.queue = [{ pose: 'happy', dur: 1.6, face: () => 0, text: hypeLine() }, ...plan(last.item)]; dog.cur = null; dog.mood = 1;
-      }, REDUCE ? 0 : 1000); }
+      if (last && announce) {
+        const busy = performance.now() < giftDue;
+        giftDue = performance.now() + 15000;                // no cheers over a moment; cleared when it ends
+        setTimeout(() => {
+          if (REDUCE) { if (last.item === 'lamp') lampOn(true); giftDue = 0; return; }
+          const run: Step[] = [{ pose: 'happy', dur: 1.2, face: () => 0, text: hypeLine() }, ...moment(last.item), { act: () => { giftDue = 0; } }];
+          if (busy && (dog.cur || dog.queue.length)) dog.queue.push(...run);
+          else { dog.queue = run; dog.cur = null; }
+          dog.mood = 1;
+        }, REDUCE ? 0 : 1000);
+      }
     },
     cheer(text) {
       if (hello || performance.now() < giftDue) return;
