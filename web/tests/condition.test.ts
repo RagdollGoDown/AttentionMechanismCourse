@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCondition, parseDebug, parsePid } from '@/lib/condition';
+import { parseCondition, parseDebug, parsePid, randomCondition } from '@/lib/condition';
 
 describe('parseCondition', () => {
   it.each([
@@ -39,4 +39,13 @@ describe('parsePid', () => {
     ['x'.repeat(41), null],
     [undefined, null],
   ] as const)('%j → %j', (input, expected) => expect(parsePid(input)).toBe(expected));
+});
+
+describe('randomCondition', () => {
+  it('splits 50/50', () => {
+    expect(randomCondition(() => 0)).toBe('ai');
+    expect(randomCondition(() => 0.4999)).toBe('ai');
+    expect(randomCondition(() => 0.5)).toBe('control');
+    expect(randomCondition(() => 0.9999)).toBe('control');
+  });
 });
