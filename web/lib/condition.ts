@@ -2,12 +2,17 @@ export type Condition = 'ai' | 'control';
 
 /**
  * `?condition=` value → Condition. Case-insensitive; first value wins.
- * Anything else → null: not assigned yet, the experimenter picks it after the pre-test (from its score).
+ * Anything else → null: the entry page then draws one at random (`randomCondition`).
  */
 export function parseCondition(value: string | readonly string[] | null | undefined): Condition | null {
   const v = Array.isArray(value) ? value[0] : value;
   const c = typeof v === 'string' ? v.trim().toLowerCase() : '';
   return c === 'ai' || c === 'control' ? c : null;
+}
+
+/** 50/50 draw, used when the link has no `?condition=`. */
+export function randomCondition(random: () => number = Math.random): Condition {
+  return random() < 0.5 ? 'ai' : 'control';
 }
 
 /** `?debug` → developer tools on. The flag's presence is enough; any value is ignored. */

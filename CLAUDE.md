@@ -17,8 +17,8 @@ ML / Modern NLP. Two versions:
 
 Only the adaptivity of the feedback differs. Keep everything else identical across conditions.
 
-Lesson flow (v2, Sep 30): welcome → pre-test (without `?condition=`, the experimenter assigns the condition
-from its score) → hook ("model" alone, then in context) → why attention → words as vectors + dot product → **sentence lab** hub on one sentence,
+Lesson flow (v2, Sep 30): welcome → pre-test (without `?condition=`, the condition is drawn at random, 50/50,
+on entry) → hook ("model" alone, then in context) → why attention → words as vectors + dot product → **sentence lab** hub on one sentence,
 five experiments that unlock one by one (two contexts: a wrong pick gets one feedback reply,
 query & key, predict a removal, invent the rule from bricks, meet softmax) → formula with clickable parts, √dₖ slider
 and V output → explain the formula (AI tutor vs expert answer) → post-test. Tests: `docs/tests.md`.
