@@ -5,7 +5,7 @@ Interactive lesson on scaled dot-product attention. Spec: `../docs/superpowers/s
 ## Run
     npm install
     npm run dev        # http://localhost:3000  (?condition=ai | ?condition=control; add &pid=P07 for a participant)
-                       # without ?condition, the experimenter assigns it after the pre-test, from the score
+                       # without ?condition, one is drawn at random (50/50) on entry
     npm test           # math, content invariants, tutor, API route
 
 ## AI tutor
